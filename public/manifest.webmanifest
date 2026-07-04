@@ -1,0 +1,13 @@
+{
+  "name": "FAAB - Founder as a Brand",
+  "short_name": "FAAB",
+  "description": "Turn founders into brands on LinkedIn.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0A66C2",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
