@@ -56,7 +56,7 @@ const STR = {
   nl: {
     connect: 'Verbinden',
     nav_home: 'Home', nav_founder: 'Founder', nav_strategy: 'Strategie', nav_topics: 'Onderwerpen', nav_post: 'Posts',
-    tagline: 'Van founders merken maken.', cta_funnel: 'Bekijk de funnel',
+    tagline: 'Keur branded posts over trending onderwerpen goed, in jouw stem.', cta_funnel: 'Bekijk de funnel',
     slogan_a: 'Van Founder naar ', slogan_b: 'Merk.',
     eb_service: 'De dienst', service_h2a: 'Jij bent het meest overtuigende', service_h2b: 'kanaal dat je bedrijf heeft.',
     service_lead: 'FAAB is een personal-brandingmotor voor founders, alleen voor LinkedIn. Het maakt van wie je bent en wat je denkt een gestage stroom posts die klinken als jij, reageren op wat nu speelt, en de reputatie bouwen waar je bedrijf op leunt.',
@@ -93,6 +93,9 @@ const STR = {
     s_generate: 'Genereer toon en keywords', s_generating: 'Genereren...', s_gen_err: 'Kon niet genereren. Probeer opnieuw.',
     s_tone_label: 'Tone of voice', s_tone_ph: 'Wordt hier gegenereerd, volledig bewerkbaar.',
     s_keywords: 'Keywords', s_add_kw_ph: 'Voeg een keyword toe, dan Enter', s_add: 'Toevoegen', s_suggestions: 'Suggesties',
+    s_li_h: 'Stem uit je LinkedIn', s_li_p: 'Laat FAAB je openbare LinkedIn-berichten en reacties analyseren om je toon te bepalen.',
+    s_li_ph: 'Naam of profiel-URL', s_li_btn: 'Analyseer mijn LinkedIn', s_li_analyzing: 'Analyseren...',
+    s_li_note: 'Gebruikt openbaar zichtbare berichten via web search. Geen persoonlijke login nodig.', s_li_err: 'Kon je LinkedIn niet analyseren. Probeer een profiel-URL.',
     s_tpl_h2: 'Templates', s_tpl_p: 'Poststructuren voor Onderwerpen en Posts. Haakjes zoals {hook} worden ingevuld.',
     s_new_tpl: 'Nieuwe template', s_upload_tpl: 'Template uploaden', s_new_tpl_name: 'Nieuwe template',
     t_h2: 'Trending onderwerpen', t_p: 'Nieuwstrends op je keywords, klaar om in te plannen als post.',
@@ -113,7 +116,7 @@ const STR = {
   en: {
     connect: 'Connect',
     nav_home: 'Home', nav_founder: 'Founder', nav_strategy: 'Strategy', nav_topics: 'Topics', nav_post: 'Post',
-    tagline: 'Turning founders into brands.', cta_funnel: 'Explore the funnel',
+    tagline: 'Approve branded social posts on trending topics, in your voice.', cta_funnel: 'Explore the funnel',
     slogan_a: 'Brand ', slogan_b: 'yourself.',
     eb_service: 'The service', service_h2a: 'You are the most convincing', service_h2b: 'channel your company has.',
     service_lead: 'FAAB is a personal branding engine for founders, built only for LinkedIn. It turns who you are and what you think into a steady stream of posts that sound like you, react to what is happening now, and build the reputation your company borrows from.',
@@ -150,6 +153,9 @@ const STR = {
     s_generate: 'Generate tone and keywords', s_generating: 'Generating...', s_gen_err: 'Could not generate. Try again.',
     s_tone_label: 'Tone of voice', s_tone_ph: 'Generated here, fully editable.',
     s_keywords: 'Keywords', s_add_kw_ph: 'Add a keyword, then Enter', s_add: 'Add', s_suggestions: 'Suggestions',
+    s_li_h: 'Voice from your LinkedIn', s_li_p: 'Let FAAB analyze your public LinkedIn posts and comments to determine your tone.',
+    s_li_ph: 'Name or profile URL', s_li_btn: 'Analyze my LinkedIn', s_li_analyzing: 'Analyzing...',
+    s_li_note: 'Uses publicly visible posts via web search. No personal login required.', s_li_err: 'Could not analyze your LinkedIn. Try a profile URL.',
     s_tpl_h2: 'Templates', s_tpl_p: 'Post structures used across Topics and Post. Placeholders like {hook} get filled in.',
     s_new_tpl: 'New template', s_upload_tpl: 'Upload template', s_new_tpl_name: 'New template',
     t_h2: 'Trending topics', t_p: 'News trends on your keywords, ready to turn into a scheduled post.',
@@ -290,8 +296,9 @@ export default function App() {
   const [menu, setMenu] = useState(false);
 
   const [founder, setFounder] = useState({ name: '', role: '', company: '', logo: '', companyDesc: '', personalityDesc: '' });
-  const [strategy, setStrategy] = useState({ phases: ['reach', 'engagement', 'followers'], goal: '', tone: '', keywords: [] });
+  const [strategy, setStrategy] = useState({ phases: ['reach', 'engagement', 'followers'], goal: '', tone: '', keywords: [], linkedin: '' });
   const [stratState, setStratState] = useState('idle');
+  const [liState, setLiState] = useState('idle');
   const [kwInput, setKwInput] = useState('');
   const [templates, setTemplates] = useState(() => makeTemplates('nl'));
   const [templatesDirty, setTemplatesDirty] = useState(false);
@@ -412,6 +419,28 @@ No markdown, no prose outside the JSON. Do not use em-dashes or en-dashes.`;
       }));
       setStratState('done');
     } catch (e) { setStratState('error'); }
+  }
+
+  async function analyzeLinkedIn() {
+    const q = (strategy.linkedin || '').trim();
+    if (!q) return;
+    setLiState('loading');
+    try {
+      const prompt = `Search the public web for the LinkedIn presence of: ${q}. Study how this person actually writes in their public posts and comments: sentence length, vocabulary, level of formality, humor, structure and recurring themes.
+
+Based on their real public writing style, return ONLY a JSON object:
+- tone: 3 to 4 short lines in ${langLabel} describing their tone of voice concretely (adjectives, sentence rhythm, point of view, one thing to lean into and one to avoid), matching how they already write.
+- keywords: array of 6 short content themes in ${langLabel} they already talk about or could credibly own.
+
+If public writing is limited, infer a sensible professional tone from what is available. No markdown, no prose outside the JSON. Do not use em-dashes or en-dashes.`;
+      const out = extractJson(textOf(await callClaude([{ role: 'user', content: prompt }], [{ type: 'web_search_20250305', name: 'web_search' }])), 'object');
+      setStrategy((p) => ({
+        ...p,
+        tone: stripDashes(String(out.tone || p.tone)),
+        keywords: Array.from(new Set([...(p.keywords || []), ...((out.keywords || []).map((k) => stripDashes(String(k))))])).slice(0, 10),
+      }));
+      setLiState('done');
+    } catch (e) { setLiState('error'); }
   }
 
   async function fetchNews() {
@@ -544,6 +573,7 @@ Write in ${langLabel}. Craft rules:
               strategy={strategy} setS={setS} togglePhase={togglePhase}
               kwInput={kwInput} setKwInput={setKwInput} addKeyword={addKeyword} toggleKeyword={toggleKeyword}
               onGenerate={generateStrategy} stratState={stratState}
+              onAnalyze={analyzeLinkedIn} liState={liState}
               templates={templates} editTemplates={editTemplates} tplUpRef={tplUpRef} onTplUpload={onTplUpload} />
           )}
           {tab === 'topics' && (
@@ -731,7 +761,7 @@ function FounderTab({ t, founder, setF, logoRef, onLogo }) {
 }
 
 // ---------- Strategy tab ----------
-function StrategyTab({ t, lang, strategy, setS, togglePhase, kwInput, setKwInput, addKeyword, toggleKeyword, onGenerate, stratState, templates, editTemplates, tplUpRef, onTplUpload }) {
+function StrategyTab({ t, lang, strategy, setS, togglePhase, kwInput, setKwInput, addKeyword, toggleKeyword, onGenerate, stratState, onAnalyze, liState, templates, editTemplates, tplUpRef, onTplUpload }) {
   return (
     <div className="stack">
       <section className="panel">
@@ -756,6 +786,21 @@ function StrategyTab({ t, lang, strategy, setS, togglePhase, kwInput, setKwInput
         <div className="gen-row">
           <button className="btn btn-blue" onClick={onGenerate} disabled={stratState === 'loading'}><I.spark width="17" height="17" /> {stratState === 'loading' ? t('s_generating') : t('s_generate')}</button>
           {stratState === 'error' && <span className="mini-err">{t('s_gen_err')}</span>}
+        </div>
+        <div className="li-source">
+          <div className="li-source-head">
+            <span className="li-source-ic"><I.linkedin width="18" height="18" /></span>
+            <div>
+              <div className="li-source-t">{t('s_li_h')}</div>
+              <div className="li-source-p">{t('s_li_p')}</div>
+            </div>
+          </div>
+          <div className="kw-add">
+            <input className="input" value={strategy.linkedin} onChange={(e) => setS('linkedin', e.target.value)} placeholder={t('s_li_ph')} />
+            <button className="btn btn-blue sm" onClick={onAnalyze} disabled={liState === 'loading'}><I.radar width="16" height="16" /> {liState === 'loading' ? t('s_li_analyzing') : t('s_li_btn')}</button>
+          </div>
+          <div className="li-source-note">{t('s_li_note')}</div>
+          {liState === 'error' && <span className="mini-err">{t('s_li_err')}</span>}
         </div>
         <Field label={t('s_tone_label')}><textarea className="input textarea" rows={4} value={strategy.tone} onChange={(e) => setS('tone', e.target.value)} placeholder={t('s_tone_ph')} /></Field>
         <div className="field-label mt">{t('s_keywords')}</div>
@@ -1018,7 +1063,7 @@ const CSS = `
 .hero { padding-top:96px; padding-bottom:90px; text-align:center; }
 .slogan { font-family:'Fraunces',serif; font-weight:400; font-size:clamp(52px,11vw,132px); line-height:0.95; letter-spacing:-0.03em; margin:0; text-wrap:balance; }
 .slogan .hl { font-style:italic; color:var(--navy); }
-.tagline { font-family:'Fraunces',serif; font-style:italic; font-size:clamp(18px,3vw,26px); color:var(--mut); margin:22px 0 34px; }
+.tagline { font-family:'Fraunces',serif; font-style:italic; font-size:clamp(18px,3vw,26px); color:var(--mut); margin:22px auto 34px; max-width:30ch; line-height:1.3; text-wrap:balance; }
 .hero-cta { display:flex; gap:13px; justify-content:center; flex-wrap:wrap; }
 
 .sect { padding-top:88px; }
@@ -1115,6 +1160,12 @@ const CSS = `
 .kw-add .input { flex:1; }
 .gen-row { display:flex; align-items:center; gap:14px; margin-bottom:16px; flex-wrap:wrap; }
 .mini-err { color:var(--mag); font-size:13px; }
+.li-source { background:var(--blue-tint); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:16px; display:flex; flex-direction:column; gap:12px; }
+.li-source-head { display:flex; gap:12px; align-items:flex-start; }
+.li-source-ic { width:34px; height:34px; border-radius:9px; background:var(--blue); color:#fff; display:inline-flex; align-items:center; justify-content:center; flex:none; }
+.li-source-t { font-family:'Fraunces',serif; font-weight:500; font-size:16px; }
+.li-source-p { color:var(--mut); font-size:13px; line-height:1.5; margin-top:2px; }
+.li-source-note { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--dim); letter-spacing:0.02em; }
 
 .mini-funnel { display:flex; flex-direction:column; gap:8px; }
 .mf-seg { display:flex; align-items:center; gap:14px; padding:14px 18px; border:1px solid var(--line); border-radius:12px; background:var(--paper); color:var(--ink); text-align:left; transition:border-color .2s, background .2s; }
