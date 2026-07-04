@@ -123,6 +123,15 @@ const STR = {
     b_upload_doc: 'Document uploaden', b_tone_h: 'Basistekst tone of voice', b_tone_p: 'Deze tekst stuurt alle gegenereerde content. Volledig bewerkbaar.',
     b_regen_tone: 'Hergenereer uit kanalen', b_tone_examples: 'Voorbeelden per gekoppeld kanaal', b_no_channels: 'Nog geen kanalen gekoppeld.',
     b_gen_example: 'Genereer voorbeeld', b_socials: 'Gekoppelde kanalen',
+    v_h: 'Tone of voice profiel', v_p: 'Een blijvende stem, opgebouwd uit je openbare posts en eigen voorbeelden. Hergebruikt bij elke post.',
+    v_analyze: 'Analyseer mijn stem', v_reanalyze: 'Vernieuw analyse', v_analyzing: 'Analyseren...',
+    v_stage_collect: 'Bronnen verzamelen...', v_stage_search: 'Zoeken op', v_stage_synth: 'Stem samenstellen...',
+    v_base: 'Basisstem', v_base_p: 'De kern die op elk kanaal geldt.', v_traits: 'Kenmerken',
+    v_accents: 'Accent per kanaal', v_accents_p: 'Hoe de basisstem verschuift per kanaal.',
+    v_samples: 'Eigen voorbeeldposts', v_samples_p: 'Plak een paar eigen posts per kanaal. Optioneel, maar maakt de analyse scherper.',
+    v_sample_ph: 'Plak hier een paar posts van dit kanaal...',
+    v_updated: 'Bijgewerkt', v_sources: 'bronnen', v_none: 'Nog geen stem geanalyseerd. Koppel kanalen of plak voorbeelden en analyseer.',
+    v_err: 'Analyse mislukte. Probeer opnieuw of plak eigen voorbeelden.',
     s_h: 'Strategie per funnelfase', s_p: 'Doel en aanpak per fase. Bewerk vrij.',
     s_goal: 'Doel', s_approach: 'Aanpak', s_gen: 'Genereer strategie', s_generating: 'Genereren...',
     s_keywords: 'Keywords', s_add_kw_ph: 'Voeg een keyword toe, dan Enter', s_add: 'Toevoegen',
@@ -183,6 +192,15 @@ const STR = {
     b_upload_doc: 'Upload document', b_tone_h: 'Tone of voice base text', b_tone_p: 'This text drives all generated content. Fully editable.',
     b_regen_tone: 'Regenerate from channels', b_tone_examples: 'Examples per connected channel', b_no_channels: 'No channels connected yet.',
     b_gen_example: 'Generate example', b_socials: 'Connected channels',
+    v_h: 'Tone of voice profile', v_p: 'A lasting voice, built from your public posts and your own examples. Reused for every post.',
+    v_analyze: 'Analyze my voice', v_reanalyze: 'Refresh analysis', v_analyzing: 'Analyzing...',
+    v_stage_collect: 'Collecting sources...', v_stage_search: 'Searching on', v_stage_synth: 'Composing voice...',
+    v_base: 'Base voice', v_base_p: 'The core that holds on every channel.', v_traits: 'Traits',
+    v_accents: 'Accent per channel', v_accents_p: 'How the base voice shifts per channel.',
+    v_samples: 'Your example posts', v_samples_p: 'Paste a few of your own posts per channel. Optional, but sharpens the analysis.',
+    v_sample_ph: 'Paste a few posts from this channel here...',
+    v_updated: 'Updated', v_sources: 'sources', v_none: 'No voice analyzed yet. Connect channels or paste examples and analyze.',
+    v_err: 'Analysis failed. Try again or paste your own examples.',
     s_h: 'Strategy per funnel stage', s_p: 'Goal and approach per stage. Edit freely.',
     s_goal: 'Goal', s_approach: 'Approach', s_gen: 'Generate strategy', s_generating: 'Generating...',
     s_keywords: 'Keywords', s_add_kw_ph: 'Add a keyword, then Enter', s_add: 'Add',
@@ -396,6 +414,15 @@ const emptyBrand = () => ({
   company: '', role: '', name: '', website: '', logo: '', description: '', audience: '',
   personality: '', colors: [], docs: [], tone: '', socials: { linkedin: '', instagram: '', x: '', facebook: '' },
   channelExamples: {},
+  voice: emptyVoice(),
+});
+const emptyVoice = () => ({
+  base: '',
+  traits: [],
+  perChannel: { linkedin: '', instagram: '', x: '', facebook: '' },
+  samples: { linkedin: '', instagram: '', x: '', facebook: '' },
+  sources: [],
+  updated: 0,
 });
 const emptyStrategy = () => ({
   keywords: [],
@@ -449,7 +476,7 @@ export default function App() {
 
   function applyData(d) {
     if (d.user) setUser(d.user);
-    if (d.brand) setBrand({ ...emptyBrand(), ...d.brand, socials: { ...emptyBrand().socials, ...(d.brand.socials || {}) } });
+    if (d.brand) setBrand({ ...emptyBrand(), ...d.brand, socials: { ...emptyBrand().socials, ...(d.brand.socials || {}) }, voice: { ...emptyVoice(), ...(d.brand.voice || {}), perChannel: { ...emptyVoice().perChannel, ...((d.brand.voice || {}).perChannel || {}) }, samples: { ...emptyVoice().samples, ...((d.brand.voice || {}).samples || {}) } } });
     if (d.strategy) setStrategy({ ...emptyStrategy(), ...d.strategy, perPhase: { ...emptyStrategy().perPhase, ...(d.strategy.perPhase || {}) } });
     if (Array.isArray(d.topics)) setTopics(d.topics);
     if (Array.isArray(d.drafts)) setDrafts(d.drafts);
@@ -528,23 +555,68 @@ No markdown. Do not use em-dashes or en-dashes.`;
 
   // ----- AI: tone of voice from connected channels + brand -----
   const [toneState, setToneState] = useState('idle');
+  const [toneStage, setToneStage] = useState('');
   async function generateTone() {
     setToneState('loading');
+    setToneStage('collect');
     try {
-      const socials = Object.entries(brand.socials).filter(([, v]) => v.trim()).map(([k, v]) => `${channelById(k).name}: ${v}`).join('\n');
-      const docs = brand.docs.map((d) => d.text).join('\n').slice(0, 3000);
-      const prompt = `You are a senior brand voice strategist. Determine the tone of voice for this founder, based on how they actually write publicly.
+      const connected = CHANNELS.filter((c) => (brand.socials[c.id] || '').trim() || (brand.voice.samples[c.id] || '').trim());
+      const docs = brand.docs.map((d) => d.text).join('\n').slice(0, 2500);
+      const sources = [];
+      const evidence = [];
 
-${socials ? 'Connected public profiles (search the web for their public posts and comments, study sentence length, vocabulary, formality, humor and recurring themes):\n' + socials + '\n' : ''}Company: ${brand.company || 'n/a'}
-Description: ${brand.description || 'n/a'}
+      // 1) Gather public writing per connected channel (web search), plus pasted samples
+      for (const ch of connected) {
+        const handle = (brand.socials[ch.id] || '').trim();
+        const sample = (brand.voice.samples[ch.id] || '').trim();
+        let found = '';
+        if (handle) {
+          setToneStage('search:' + ch.id);
+          const sp = `Search the public web for how this person writes on ${ch.name}: ${handle}.
+Author: ${brand.name || 'the founder'}${brand.company ? ' at ' + brand.company : ''}.
+Find their real public posts and comments. Summarize concrete style evidence: typical opening lines, sentence length, vocabulary, level of formality, humor, structure, punctuation habits and recurring themes. Quote at most a few very short phrases as evidence. Return 4 to 6 dense lines of observations, no preamble, no markdown. Do not use em-dashes or en-dashes.`;
+          try {
+            found = stripDashes(textOf(await callClaude([{ role: 'user', content: sp }], WEB_TOOL))).slice(0, 1200);
+            if (found) sources.push({ channel: ch.id, kind: 'web', at: Date.now() });
+          } catch (e) { /* skip channel on failure */ }
+        }
+        const block = [found, sample ? 'Pasted example posts by the author:\n' + sample.slice(0, 1500) : ''].filter(Boolean).join('\n');
+        if (sample) sources.push({ channel: ch.id, kind: 'sample', at: Date.now() });
+        if (block) evidence.push({ id: ch.id, name: ch.name, block });
+      }
+
+      // 2) Synthesize base voice + per-channel accents in one structured pass
+      setToneStage('synth');
+      const evidenceText = evidence.length
+        ? evidence.map((e) => `=== ${e.name} ===\n${e.block}`).join('\n\n')
+        : 'No public writing found. Infer a sensible professional founder voice from the brand context below.';
+      const synth = `You are a senior brand voice strategist. Build a lasting tone of voice profile for this founder from the evidence.
+
+Author: ${brand.name || 'the founder'}${brand.role ? ', ' + brand.role : ''}${brand.company ? ' at ' + brand.company : ''}
+Brand: ${brand.description || 'n/a'}
 Audience: ${brand.audience || 'n/a'}
 Personality: ${brand.personality || 'n/a'}
 ${docs ? 'Brand documents excerpt:\n' + docs + '\n' : ''}
-Write a tone of voice base text in ${langName(lang)}: 4 to 6 short lines covering voice adjectives, sentence rhythm, point of view, what to lean into and what to avoid. Concrete and usable, matching how this person already writes. Return only the text, no JSON, no markdown headers. Do not use em-dashes or en-dashes.`;
-      const text = stripDashes(textOf(await callClaude([{ role: 'user', content: prompt }], socials ? WEB_TOOL : undefined)));
-      setBrand((p) => ({ ...p, tone: text }));
+Writing evidence:
+${evidenceText}
+
+Return ONLY a JSON object in ${langName(lang)}, no markdown, with:
+- "base": 4 to 6 short lines describing the core voice that holds across every channel (voice adjectives, sentence rhythm, point of view, what to lean into, what to avoid). Concrete and usable, matching how this person already writes.
+- "traits": array of 5 to 8 very short style tags (single words or two words).
+- "channels": object with keys for exactly these channels present in the evidence: ${connected.map((c) => c.id).join(', ') || 'none'}. Each value is 1 to 2 short lines describing how the base voice shifts on that specific channel (length, format, energy), never repeating the base. If a channel has no evidence, omit it.
+Do not use em-dashes or en-dashes.`;
+      const out = extractJson(textOf(await callClaude([{ role: 'user', content: synth }])), 'object');
+      const base = stripDashes(String(out.base || ''));
+      const traits = Array.isArray(out.traits) ? out.traits.map((x) => stripDashes(String(x))).slice(0, 8) : [];
+      const chOut = out.channels && typeof out.channels === 'object' ? out.channels : {};
+      setBrand((p) => {
+        const per = { ...p.voice.perChannel };
+        CHANNELS.forEach((c) => { if (chOut[c.id]) per[c.id] = stripDashes(String(chOut[c.id])); });
+        return { ...p, tone: base || p.tone, voice: { ...p.voice, base: base || p.voice.base, traits: traits.length ? traits : p.voice.traits, perChannel: per, sources, updated: Date.now() } };
+      });
       setToneState('done');
     } catch (e) { setToneState('error'); }
+    finally { setToneStage(''); }
   }
 
   // ----- AI: example post per connected channel -----
@@ -620,7 +692,8 @@ Titles in ${langName(lang)} for keyword items; reddit titles stay as found. No m
 Author: ${brand.name || 'the founder'}${brand.role ? ', ' + brand.role : ''}${brand.company ? ' at ' + brand.company : ''}.
 Brand: ${brand.description || 'n/a'} Audience: ${brand.audience || 'n/a'}
 Tone of voice (match exactly):
-${brand.tone || 'personal, clear, first person'}
+${brand.voice.base || brand.tone || 'personal, clear, first person'}
+${brand.voice.perChannel[channel] ? 'Channel accent for ' + ch.name + ' (apply on top of the base voice): ' + brand.voice.perChannel[channel] : ''}
 Channel conventions for ${ch.name}: ${ch.tone.en}
 Funnel stage: ${ph.t.en}. Stage intent: ${ph.intent}.${per.goal ? ' Stage goal: ' + per.goal : ''}${per.approach ? ' Approach: ' + per.approach : ''}
 ${subject ? 'Subject to react to: ' + subject : ''}${angle ? '\nAngle: ' + angle : ''}
@@ -698,14 +771,14 @@ Write in ${langName(lang)}. Rules:
       {view === 'home' && <Home t={t} lang={lang} go={go} />}
       {view.startsWith('channel:') && <ChannelPage t={t} lang={lang} id={view.split(':')[1]} go={go} />}
       {view === 'onboarding' && (
-        <Onboarding t={t} lang={lang} user={user} brand={brand} setB={setB} setSocial={setSocial}
+        <Onboarding t={t} lang={lang} user={user} brand={brand} setB={setB} setSocial={setSocial} setBrand={setBrand}
           auth={auth} scanWebsite={scanWebsite} scanState={scanState}
-          generateTone={generateTone} toneState={toneState} go={go} />
+          generateTone={generateTone} toneState={toneState} toneStage={toneStage} go={go} />
       )}
       {view === 'cms' && (
         <CMS t={t} lang={lang} user={user} brand={brand} setB={setB} setBrand={setBrand} setSocial={setSocial}
           strategy={strategy} setStrategy={setStrategy}
-          generateTone={generateTone} toneState={toneState} generateExampleFor={generateExampleFor}
+          generateTone={generateTone} toneState={toneState} toneStage={toneStage} generateExampleFor={generateExampleFor}
           generateStrategy={generateStrategy} stratState={stratState}
           topics={topics} topicState={topicState} researchTopics={researchTopics} addLinkTopic={addLinkTopic}
           genPost={genPost} drafts={drafts} saveDraft={saveDraft} deleteDraft={deleteDraft}
@@ -964,7 +1037,7 @@ function ChannelPage({ t, lang, id, go }) {
 }
 
 // ---------- Onboarding ----------
-function Onboarding({ t, lang, user, brand, setB, setSocial, auth, scanWebsite, scanState, generateTone, toneState, go }) {
+function Onboarding({ t, lang, user, brand, setB, setSocial, setBrand, auth, scanWebsite, scanState, generateTone, toneState, toneStage, go }) {
   const [mode, setMode] = useState(null); // null | 'login' | 'register'
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -991,9 +1064,10 @@ function Onboarding({ t, lang, user, brand, setB, setSocial, auth, scanWebsite, 
     const res = await auth(m, username, password, name);
     if (!res.ok) { setAuthErr(t(res.err === 'exists' ? 'ob_auth_exists' : 'ob_auth_wrong')); return; }
   }
+  const setSample = (id, v) => setBrand((p) => ({ ...p, voice: { ...p.voice, samples: { ...p.voice.samples, [id]: v } } }));
   async function saveAll() {
     setSaving(true);
-    try { if (!brand.tone) await generateTone(); } catch (e) { /* tone optional */ }
+    try { if (!brand.voice.base) await generateTone(); } catch (e) { /* voice optional */ }
     setSaving(false);
     go('cms');
   }
@@ -1053,6 +1127,16 @@ function Onboarding({ t, lang, user, brand, setB, setSocial, auth, scanWebsite, 
                 </div>
               ))}
             </div>
+            <div className="field-label mt">{t('v_samples')}</div>
+            <p className="li-source-note">{t('v_samples_p')}</p>
+            <div className="v-sample-grid">
+              {CHANNELS.map((c) => (
+                <div className="v-sample" key={c.id}>
+                  <div className="v-sample-head" style={{ color: c.c }}>{c.ic({ width: 16, height: 16 })} {c.name}</div>
+                  <textarea className="input textarea" rows={2} value={brand.voice.samples[c.id]} onChange={(e) => setSample(c.id, e.target.value)} placeholder={t('v_sample_ph')} />
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="ob-sec">
@@ -1091,7 +1175,7 @@ function Onboarding({ t, lang, user, brand, setB, setSocial, auth, scanWebsite, 
 
           <div className="li-source-note">{t('ob_tone_note')}</div>
           <div className="wiz-nav"><span />
-            <button className="btn btn-blue" disabled={saving || toneState === 'loading'} onClick={saveAll}>{saving || toneState === 'loading' ? t('ob_saving') : t('ob_save')} <I.arrow width="18" height="18" /></button>
+            <button className="btn btn-blue" disabled={saving || toneState === 'loading'} onClick={saveAll}>{toneState === 'loading' ? (toneStage === 'synth' ? t('v_stage_synth') : t('v_analyzing')) : (saving ? t('ob_saving') : t('ob_save'))} <I.arrow width="18" height="18" /></button>
           </div>
         </section>
       )}
@@ -1142,10 +1226,18 @@ function CMS(props) {
 }
 
 // ----- Brand personality tab -----
-function CmsBrand({ t, brand, setB, setBrand, setSocial, generateTone, toneState, generateExampleFor }) {
+function CmsBrand({ t, lang, brand, setB, setBrand, setSocial, generateTone, toneState, toneStage, generateExampleFor }) {
   const logoRef = useRef(null);
   const docRef = useRef(null);
   const [exLoading, setExLoading] = useState('');
+  const setSample = (id, v) => setBrand((p) => ({ ...p, voice: { ...p.voice, samples: { ...p.voice.samples, [id]: v } } }));
+  const setAccent = (id, v) => setBrand((p) => ({ ...p, voice: { ...p.voice, perChannel: { ...p.voice.perChannel, [id]: v } } }));
+  const stageLabel = () => {
+    if (toneStage === 'collect') return t('v_stage_collect');
+    if (toneStage && toneStage.startsWith('search:')) return t('v_stage_search') + ' ' + channelById(toneStage.split(':')[1]).name;
+    if (toneStage === 'synth') return t('v_stage_synth');
+    return t('v_analyzing');
+  };
   function onLogo(e) {
     const f = e.target.files && e.target.files[0]; if (!f) return;
     const r = new FileReader(); r.onload = () => setB('logo', String(r.result)); r.readAsDataURL(f);
@@ -1229,12 +1321,63 @@ function CmsBrand({ t, brand, setB, setBrand, setSocial, generateTone, toneState
       </section>
 
       <section className="panel">
-        <div className="panel-head"><h2>{t('b_tone_h')}</h2><p>{t('b_tone_p')}</p></div>
-        <textarea className="input textarea" rows={6} value={brand.tone} onChange={(e) => setB('tone', e.target.value)} />
-        <div className="gen-row" style={{ marginTop: 12 }}>
-          <button className="btn btn-blue sm" onClick={generateTone} disabled={toneState === 'loading'}><I.refresh width="15" height="15" /> {toneState === 'loading' ? t('ob_generating') : t('b_regen_tone')}</button>
-          {toneState === 'error' && <span className="mini-err">{t('err_generic')}</span>}
+        <div className="panel-head">
+          <h2>{t('v_h')}</h2><p>{t('v_p')}</p>
         </div>
+
+        <div className="v-samples">
+          <div className="field-label">{t('v_samples')}</div>
+          <p className="li-source-note">{t('v_samples_p')}</p>
+          <div className="v-sample-grid">
+            {CHANNELS.map((c) => (
+              <div className="v-sample" key={c.id}>
+                <div className="v-sample-head" style={{ color: c.c }}>{c.ic({ width: 16, height: 16 })} {c.name}</div>
+                <textarea className="input textarea" rows={3} value={brand.voice.samples[c.id]} onChange={(e) => setSample(c.id, e.target.value)} placeholder={t('v_sample_ph')} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="gen-row" style={{ marginTop: 14 }}>
+          <button className="btn btn-blue sm" onClick={generateTone} disabled={toneState === 'loading'}>
+            <I.radar width="15" height="15" /> {toneState === 'loading' ? stageLabel() : (brand.voice.updated ? t('v_reanalyze') : t('v_analyze'))}
+          </button>
+          {brand.voice.updated > 0 && toneState !== 'loading' && (
+            <span className="v-meta">{t('v_updated')} {new Date(brand.voice.updated).toLocaleDateString(lang === 'nl' ? 'nl-NL' : 'en-GB')} &middot; {brand.voice.sources.length} {t('v_sources')}</span>
+          )}
+          {toneState === 'error' && <span className="mini-err">{t('v_err')}</span>}
+        </div>
+
+        {!brand.voice.base && toneState !== 'loading' && <p className="li-source-note mt">{t('v_none')}</p>}
+
+        {brand.voice.base && (
+          <div className="v-profile">
+            <div className="v-block">
+              <div className="field-label">{t('v_base')}</div>
+              <p className="li-source-note">{t('v_base_p')}</p>
+              <textarea className="input textarea" rows={6} value={brand.voice.base} onChange={(e) => setBrand((p) => ({ ...p, voice: { ...p.voice, base: e.target.value }, tone: e.target.value }))} />
+              {brand.voice.traits.length > 0 && (
+                <div className="v-traits">
+                  {brand.voice.traits.map((tr, i) => <span className="v-trait" key={i}>{tr}</span>)}
+                </div>
+              )}
+            </div>
+
+            <div className="v-block">
+              <div className="field-label">{t('v_accents')}</div>
+              <p className="li-source-note">{t('v_accents_p')}</p>
+              <div className="v-accent-grid">
+                {CHANNELS.map((c) => (
+                  <div className="v-accent" key={c.id} style={{ '--cc': c.c }}>
+                    <div className="v-accent-head" style={{ color: c.c }}>{c.ic({ width: 16, height: 16 })} {c.name}</div>
+                    <textarea className="input textarea" rows={2} value={brand.voice.perChannel[c.id]} onChange={(e) => setAccent(c.id, e.target.value)} placeholder="..." />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="field-label mt">{t('b_tone_examples')}</div>
         {connected.length === 0 && <p className="li-source-note">{t('b_no_channels')}</p>}
         <div className="ex-cards">
@@ -1243,7 +1386,7 @@ function CmsBrand({ t, brand, setB, setBrand, setSocial, generateTone, toneState
               <div className="ex-card-head" style={{ color: c.c }}>{c.ic({ width: 18, height: 18 })} {c.name}</div>
               {brand.channelExamples[c.id]
                 ? <p className="ex-copy">{brand.channelExamples[c.id]}</p>
-                : <button className="btn btn-ghost sm" onClick={() => genEx(c.id)} disabled={exLoading === c.id}><I.spark width="14" height="14" /> {exLoading === c.id ? t('ob_generating') : t('b_gen_example')}</button>}
+                : <button className="btn btn-ghost sm" onClick={() => genEx(c.id)} disabled={exLoading === c.id || !brand.voice.base}><I.spark width="14" height="14" /> {exLoading === c.id ? t('ob_generating') : t('b_gen_example')}</button>}
             </div>
           ))}
         </div>
@@ -1809,6 +1952,16 @@ const CSS = `
 /* tone / examples */
 .tone-box { background:var(--blue-tint); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:16px; }
 .tone-text { margin:8px 0 0; font-size:14.5px; line-height:1.6; white-space:pre-wrap; }
+.v-samples { margin-top:4px; }
+.v-sample-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:8px; }
+.v-sample-head, .v-accent-head { display:flex; align-items:center; gap:7px; font-weight:600; font-size:13px; margin-bottom:6px; }
+.v-meta { font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--dim); }
+.v-profile { margin-top:18px; display:flex; flex-direction:column; gap:20px; }
+.v-block { }
+.v-traits { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.v-trait { font-family:'IBM Plex Mono',monospace; font-size:12px; padding:5px 11px; border-radius:999px; background:var(--blue-tint); color:var(--blue); border:1px solid var(--line); }
+.v-accent-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:8px; }
+.v-accent { border-left:3px solid var(--cc); padding-left:12px; }
 .ex-cards { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-top:12px; }
 .ex-card { background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:16px; }
 .ex-card-head { display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:14px; margin-bottom:8px; }
