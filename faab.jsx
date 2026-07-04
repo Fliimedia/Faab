@@ -18,6 +18,7 @@ const I = {
   message: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M8 9h8M8 13h5"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-5l-5 3v-3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3z"/></svg>),
   coin: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="9"/><path d="M14.8 9A2 2 0 0 0 13 8h-2a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4h-2a2 2 0 0 1-1.8-1"/><path d="M12 6v2m0 8v2"/></svg>),
   heart: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M19.5 12.572L12 20l-7.5-7.428A5 5 0 1 1 12 6.006a5 5 0 1 1 7.5 6.572"/></svg>),
+  send: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>),
   calendar: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M16 3v4M8 3v4M4 11h16"/></svg>),
   tag: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M7.5 7.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0-2 0"/><path d="M3 6v5.172a2 2 0 0 0 .586 1.414l7.71 7.71a2.41 2.41 0 0 0 3.408 0l5.592-5.592a2.41 2.41 0 0 0 0-3.408l-7.71-7.71A2 2 0 0 0 11.172 3H6a3 3 0 0 0-3 3"/></svg>),
   spark: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>),
@@ -84,18 +85,17 @@ const Logo = {
 const STR = {
   nl: {
     start_brand: 'Start je merk', cta_how: 'Hoe het werkt',
-    hero_slogan: 'Be the spokesperson for your brand.',
+    hero_slogan: 'Wees de woordvoerder van je merk.',
     nav_home: 'Home', nav_how: 'Hoe het werkt', nav_channels: 'Kanalen', nav_cms: 'CMS', nav_start: 'Start je merk',
     eb_funnel: 'De funnel', funnel_h2a: 'Van bereik tot ambassadeurschap,', funnel_h2b: 'in vijf fasen.',
     fn_example: 'Voorbeeldpost op',
-    eb_flow: 'Hoe het werkt', flow_h2: 'Personal branding for founders',
-    flow_lede: 'Simply approve or reject posts. Our AI signals trending niche topics and prepares ready made posts for you, based on your style, voice, personality and goals.',
+    eb_flow: 'Hoe het werkt', flow_h2: 'Personal branding voor founders',
+    flow_lede: 'Keur posts simpelweg goed of af. Onze AI signaleert trending onderwerpen in jouw niche en zet kant-en-klare posts voor je klaar, op basis van jouw stijl, stem, persoonlijkheid en doelen.',
     eb_channels: 'Kanalen', channels_h2a: 'Een stem,', channels_h2b: 'vier kanalen.',
-    eb_control: 'Menselijke controle', control_h2: 'AI schrijft. Jij beslist.',
-    ctrl1_t: 'Jij bepaalt de stem', ctrl1_d: 'Toon, thema\u0027s en templates stel jij in, niet stiekem aangeleerd.',
-    ctrl2_t: 'Jij keurt elk onderwerp goed', ctrl2_d: 'FAAB stelt voor, kiest nooit voor je.',
-    ctrl3_t: 'Jij bewerkt elke draft', ctrl3_d: 'Elke post opent in een editor met live preview.',
-    ctrl4_t: 'Jij drukt op publiceren', ctrl4_d: 'FAAB plaatst nooit namens jou.',
+    eb_control: 'De human review', control_h2: 'Drie momenten waarop jij beslist.',
+    rv1_t: 'Onderwerpkeuze', rv1_d: 'AI signaleert trending onderwerpen in jouw niche. Jij bepaalt welke doorgaan.',
+    rv2_t: 'De draft', rv2_d: 'Elke post staat klaar als preview, in jouw stem. Bewerk vrij of laat staan.',
+    rv3_t: 'Akkoord', rv3_d: 'Goedkeuren, aanpassen of afwijzen. Zonder jouw akkoord gaat niets live.',
     eb_contact: 'Contact', contact_h2a: 'Praat met ons over', contact_h2b: 'jouw founder-merk.',
     foot_tag: 'Founders zijn hun merk.', foot_app: 'App', foot_learn: 'Kanalen', foot_contact: 'Contact', foot_the_funnel: 'De funnel',
     foot_base: 'FAAB. Gebouwd voor founders die met intentie posten.',
@@ -155,11 +155,10 @@ const STR = {
     eb_flow: 'How it works', flow_h2: 'Personal branding for founders',
     flow_lede: 'Simply approve or reject posts. Our AI signals trending niche topics and prepares ready made posts for you, based on your style, voice, personality and goals.',
     eb_channels: 'Channels', channels_h2a: 'One voice,', channels_h2b: 'four channels.',
-    eb_control: 'Human control', control_h2: 'AI drafts. You decide.',
-    ctrl1_t: 'You define the voice', ctrl1_d: 'Tone, themes and templates are set by you, never learned behind your back.',
-    ctrl2_t: 'You approve every topic', ctrl2_d: 'FAAB suggests, it never selects for you.',
-    ctrl3_t: 'You edit every draft', ctrl3_d: 'Each post opens in an editor with live preview.',
-    ctrl4_t: 'You press publish', ctrl4_d: 'FAAB never posts on your behalf.',
+    eb_control: 'The human review', control_h2: 'Three moments where you decide.',
+    rv1_t: 'Topic selection', rv1_d: 'AI signals trending topics in your niche. You decide which ones go ahead.',
+    rv2_t: 'The draft', rv2_d: 'Every post is ready as a preview, in your voice. Edit freely or leave it.',
+    rv3_t: 'Approval', rv3_d: 'Approve, adjust or reject. Nothing goes live without your sign-off.',
     eb_contact: 'Contact', contact_h2a: 'Talk to us about', contact_h2b: 'your founder brand.',
     foot_tag: 'Founders are their brand.', foot_app: 'App', foot_learn: 'Channels', foot_contact: 'Contact', foot_the_funnel: 'The funnel',
     foot_base: 'FAAB. Built for founders who post with intent.',
@@ -413,12 +412,6 @@ export default function App() {
   const [intro, setIntro] = useState(true);
   const [view, setView] = useState('home'); // home | channel:<id> | onboarding | cms
   const [menu, setMenu] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 90);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   const [user, setUser] = useState(null); // { email, name }
   const [brand, setBrand] = useState(emptyBrand());
@@ -670,10 +663,7 @@ Write in ${langName(lang)}. Rules:
 
       <header className="topbar">
         <button className="brand" onClick={() => go('home')} aria-label="FAAB home">
-          <span className={'brand-swap' + (scrolled ? ' brand-scrolled' : '')}>
-            {Logo.mark({ className: 'brand-mark' })}
-            {Logo.wordmark({ className: 'brand-logo' })}
-          </span>
+          {Logo.wordmark({ className: 'brand-logo' })}
         </button>
         <button className={'burger' + (menu ? ' burger-on' : '')} onClick={() => setMenu((m) => !m)} aria-label="Menu" aria-expanded={menu}>
           <span className="burger-bar b1" /><span className="burger-bar b2" /><span className="burger-bar b3" />
@@ -800,11 +790,14 @@ function FunnelViz({ t, lang }) {
 }
 
 function Home({ t, lang, go }) {
+  const [prevCh, setPrevCh] = useState('linkedin');
+  const pc = channelById(prevCh);
   return (
     <main>
       <section className="hero wrap">
         <div className="hero-ripple" aria-hidden="true"><span /><span /><span /><span /></div>
         {Logo.mark({ className: 'hero-mark' })}
+        {Logo.subline({ className: 'hero-subline' })}
         <p className="tagline">{t('hero_slogan')}</p>
         <div className="hero-cta">
           <button className="btn btn-blue" onClick={() => go('onboarding')}>{t('start_brand')} <I.arrow width="18" height="18" /></button>
@@ -840,26 +833,32 @@ function Home({ t, lang, go }) {
       <section id="channels" className="sect wrap">
         <div className="eyebrow">{t('eb_channels')}</div>
         <h2 className="h2">{t('channels_h2a')}<br className="bk" /> {t('channels_h2b')}</h2>
-        <div className="ch-grid">
+        <div className="ch-tabs" role="tablist">
           {CHANNELS.map((c) => (
-            <button className="ch-card" key={c.id} onClick={() => go('channel:' + c.id)}>
-              <div className="ch-post">
-                <div className="ch-post-top">
-                  <span className="ch-ava" style={{ background: c.c }}>{Logo.mark({ width: 18, height: 18 })}</span>
-                  <div><div className="ch-post-name">Founder</div><div className="ch-post-sub">{c.name}</div></div>
-                </div>
-                <p className="ch-post-text">{c.sample[lang]}</p>
-              </div>
-              <span className="ch-label" style={{ color: c.c }}>{c.ic({ width: 22, height: 22 })} {c.name} <I.arrow width="15" height="15" /></span>
+            <button key={c.id} role="tab" aria-selected={prevCh === c.id}
+              className={'fch' + (prevCh === c.id ? ' fch-on' : '')} style={{ '--cc': c.c }}
+              onClick={() => setPrevCh(c.id)} aria-label={c.name}>
+              {c.ic({ width: 18, height: 18 })}
             </button>
           ))}
         </div>
-        <div className="ch-icons">
-          {CHANNELS.map((c) => (
-            <button className="ch-icon" key={c.id} onClick={() => go('channel:' + c.id)} aria-label={c.name} style={{ '--cc': c.c }}>
-              {c.ic({ width: 24, height: 24 })}
-            </button>
-          ))}
+        <div className="ch-stage">
+          <div className="ch-post ch-post-big" style={{ '--cc': pc.c }}>
+            <div className="ch-post-top">
+              <span className="ch-ava" style={{ background: pc.c }}>{Logo.mark({ width: 20, height: 20 })}</span>
+              <div><div className="ch-post-name">Founder</div><div className="ch-post-sub">@founder &middot; {pc.name}</div></div>
+              <span className="ch-post-badge" style={{ color: pc.c }}>{pc.ic({ width: 18, height: 18 })}</span>
+            </div>
+            <p className="ch-post-text">{pc.sample[lang]}</p>
+            <div className="ch-post-actions">
+              <span><I.heart width="16" height="16" /> 128</span>
+              <span><I.message width="16" height="16" /> 32</span>
+              <span><I.send width="16" height="16" /> 11</span>
+            </div>
+          </div>
+          <button className="ch-open" style={{ color: pc.c }} onClick={() => go('channel:' + pc.id)}>
+            {pc.name} <I.arrow width="15" height="15" />
+          </button>
         </div>
       </section>
 
@@ -869,13 +868,47 @@ function Home({ t, lang, go }) {
             <span className="ctrl-ic"><I.shield width="26" height="26" /></span>
             <div><div className="eyebrow">{t('eb_control')}</div><h2 className="h2">{t('control_h2')}</h2></div>
           </div>
-          <div className="ctrl-grid">
-            {[[I.user, 'ctrl1_t', 'ctrl1_d'], [I.eye, 'ctrl2_t', 'ctrl2_d'], [I.edit, 'ctrl3_t', 'ctrl3_d'], [I.megaphone, 'ctrl4_t', 'ctrl4_d']].map(([ic, tk, dk]) => (
-              <div className="ctrl-item" key={tk}>
-                <span className="ctrl-item-ic">{ic({ width: 19, height: 19 })}</span>
-                <div><h3>{t(tk)}</h3><p>{t(dk)}</p></div>
-              </div>
-            ))}
+          <div className="rv-grid">
+            <div className="rv-card">
+              <svg className="rv-visual" viewBox="0 0 150 92" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="14" y="10" width="122" height="18" rx="6" opacity="0.35" />
+                <line x1="26" y1="19" x2="86" y2="19" opacity="0.35" />
+                <rect x="14" y="37" width="122" height="18" rx="6" className="rv-blue" />
+                <line x1="26" y1="46" x2="86" y2="46" className="rv-blue" />
+                <circle cx="122" cy="46" r="7" className="rv-blue" />
+                <path d="M119 46l2.2 2.2 3.8 -4.4" className="rv-blue" />
+                <rect x="14" y="64" width="122" height="18" rx="6" opacity="0.35" />
+                <line x1="26" y1="73" x2="86" y2="73" opacity="0.35" />
+              </svg>
+              <h3>{t('rv1_t')}</h3><p>{t('rv1_d')}</p>
+            </div>
+            <div className="rv-card">
+              <svg className="rv-visual" viewBox="0 0 150 92" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="26" y="10" width="98" height="72" rx="9" opacity="0.55" />
+                <circle cx="42" cy="26" r="6" opacity="0.55" />
+                <line x1="54" y1="23" x2="92" y2="23" opacity="0.55" />
+                <line x1="54" y1="30" x2="80" y2="30" opacity="0.35" />
+                <line x1="38" y1="46" x2="112" y2="46" opacity="0.35" />
+                <line x1="38" y1="55" x2="104" y2="55" opacity="0.35" />
+                <line x1="38" y1="64" x2="96" y2="64" className="rv-blue" />
+                <path d="M116 74l14 -14 6 6 -14 14 -7.5 1.5z" className="rv-blue" fill="var(--white)" />
+              </svg>
+              <h3>{t('rv2_t')}</h3><p>{t('rv2_d')}</p>
+            </div>
+            <div className="rv-card">
+              <svg className="rv-visual" viewBox="0 0 150 92" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="26" y="8" width="98" height="52" rx="9" opacity="0.55" />
+                <circle cx="42" cy="22" r="6" opacity="0.55" />
+                <line x1="54" y1="19" x2="92" y2="19" opacity="0.55" />
+                <line x1="38" y1="38" x2="112" y2="38" opacity="0.35" />
+                <line x1="38" y1="47" x2="98" y2="47" opacity="0.35" />
+                <rect x="34" y="68" width="38" height="16" rx="8" className="rv-fill" stroke="none" />
+                <path d="M46 76l3.5 3.5 8 -8" stroke="#fff" />
+                <rect x="80" y="68" width="38" height="16" rx="8" opacity="0.55" />
+                <path d="M94 72l8 8 M102 72l-8 8" opacity="0.55" />
+              </svg>
+              <h3>{t('rv3_t')}</h3><p>{t('rv3_d')}</p>
+            </div>
           </div>
         </div>
       </section>
@@ -1569,12 +1602,8 @@ const CSS = `
 /* topbar */
 .topbar { display:flex; align-items:center; justify-content:space-between; padding:14px 26px; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:60; background:rgba(255,255,255,0.9); backdrop-filter:blur(14px); }
 .brand { display:flex; align-items:center; gap:12px; background:none; border:none; padding:0; color:var(--ink); }
-.brand-swap { position:relative; display:block; width:100px; height:24px; }
-.brand-mark { position:absolute; left:0; top:50%; transform:translateY(-50%); height:20px; width:auto; aspect-ratio:1719.8/784; opacity:1; transition:opacity .25s ease; }
-.brand-logo { position:absolute; left:0; top:50%; transform:translateY(-50%); height:19px; width:auto; aspect-ratio:3636/748; opacity:0; transition:opacity .25s ease; }
-.brand-scrolled .brand-mark { opacity:0; }
-.brand-scrolled .brand-logo { opacity:1; }
-.foot .brand-logo.sm { position:static; transform:none; height:18px; opacity:1; }
+.brand-logo { height:19px; width:auto; aspect-ratio:3636/748; display:block; }
+.brand-logo.sm { height:17px; }
 
 /* burger */
 .burger { position:relative; width:40px; height:40px; border:1px solid var(--line); border-radius:12px; background:var(--white); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; }
@@ -1618,6 +1647,7 @@ const CSS = `
 /* hero */
 .hero { position:relative; overflow:hidden; padding-top:90px; padding-bottom:90px; text-align:center; display:flex; flex-direction:column; align-items:center; }
 .hero-mark { position:relative; z-index:1; width:min(138px,31vw); height:auto; color:var(--ink); animation:fadeUp .8s ease both; }
+.hero-subline { position:relative; z-index:1; width:min(210px,47vw); height:auto; color:var(--mut); margin-top:16px; animation:fadeUp .8s ease .15s both; }
 .hero-ripple { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; }
 .hero-ripple span { position:absolute; width:340px; height:340px; border-radius:50%; border:1.5px solid var(--paper); box-shadow:0 0 0 1px rgba(23,23,23,0.015) inset; animation:ripple 7s ease-out infinite; }
 .hero-ripple span:nth-child(2) { animation-delay:1.75s; }
@@ -1665,30 +1695,34 @@ const CSS = `
 .flow-arrow { display:flex; align-items:center; justify-content:center; color:var(--dim); flex:none; }
 
 /* channels */
-.ch-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
-.ch-card { background:none; border:none; padding:0; text-align:left; display:flex; flex-direction:column; gap:12px; }
-.ch-post { background:var(--white); border:1px solid var(--line); border-radius:16px; padding:16px; box-shadow:0 10px 26px rgba(23,23,23,0.05); transition:transform .16s ease, border-color .2s; width:100%; }
-.ch-card:hover .ch-post { transform:translateY(-3px); border-color:var(--blue); }
+.ch-tabs { display:flex; gap:10px; margin-bottom:20px; }
+.ch-stage { display:flex; flex-direction:column; align-items:center; gap:16px; }
+.ch-post-big { background:var(--white); border:1px solid var(--line); border-top:3px solid var(--cc); border-radius:18px; padding:20px; box-shadow:0 16px 40px rgba(23,23,23,0.07); width:min(460px,100%); animation:fadeUp .35s ease both; }
+.ch-post-badge { margin-left:auto; }
 .ch-post-top { display:flex; gap:10px; align-items:center; margin-bottom:10px; }
 .ch-ava { width:34px; height:34px; border-radius:50%; color:#fff; display:inline-flex; align-items:center; justify-content:center; flex:none; }
 .ch-post-name { font-weight:600; font-size:13.5px; }
 .ch-post-sub { color:var(--dim); font-size:11.5px; }
-.ch-post-text { margin:0; font-size:13.5px; line-height:1.5; color:var(--ink); }
-.ch-label { display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:14.5px; }
-.ch-icons { display:flex; gap:14px; justify-content:center; margin-top:34px; }
-.ch-icon { width:54px; height:54px; border-radius:16px; border:1px solid var(--line); background:var(--white); color:var(--cc); display:inline-flex; align-items:center; justify-content:center; transition:transform .15s ease, border-color .2s, background .2s; }
-.ch-icon:hover { transform:translateY(-2px); border-color:var(--cc); background:var(--paper); }
+.ch-post-text { margin:0; font-size:14.5px; line-height:1.6; color:var(--ink); }
+.ch-post-actions { display:flex; gap:22px; margin-top:14px; padding-top:12px; border-top:1px solid var(--line); color:var(--dim); font-size:12.5px; }
+.ch-post-actions span { display:inline-flex; align-items:center; gap:6px; }
+.ch-open { display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:14.5px; background:none; border:none; }
+
+
+
 
 /* control */
 .ctrl { background:var(--blue-tint); border:1px solid var(--line); border-radius:24px; padding:40px; }
 .ctrl-head { display:flex; gap:18px; align-items:center; margin-bottom:20px; }
 .ctrl-ic { display:inline-flex; width:56px; height:56px; align-items:center; justify-content:center; border-radius:16px; background:var(--blue); color:#fff; flex:none; }
 .ctrl-head .h2 { margin:8px 0 0; }
-.ctrl-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
-.ctrl-item { display:flex; gap:14px; background:var(--white); border:1px solid var(--line); border-radius:14px; padding:18px; }
-.ctrl-item-ic { display:inline-flex; width:36px; height:36px; align-items:center; justify-content:center; border-radius:10px; background:var(--blue-soft); color:var(--blue); flex:none; }
-.ctrl-item h3 { font-family:'Fraunces',serif; font-weight:500; font-size:16.5px; margin:0 0 5px; }
-.ctrl-item p { color:var(--mut); font-size:13.5px; line-height:1.55; margin:0; }
+.rv-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.rv-card { background:var(--white); border:1px solid var(--line); border-radius:16px; padding:20px; display:flex; flex-direction:column; gap:6px; }
+.rv-visual { width:100%; max-width:190px; height:auto; color:var(--ink); margin:0 auto 14px; display:block; }
+.rv-visual .rv-blue { stroke:var(--blue); }
+.rv-visual .rv-fill { fill:var(--blue); }
+.rv-card h3 { font-family:'Fraunces',serif; font-weight:500; font-size:16.5px; margin:0; }
+.rv-card p { color:var(--mut); font-size:13.5px; line-height:1.55; margin:0; }
 
 /* contact */
 .contact { display:grid; grid-template-columns:1.1fr 0.9fr; gap:36px; align-items:center; }
@@ -1888,8 +1922,7 @@ const CSS = `
   .hero { padding-top:48px; padding-bottom:52px; }
   .flow { flex-direction:column; }
   .flow-arrow { transform:rotate(90deg); padding:4px 0; }
-  .ch-grid { grid-template-columns:repeat(2,1fr); }
-  .ctrl { padding:24px; } .ctrl-grid { grid-template-columns:1fr; }
+  .ctrl { padding:24px; } .rv-grid { grid-template-columns:1fr; }
   .contact { grid-template-columns:1fr; }
   .content-grid { grid-template-columns:1fr; }
   .scan-grid { grid-template-columns:1fr; }
@@ -1914,7 +1947,6 @@ const CSS = `
   .cal-cell { min-height:50px; padding:6px; }
   .bk { display:none; }
 }
-@media (max-width:560px) { .ch-grid { grid-template-columns:1fr; } }
 @media (prefers-reduced-motion:reduce) {
   .btn-blue:hover, .ch-icon:hover, .cms-fab:hover { transform:none; }
   .menu, .menu-item, .burger-bar, .fold-chev { transition:none; }
