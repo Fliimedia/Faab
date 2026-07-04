@@ -84,11 +84,11 @@ const Logo = {
 // ---------- i18n ----------
 const STR = {
   nl: {
-    start_brand: 'Start je merk', cta_how: 'Hoe het werkt',
+    start_brand: 'Bouw je strategie', cta_how: 'Hoe het werkt',
     hero_slogan: 'Wees de woordvoerder van je merk.',
-    nav_home: 'Home', nav_how: 'Hoe het werkt', nav_channels: 'Kanalen', nav_cms: 'CMS', nav_start: 'Start je merk',
+    nav_home: 'Home', nav_how: 'Hoe het werkt', nav_channels: 'Kanalen', nav_cms: 'CMS', nav_start: 'Bouw je strategie',
     eb_funnel: 'De funnel', funnel_h2a: 'Van bereik tot ambassadeurschap,', funnel_h2b: 'in vijf fasen.',
-    fn_example: 'Voorbeeldpost op',
+    funnel_lede: 'Elke post krijgt een plek in de klantreis: zo werkt je content gericht van eerste kennismaking naar ambassadeur.',
     eb_flow: 'Hoe het werkt', flow_h2: 'Personal branding voor founders',
     flow_lede: 'Keur posts simpelweg goed of af. Onze AI signaleert trending onderwerpen in jouw niche en zet kant-en-klare posts voor je klaar, op basis van jouw stijl, stem, persoonlijkheid en doelen.',
     eb_channels: 'Kanalen', channels_h2a: 'Een stem,', channels_h2b: 'vier kanalen.',
@@ -98,7 +98,6 @@ const STR = {
     rv3_t: 'Akkoord', rv3_d: 'Goedkeuren, aanpassen of afwijzen. Zonder jouw akkoord gaat niets live.',
     eb_contact: 'Contact', contact_h2a: 'Praat met ons over', contact_h2b: 'jouw founder-merk.',
     foot_tag: 'Founders zijn hun merk.', foot_app: 'App', foot_learn: 'Kanalen', foot_contact: 'Contact', foot_the_funnel: 'De funnel',
-    foot_base: 'FAAB. Gebouwd voor founders die met intentie posten.',
     lang_word: 'Taal',
     // onboarding
     ob_title: 'Start je merk', ob_ind_account: 'Account', ob_ind_channels: 'Kanalen', ob_ind_brand: 'Merk',
@@ -147,11 +146,11 @@ const STR = {
     ch_back: 'Alle kanalen', ch_cta: 'Start je merk op', example_word: 'Voorbeeld',
   },
   en: {
-    start_brand: 'Start your brand', cta_how: 'How it works',
+    start_brand: 'Build your strategy', cta_how: 'How it works',
     hero_slogan: 'Be the spokesperson for your brand.',
-    nav_home: 'Home', nav_how: 'How it works', nav_channels: 'Channels', nav_cms: 'CMS', nav_start: 'Start your brand',
+    nav_home: 'Home', nav_how: 'How it works', nav_channels: 'Channels', nav_cms: 'CMS', nav_start: 'Build your strategy',
     eb_funnel: 'The funnel', funnel_h2a: 'From reach to ambassadorship,', funnel_h2b: 'in five stages.',
-    fn_example: 'Example post on',
+    funnel_lede: 'Every post gets a place in the customer journey: your content works purposefully from first touch to ambassador.',
     eb_flow: 'How it works', flow_h2: 'Personal branding for founders',
     flow_lede: 'Simply approve or reject posts. Our AI signals trending niche topics and prepares ready made posts for you, based on your style, voice, personality and goals.',
     eb_channels: 'Channels', channels_h2a: 'One voice,', channels_h2b: 'four channels.',
@@ -161,7 +160,6 @@ const STR = {
     rv3_t: 'Approval', rv3_d: 'Approve, adjust or reject. Nothing goes live without your sign-off.',
     eb_contact: 'Contact', contact_h2a: 'Talk to us about', contact_h2b: 'your founder brand.',
     foot_tag: 'Founders are their brand.', foot_app: 'App', foot_learn: 'Channels', foot_contact: 'Contact', foot_the_funnel: 'The funnel',
-    foot_base: 'FAAB. Built for founders who post with intent.',
     lang_word: 'Language',
     ob_title: 'Start your brand', ob_ind_account: 'Account', ob_ind_channels: 'Channels', ob_ind_brand: 'Brand',
     ob_choice_h: 'How do you want to start?',
@@ -216,11 +214,11 @@ const WD = { nl: ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'], en: ['Mo', 'Tu', 'W
 
 // ---------- Funnel (with icons) ----------
 const FUNNEL = [
-  { id: 'reach', n: '01', ic: I.megaphone, t: { nl: 'Bereik', en: 'Reach' }, d: { nl: 'Kom in beeld bij de juiste mensen.', en: 'Get in front of the right people.' }, intent: 'maximize reach and get discovered by new people', c: '#6BA3E0', w: 100 },
-  { id: 'engagement', n: '02', ic: I.message, t: { nl: 'Interactie', en: 'Engagement' }, d: { nl: 'Zet views om in gesprek.', en: 'Turn views into conversation.' }, intent: 'spark comments, replies and conversation', c: '#3E86D6', w: 84 },
-  { id: 'followers', n: '03', ic: I.users, t: { nl: 'Volgers', en: 'Followers' }, d: { nl: 'Bouw een publiek dat terugkomt.', en: 'Build an audience that returns.' }, intent: 'give a clear reason to follow and come back', c: '#0A66C2', w: 68 },
-  { id: 'revenue', n: '04', ic: I.coin, t: { nl: 'Omzet', en: 'Revenue' }, d: { nl: 'Zet vertrouwen om in pipeline.', en: 'Turn trust into pipeline.' }, intent: 'build trust that softly leads to inbound and sales', c: '#0B4E96', w: 52 },
-  { id: 'ambassadorship', n: '05', ic: I.heart, t: { nl: 'Ambassadeurschap', en: 'Ambassadorship' }, d: { nl: 'Volgers verspreiden je merk.', en: 'Followers carry your brand.' }, intent: 'make existing fans want to share and advocate', c: '#06356C', w: 38 },
+  { id: 'reach', n: '01', ic: I.megaphone, t: { nl: 'Bereik', en: 'Reach' }, d: { nl: 'Kom in beeld bij de juiste mensen.', en: 'Get in front of the right people.' }, intent: 'maximize reach and get discovered by new people', j: { nl: 'Nieuwe mensen ontdekken je. In deze fase draait alles om zichtbaarheid: herkenbare, deelbare posts die je naam in de tijdlijn van je doelgroep zetten.', en: 'New people discover you. This stage is all about visibility: recognizable, shareable posts that put your name in your audience\u0027s timeline.' }, c: '#6BA3E0', w: 100 },
+  { id: 'engagement', n: '02', ic: I.message, t: { nl: 'Interactie', en: 'Engagement' }, d: { nl: 'Zet views om in gesprek.', en: 'Turn views into conversation.' }, intent: 'spark comments, replies and conversation', j: { nl: 'Kijkers worden deelnemers. Je posts nodigen uit tot reacties en gesprek, en elk gesprek vergroot je bereik en geloofwaardigheid.', en: 'Viewers become participants. Your posts invite comments and conversation, and every conversation grows your reach and credibility.' }, c: '#3E86D6', w: 84 },
+  { id: 'followers', n: '03', ic: I.users, t: { nl: 'Volgers', en: 'Followers' }, d: { nl: 'Bouw een publiek dat terugkomt.', en: 'Build an audience that returns.' }, intent: 'give a clear reason to follow and come back', j: { nl: 'Wie vaker waarde ziet, wil niets meer missen. Consistentie en herkenbaarheid zetten losse kijkers om in vaste volgers.', en: 'Whoever sees value repeatedly does not want to miss out. Consistency and recognizability turn loose viewers into loyal followers.' }, c: '#0A66C2', w: 68 },
+  { id: 'revenue', n: '04', ic: I.coin, t: { nl: 'Omzet', en: 'Revenue' }, d: { nl: 'Zet vertrouwen om in pipeline.', en: 'Turn trust into pipeline.' }, intent: 'build trust that softly leads to inbound and sales', j: { nl: 'Vertrouwen wordt omzet. Volgers die je expertise kennen, veranderen in aanvragen en klanten zodra je aanbod voorbijkomt.', en: 'Trust becomes revenue. Followers who know your expertise turn into inquiries and clients the moment your offer passes by.' }, c: '#0B4E96', w: 52 },
+  { id: 'ambassadorship', n: '05', ic: I.heart, t: { nl: 'Ambassadeurschap', en: 'Ambassadorship' }, d: { nl: 'Volgers verspreiden je merk.', en: 'Followers carry your brand.' }, intent: 'make existing fans want to share and advocate', j: { nl: 'Klanten en fans dragen je merk verder. Ze delen, taggen en bevelen aan, en brengen zo de volgende lichting bereik binnen.', en: 'Clients and fans carry your brand onward. They share, tag and recommend, bringing in the next wave of reach.' }, c: '#06356C', w: 38 },
 ];
 const phaseById = (id) => FUNNEL.find((f) => f.id === id) || FUNNEL[0];
 
@@ -412,6 +410,13 @@ export default function App() {
   const [intro, setIntro] = useState(true);
   const [view, setView] = useState('home'); // home | channel:<id> | onboarding | cms
   const [menu, setMenu] = useState(false);
+  const [bursts, setBursts] = useState([]);
+  function onBgTap(e) {
+    if (e.target.closest('button, a, input, textarea, select, label, [role="button"], .panel, .fnote, .ch-post-big, .cms, .topbar, .menu')) return;
+    const id = uid();
+    setBursts((b) => [...b.slice(-2), { id, x: e.clientX, y: e.clientY }]);
+    setTimeout(() => setBursts((b) => b.filter((x) => x.id !== id)), 1700);
+  }
 
   const [user, setUser] = useState(null); // { email, name }
   const [brand, setBrand] = useState(emptyBrand());
@@ -652,8 +657,13 @@ Write in ${langName(lang)}. Rules:
   ];
 
   return (
-    <div className="faab">
+    <div className="faab" onClick={onBgTap}>
       <style>{CSS}</style>
+
+      <div className="ripple-layer" aria-hidden="true">
+        <div className="ripple-center"><span /><span /><span /><span /></div>
+        {bursts.map((b) => <span key={b.id} className="ripple-burst" style={{ left: b.x + 'px', top: b.y + 'px' }} />)}
+      </div>
 
       {intro && (
         <div className="intro" onClick={() => setIntro(false)}>
@@ -728,7 +738,6 @@ Write in ${langName(lang)}. Rules:
             </div>
           </div>
           <div className="foot-base">
-            <span>{t('foot_base')}</span>
             <div className="lang-toggle" role="group" aria-label={t('lang_word')}>
               <button className={lang === 'nl' ? 'lang-on' : ''} onClick={() => setLang('nl')}>NL</button>
               <button className={lang === 'en' ? 'lang-on' : ''} onClick={() => setLang('en')}>EN</button>
@@ -743,11 +752,9 @@ Write in ${langName(lang)}. Rules:
 // ---------- Home ----------
 function FunnelViz({ t, lang }) {
   const [phase, setPhase] = useState('reach');
-  const [exCh, setExCh] = useState('linkedin');
   const W = 1000, H = 330, cy = 145, labelY = 318, segW = W / FUNNEL.length;
   const hs = [...FUNNEL.map((f) => f.w * 2.6), FUNNEL[FUNNEL.length - 1].w * 2.6 * 0.7];
   const f = FUNNEL.find((x) => x.id === phase) || FUNNEL[0];
-  const ch = channelById(exCh);
   return (
     <div className="hfunnel">
       <svg className="bowtie" viewBox={`0 0 ${W} ${H}`} role="group" aria-label={t('eb_funnel')}>
@@ -771,18 +778,7 @@ function FunnelViz({ t, lang }) {
       <div className="fnote">
         <span className="fnote-ic" style={{ background: f.c }}>{f.ic({ width: 16, height: 16 })}</span>
         <div className="fnote-body">
-          <p className="fnote-d"><b>{f.t[lang]}.</b> {f.d[lang]}</p>
-          <div className="fnote-ex">
-            <span className="fnote-ex-label">{t('fn_example')} {ch.name}</span>
-            <p className="fnote-ex-copy">{ch.ex[phase][lang]}</p>
-          </div>
-          <div className="fnote-channels">
-            {CHANNELS.map((c) => (
-              <button key={c.id} className={'fch' + (exCh === c.id ? ' fch-on' : '')} style={{ '--cc': c.c }} onClick={() => setExCh(c.id)} aria-label={c.name} aria-pressed={exCh === c.id}>
-                {c.ic({ width: 17, height: 17 })}
-              </button>
-            ))}
-          </div>
+          <p className="fnote-d"><b>{f.t[lang]}.</b> {f.j[lang]}</p>
         </div>
       </div>
     </div>
@@ -795,7 +791,6 @@ function Home({ t, lang, go }) {
   return (
     <main>
       <section className="hero wrap">
-        <div className="hero-ripple" aria-hidden="true"><span /><span /><span /><span /></div>
         {Logo.mark({ className: 'hero-mark' })}
         {Logo.subline({ className: 'hero-subline' })}
         <p className="tagline">{t('hero_slogan')}</p>
@@ -808,6 +803,7 @@ function Home({ t, lang, go }) {
       <section id="funnel" className="sect wrap">
         <div className="eyebrow">{t('eb_funnel')}</div>
         <h2 className="h2">{t('funnel_h2a')}<br className="bk" /> {t('funnel_h2b')}</h2>
+        <p className="sect-lede">{t('funnel_lede')}</p>
         <FunnelViz t={t} lang={lang} />
       </section>
 
@@ -1648,12 +1644,19 @@ const CSS = `
 .hero { position:relative; overflow:hidden; padding-top:90px; padding-bottom:90px; text-align:center; display:flex; flex-direction:column; align-items:center; }
 .hero-mark { position:relative; z-index:1; width:min(138px,31vw); height:auto; color:var(--ink); animation:fadeUp .8s ease both; }
 .hero-subline { position:relative; z-index:1; width:min(210px,47vw); height:auto; color:var(--mut); margin-top:16px; animation:fadeUp .8s ease .15s both; }
-.hero-ripple { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; }
-.hero-ripple span { position:absolute; width:340px; height:340px; border-radius:50%; border:1.5px solid var(--paper); box-shadow:0 0 0 1px rgba(23,23,23,0.015) inset; animation:ripple 7s ease-out infinite; }
-.hero-ripple span:nth-child(2) { animation-delay:1.75s; }
-.hero-ripple span:nth-child(3) { animation-delay:3.5s; }
-.hero-ripple span:nth-child(4) { animation-delay:5.25s; }
-@keyframes ripple { 0% { transform:scale(.45); opacity:0; } 18% { opacity:1; } 100% { transform:scale(2.5); opacity:0; } }
+.ripple-layer { position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:0; }
+.ripple-center { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+.ripple-center span { position:absolute; width:min(420px,80vw); height:min(420px,80vw); border-radius:50%;
+  background:radial-gradient(circle, rgba(0,0,0,0) 56%, rgba(23,23,23,0.045) 65%, rgba(255,255,255,0.9) 71%, rgba(23,23,23,0.028) 77%, rgba(0,0,0,0) 84%);
+  filter:blur(6px); opacity:0; animation:ripple3d 10s ease-out infinite; }
+.ripple-center span:nth-child(2) { animation-delay:2.5s; }
+.ripple-center span:nth-child(3) { animation-delay:5s; }
+.ripple-center span:nth-child(4) { animation-delay:7.5s; }
+@keyframes ripple3d { 0% { transform:scale(0.22); opacity:0; } 14% { opacity:1; } 100% { transform:scale(3); opacity:0; } }
+.ripple-burst { position:absolute; width:240px; height:240px; margin-left:-120px; margin-top:-120px; border-radius:50%;
+  background:radial-gradient(circle, rgba(0,0,0,0) 52%, rgba(23,23,23,0.07) 63%, rgba(255,255,255,0.95) 70%, rgba(23,23,23,0.045) 77%, rgba(0,0,0,0) 85%);
+  filter:blur(4px); opacity:0; animation:rippleBurst 1.6s ease-out forwards; }
+@keyframes rippleBurst { 0% { transform:scale(0.12); opacity:0; } 16% { opacity:1; } 100% { transform:scale(2.4); opacity:0; } }
 .tagline { font-family:'Fraunces',serif; font-style:italic; font-size:clamp(19px,3.4vw,30px); color:var(--ink); margin:30px auto 34px; max-width:26ch; line-height:1.3; text-wrap:balance; position:relative; z-index:1; }
 .hero-cta { display:flex; gap:13px; justify-content:center; flex-wrap:wrap; position:relative; z-index:1; }
 
@@ -1677,10 +1680,6 @@ const CSS = `
 .fnote-body { display:flex; flex-direction:column; gap:12px; min-width:0; flex:1; }
 .fnote-d { margin:0; color:var(--mut); font-size:14.5px; line-height:1.6; }
 .fnote-d b { color:var(--ink); font-weight:600; }
-.fnote-ex { background:var(--white); border:1px solid var(--line); border-radius:12px; padding:13px 15px; }
-.fnote-ex-label { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.06em; color:var(--dim); text-transform:uppercase; display:block; margin-bottom:6px; }
-.fnote-ex-copy { margin:0; font-size:14.5px; line-height:1.6; }
-.fnote-channels { display:flex; gap:9px; }
 .fch { width:38px; height:38px; border-radius:11px; border:1px solid var(--line); background:var(--white); color:var(--dim); display:inline-flex; align-items:center; justify-content:center; transition:color .15s, border-color .15s, transform .12s; }
 .fch:hover { transform:translateY(-1px); color:var(--cc); }
 .fch-on { color:#fff; background:var(--cc); border-color:var(--cc); }
@@ -1952,7 +1951,7 @@ const CSS = `
   .menu, .menu-item, .burger-bar, .fold-chev { transition:none; }
   .lockup-anim .lockup-word { animation:none; clip-path:none; }
   .lockup-anim .lockup-sub { animation:none; opacity:1; }
-  .hero-ripple span { animation:none; opacity:0.5; }
+  .ripple-center span, .ripple-burst { animation:none; opacity:0; }
   .intro { animation-duration:0.01s; animation-delay:0.6s; }
 }
 `;
