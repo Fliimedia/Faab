@@ -87,7 +87,9 @@ const STR = {
     hero_slogan: 'Be the spokesperson for your brand.',
     nav_home: 'Home', nav_how: 'Hoe het werkt', nav_channels: 'Kanalen', nav_cms: 'CMS', nav_start: 'Start je merk',
     eb_funnel: 'De funnel', funnel_h2a: 'Van bereik tot ambassadeurschap,', funnel_h2b: 'in vijf fasen.',
-    eb_flow: 'Hoe het werkt', flow_h2a: 'Van profiel tot webcare,', flow_h2b: 'in vijf stappen.',
+    fn_example: 'Voorbeeldpost op',
+    eb_flow: 'Hoe het werkt', flow_h2: 'Personal branding for founders',
+    flow_lede: 'Simply approve or reject posts. Our AI signals trending niche topics and prepares ready made posts for you, based on your style, voice, personality and goals.',
     eb_channels: 'Kanalen', channels_h2a: 'Een stem,', channels_h2b: 'vier kanalen.',
     eb_control: 'Menselijke controle', control_h2: 'AI schrijft. Jij beslist.',
     ctrl1_t: 'Jij bepaalt de stem', ctrl1_d: 'Toon, thema\u0027s en templates stel jij in, niet stiekem aangeleerd.',
@@ -141,7 +143,7 @@ const STR = {
     sch_schedule: 'Inplannen', sch_date: 'Datum', sch_time: 'Tijd', sch_confirm: 'Bevestig planning', sch_unschedule: 'Terug naar concepten',
     err_generic: 'Er ging iets mis. Probeer opnieuw.',
     untitled: 'Naamloos concept',
-    ch_strategy: 'Strategie', ch_placements: 'Plaatsingen', ch_examples: 'Voorbeeldcopy per funnelfase', ch_tone: 'Tone of voice op dit kanaal',
+    ch_strategy: 'Strategie', ch_placements: 'Plaatsingen', ch_tone: 'Tone of voice op dit kanaal',
     ch_back: 'Alle kanalen', ch_cta: 'Start je merk op', example_word: 'Voorbeeld',
   },
   en: {
@@ -149,7 +151,9 @@ const STR = {
     hero_slogan: 'Be the spokesperson for your brand.',
     nav_home: 'Home', nav_how: 'How it works', nav_channels: 'Channels', nav_cms: 'CMS', nav_start: 'Start your brand',
     eb_funnel: 'The funnel', funnel_h2a: 'From reach to ambassadorship,', funnel_h2b: 'in five stages.',
-    eb_flow: 'How it works', flow_h2a: 'From profile to webcare,', flow_h2b: 'in five steps.',
+    fn_example: 'Example post on',
+    eb_flow: 'How it works', flow_h2: 'Personal branding for founders',
+    flow_lede: 'Simply approve or reject posts. Our AI signals trending niche topics and prepares ready made posts for you, based on your style, voice, personality and goals.',
     eb_channels: 'Channels', channels_h2a: 'One voice,', channels_h2b: 'four channels.',
     eb_control: 'Human control', control_h2: 'AI drafts. You decide.',
     ctrl1_t: 'You define the voice', ctrl1_d: 'Tone, themes and templates are set by you, never learned behind your back.',
@@ -201,7 +205,7 @@ const STR = {
     sch_schedule: 'Schedule', sch_date: 'Date', sch_time: 'Time', sch_confirm: 'Confirm schedule', sch_unschedule: 'Back to drafts',
     err_generic: 'Something went wrong. Try again.',
     untitled: 'Untitled draft',
-    ch_strategy: 'Strategy', ch_placements: 'Placements', ch_examples: 'Example copy per funnel stage', ch_tone: 'Tone of voice on this channel',
+    ch_strategy: 'Strategy', ch_placements: 'Placements', ch_tone: 'Tone of voice on this channel',
     ch_back: 'All channels', ch_cta: 'Start your brand on', example_word: 'Example',
   },
 };
@@ -409,6 +413,12 @@ export default function App() {
   const [intro, setIntro] = useState(true);
   const [view, setView] = useState('home'); // home | channel:<id> | onboarding | cms
   const [menu, setMenu] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 90);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const [user, setUser] = useState(null); // { email, name }
   const [brand, setBrand] = useState(emptyBrand());
@@ -660,8 +670,10 @@ Write in ${langName(lang)}. Rules:
 
       <header className="topbar">
         <button className="brand" onClick={() => go('home')} aria-label="FAAB home">
-          {Logo.mark({ className: 'brand-mark' })}
-          {Logo.wordmark({ className: 'brand-logo' })}
+          <span className={'brand-swap' + (scrolled ? ' brand-scrolled' : '')}>
+            {Logo.mark({ className: 'brand-mark' })}
+            {Logo.wordmark({ className: 'brand-logo' })}
+          </span>
         </button>
         <button className={'burger' + (menu ? ' burger-on' : '')} onClick={() => setMenu((m) => !m)} aria-label="Menu" aria-expanded={menu}>
           <span className="burger-bar b1" /><span className="burger-bar b2" /><span className="burger-bar b3" />
@@ -739,6 +751,54 @@ Write in ${langName(lang)}. Rules:
 }
 
 // ---------- Home ----------
+function FunnelViz({ t, lang }) {
+  const [phase, setPhase] = useState('reach');
+  const [exCh, setExCh] = useState('linkedin');
+  const W = 1000, H = 330, cy = 145, labelY = 318, segW = W / FUNNEL.length;
+  const hs = [...FUNNEL.map((f) => f.w * 2.6), FUNNEL[FUNNEL.length - 1].w * 2.6 * 0.7];
+  const f = FUNNEL.find((x) => x.id === phase) || FUNNEL[0];
+  const ch = channelById(exCh);
+  return (
+    <div className="hfunnel">
+      <svg className="bowtie" viewBox={`0 0 ${W} ${H}`} role="group" aria-label={t('eb_funnel')}>
+        {FUNNEL.map((fu, i) => {
+          const x0 = i * segW + 3, x1 = (i + 1) * segW - 3;
+          const hl = hs[i], hr = hs[i + 1];
+          const pts = `${x0},${cy - hl / 2} ${x1},${cy - hr / 2} ${x1},${cy + hr / 2} ${x0},${cy + hl / 2}`;
+          const cx = i * segW + segW / 2;
+          const on = phase === fu.id;
+          return (
+            <g key={fu.id} className={'bseg' + (on ? ' bseg-on' : '')} onClick={() => setPhase(fu.id)}
+              role="button" tabIndex={0} aria-pressed={on}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setPhase(fu.id); } }}>
+              <polygon points={pts} fill={fu.c} />
+              {fu.ic({ x: cx - 15, y: cy - 15, width: 30, height: 30, color: '#fff', className: 'bic' })}
+              <text x={cx} y={labelY} textAnchor="middle" className="blbl">{fu.t[lang]}</text>
+            </g>
+          );
+        })}
+      </svg>
+      <div className="fnote">
+        <span className="fnote-ic" style={{ background: f.c }}>{f.ic({ width: 16, height: 16 })}</span>
+        <div className="fnote-body">
+          <p className="fnote-d"><b>{f.t[lang]}.</b> {f.d[lang]}</p>
+          <div className="fnote-ex">
+            <span className="fnote-ex-label">{t('fn_example')} {ch.name}</span>
+            <p className="fnote-ex-copy">{ch.ex[phase][lang]}</p>
+          </div>
+          <div className="fnote-channels">
+            {CHANNELS.map((c) => (
+              <button key={c.id} className={'fch' + (exCh === c.id ? ' fch-on' : '')} style={{ '--cc': c.c }} onClick={() => setExCh(c.id)} aria-label={c.name} aria-pressed={exCh === c.id}>
+                {c.ic({ width: 17, height: 17 })}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Home({ t, lang, go }) {
   return (
     <main>
@@ -755,20 +815,13 @@ function Home({ t, lang, go }) {
       <section id="funnel" className="sect wrap">
         <div className="eyebrow">{t('eb_funnel')}</div>
         <h2 className="h2">{t('funnel_h2a')}<br className="bk" /> {t('funnel_h2b')}</h2>
-        <div className="funnel">
-          {FUNNEL.map((f) => (
-            <div className="f-seg" key={f.id} style={{ '--fw': f.w + '%', background: f.c }}>
-              <span className="f-ic">{f.ic({ width: 21, height: 21 })}</span>
-              <span className="f-body"><span className="f-t">{f.t[lang]}</span><span className="f-d">{f.d[lang]}</span></span>
-              <span className="f-n">{f.n}</span>
-            </div>
-          ))}
-        </div>
+        <FunnelViz t={t} lang={lang} />
       </section>
 
       <section id="flow" className="sect wrap">
         <div className="eyebrow">{t('eb_flow')}</div>
-        <h2 className="h2">{t('flow_h2a')}<br className="bk" /> {t('flow_h2b')}</h2>
+        <h2 className="h2">{t('flow_h2')}</h2>
+        <p className="sect-lede">{t('flow_lede')}</p>
         <div className="flow">
           {USERFLOW.map((s, i) => (
             <React.Fragment key={s.k}>
@@ -871,21 +924,6 @@ function ChannelPage({ t, lang, id, go }) {
       <section className="panel">
         <h2 className="panel-title">{t('ch_tone')}</h2>
         <p className="body-text">{ch.tone[lang]}</p>
-      </section>
-
-      <section className="panel">
-        <h2 className="panel-title">{t('ch_examples')}</h2>
-        <div className="ex-list">
-          {FUNNEL.map((f) => (
-            <div className="ex-item" key={f.id}>
-              <div className="ex-head">
-                <span className="ex-ic" style={{ background: f.c }}>{f.ic({ width: 16, height: 16 })}</span>
-                <span className="ex-phase">{f.t[lang]}</span>
-              </div>
-              <p className="ex-copy">{ch.ex[f.id][lang]}</p>
-            </div>
-          ))}
-        </div>
       </section>
 
       <div className="chpage-cta">
@@ -1509,6 +1547,7 @@ const CSS = `
 .faab a { color:inherit; text-decoration:none; }
 .faab :focus-visible { outline:2px solid var(--blue); outline-offset:2px; border-radius:8px; }
 
+.sect-lede { margin:-8px 0 26px; color:var(--mut); font-size:16px; line-height:1.65; max-width:56ch; }
 .eyebrow { display:inline-flex; align-items:center; gap:7px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--blue); }
 .field-label { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.13em; text-transform:uppercase; color:var(--dim); display:flex; gap:8px; align-items:baseline; }
 .field-label.mt { display:block; margin:20px 0 10px; }
@@ -1530,9 +1569,12 @@ const CSS = `
 /* topbar */
 .topbar { display:flex; align-items:center; justify-content:space-between; padding:14px 26px; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:60; background:rgba(255,255,255,0.9); backdrop-filter:blur(14px); }
 .brand { display:flex; align-items:center; gap:12px; background:none; border:none; padding:0; color:var(--ink); }
-.brand-mark { height:22px; width:auto; aspect-ratio:1719.8/784; display:block; }
-.brand-logo { height:20px; width:auto; aspect-ratio:3636/748; display:block; }
-.brand-logo.sm { height:18px; }
+.brand-swap { position:relative; display:block; width:100px; height:24px; }
+.brand-mark { position:absolute; left:0; top:50%; transform:translateY(-50%); height:20px; width:auto; aspect-ratio:1719.8/784; opacity:1; transition:opacity .25s ease; }
+.brand-logo { position:absolute; left:0; top:50%; transform:translateY(-50%); height:19px; width:auto; aspect-ratio:3636/748; opacity:0; transition:opacity .25s ease; }
+.brand-scrolled .brand-mark { opacity:0; }
+.brand-scrolled .brand-logo { opacity:1; }
+.foot .brand-logo.sm { position:static; transform:none; height:18px; opacity:1; }
 
 /* burger */
 .burger { position:relative; width:40px; height:40px; border:1px solid var(--line); border-radius:12px; background:var(--white); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; }
@@ -1575,7 +1617,7 @@ const CSS = `
 
 /* hero */
 .hero { position:relative; overflow:hidden; padding-top:90px; padding-bottom:90px; text-align:center; display:flex; flex-direction:column; align-items:center; }
-.hero-mark { position:relative; z-index:1; width:min(230px,52vw); height:auto; color:var(--ink); animation:fadeUp .8s ease both; }
+.hero-mark { position:relative; z-index:1; width:min(138px,31vw); height:auto; color:var(--ink); animation:fadeUp .8s ease both; }
 .hero-ripple { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; }
 .hero-ripple span { position:absolute; width:340px; height:340px; border-radius:50%; border:1.5px solid var(--paper); box-shadow:0 0 0 1px rgba(23,23,23,0.015) inset; animation:ripple 7s ease-out infinite; }
 .hero-ripple span:nth-child(2) { animation-delay:1.75s; }
@@ -1590,13 +1632,28 @@ const CSS = `
 .h2 { font-family:'Fraunces',serif; font-weight:400; font-size:clamp(28px,4vw,42px); letter-spacing:-0.02em; line-height:1.12; margin:14px 0 28px; text-wrap:balance; }
 
 /* funnel */
-.funnel { display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:8px; }
-.f-seg { width:100%; max-width:var(--fw,100%); display:flex; align-items:center; gap:16px; padding:18px 24px; border-radius:16px; color:#fff; text-align:left; box-shadow:0 8px 22px rgba(10,102,194,0.14); }
-.f-ic { display:inline-flex; width:40px; height:40px; border-radius:11px; background:rgba(255,255,255,0.16); align-items:center; justify-content:center; flex:none; }
-.f-body { display:flex; flex-direction:column; gap:2px; flex:1; min-width:0; }
-.f-t { font-family:'Fraunces',serif; font-weight:500; font-size:20px; }
-.f-d { font-size:13.5px; opacity:0.85; }
-.f-n { font-family:'IBM Plex Mono',monospace; font-size:13px; opacity:0.72; flex:none; }
+.hfunnel { display:flex; flex-direction:column; gap:18px; margin-top:8px; }
+.bowtie { width:100%; height:auto; display:block; }
+.bseg { cursor:pointer; outline:none; }
+.bseg polygon { stroke:rgba(255,255,255,0.55); stroke-width:1; opacity:0.92; transition:opacity .15s ease, filter .15s ease; }
+.bseg:hover polygon { opacity:1; }
+.bseg:focus-visible polygon { stroke:#fff; stroke-width:2; }
+.bseg-on polygon { opacity:1; filter:brightness(1.1); stroke:#fff; stroke-width:1.4; }
+.bic { pointer-events:none; }
+.blbl { font-family:'IBM Plex Mono',monospace; font-size:30px; font-weight:600; fill:var(--mut); letter-spacing:0.04em; }
+.bseg-on .blbl { fill:var(--blue); }
+.fnote { display:flex; gap:14px; align-items:flex-start; background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:18px; }
+.fnote-ic { width:32px; height:32px; border-radius:9px; color:#fff; display:inline-flex; align-items:center; justify-content:center; flex:none; }
+.fnote-body { display:flex; flex-direction:column; gap:12px; min-width:0; flex:1; }
+.fnote-d { margin:0; color:var(--mut); font-size:14.5px; line-height:1.6; }
+.fnote-d b { color:var(--ink); font-weight:600; }
+.fnote-ex { background:var(--white); border:1px solid var(--line); border-radius:12px; padding:13px 15px; }
+.fnote-ex-label { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.06em; color:var(--dim); text-transform:uppercase; display:block; margin-bottom:6px; }
+.fnote-ex-copy { margin:0; font-size:14.5px; line-height:1.6; }
+.fnote-channels { display:flex; gap:9px; }
+.fch { width:38px; height:38px; border-radius:11px; border:1px solid var(--line); background:var(--white); color:var(--dim); display:inline-flex; align-items:center; justify-content:center; transition:color .15s, border-color .15s, transform .12s; }
+.fch:hover { transform:translateY(-1px); color:var(--cc); }
+.fch-on { color:#fff; background:var(--cc); border-color:var(--cc); }
 
 /* userflow */
 .flow { display:flex; align-items:stretch; gap:10px; margin-top:8px; }
@@ -1650,11 +1707,6 @@ const CSS = `
 .place-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
 .place { display:flex; gap:12px; align-items:center; background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:14px; font-size:14.5px; }
 .place-n { width:26px; height:26px; border-radius:50%; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:600; flex:none; }
-.ex-list { display:flex; flex-direction:column; gap:12px; }
-.ex-item { background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:16px; }
-.ex-head { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
-.ex-ic { width:28px; height:28px; border-radius:8px; color:#fff; display:inline-flex; align-items:center; justify-content:center; flex:none; }
-.ex-phase { font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--mut); }
 .ex-copy { margin:0; font-size:14.5px; line-height:1.55; white-space:pre-wrap; }
 .chpage-cta { display:flex; justify-content:center; margin-top:10px; }
 
@@ -1836,7 +1888,6 @@ const CSS = `
   .hero { padding-top:48px; padding-bottom:52px; }
   .flow { flex-direction:column; }
   .flow-arrow { transform:rotate(90deg); padding:4px 0; }
-  .f-seg { max-width:100%; }
   .ch-grid { grid-template-columns:repeat(2,1fr); }
   .ctrl { padding:24px; } .ctrl-grid { grid-template-columns:1fr; }
   .contact { grid-template-columns:1fr; }
