@@ -91,7 +91,7 @@ const STR = {
     funnel_lede: 'Elke post krijgt een plek in de klantreis: zo werkt je content gericht van eerste kennismaking naar ambassadeur.',
     eb_flow: 'Hoe het werkt', flow_h2: 'Personal branding voor founders',
     flow_lede: 'Keur posts simpelweg goed of af. Onze AI signaleert trending onderwerpen in jouw niche en zet kant-en-klare posts voor je klaar, op basis van jouw stijl, stem, persoonlijkheid en doelen.',
-    eb_channels: 'Kanalen', channels_h2a: 'Een stem,', channels_h2b: 'vier kanalen.',
+    eb_channels: 'Kanalen', channels_h2a: 'Jouw voice,', channels_h2b: 'afgestemd per kanaal.',
     eb_control: 'De human review', control_h2: 'Drie momenten waarop jij beslist.',
     rv1_t: 'Onderwerpkeuze', rv1_d: 'AI signaleert trending onderwerpen in jouw niche. Jij bepaalt welke doorgaan.',
     rv2_t: 'De draft', rv2_d: 'Elke post staat klaar als preview, in jouw stem. Bewerk vrij of laat staan.',
@@ -153,7 +153,7 @@ const STR = {
     funnel_lede: 'Every post gets a place in the customer journey: your content works purposefully from first touch to ambassador.',
     eb_flow: 'How it works', flow_h2: 'Personal branding for founders',
     flow_lede: 'Simply approve or reject posts. Our AI signals trending niche topics and prepares ready made posts for you, based on your style, voice, personality and goals.',
-    eb_channels: 'Channels', channels_h2a: 'One voice,', channels_h2b: 'four channels.',
+    eb_channels: 'Channels', channels_h2a: 'Your voice,', channels_h2b: 'tuned per channel.',
     eb_control: 'The human review', control_h2: 'Three moments where you decide.',
     rv1_t: 'Topic selection', rv1_d: 'AI signals trending topics in your niche. You decide which ones go ahead.',
     rv2_t: 'The draft', rv2_d: 'Every post is ready as a preview, in your voice. Edit freely or leave it.',
@@ -228,7 +228,6 @@ const USERFLOW = [
   { k: 'strategy', ic: I.target, t: { nl: 'Strategie', en: 'Strategy' }, d: { nl: 'Doel en aanpak per funnelfase, door jou bijgestuurd.', en: 'Goal and approach per funnel stage, steered by you.' } },
   { k: 'topics', ic: I.radar, t: { nl: 'Actuele onderwerpen', en: 'Current topics' }, d: { nl: 'Trending discussies en zoekvolumes op jouw thema\u0027s.', en: 'Trending discussions and search volumes on your themes.' } },
   { k: 'posting', ic: I.calendar, t: { nl: 'Posting', en: 'Posting' }, d: { nl: 'Posts in jouw stem. Jij keurt goed en plant in.', en: 'Posts in your voice. You approve and schedule.' } },
-  { k: 'webcare', ic: I.message, t: { nl: 'Webcare', en: 'Webcare' }, d: { nl: 'Reacties en gesprekken onder je posts, bijgehouden.', en: 'Comments and conversations under your posts, kept up.' } },
 ];
 
 // ---------- Channels ----------
