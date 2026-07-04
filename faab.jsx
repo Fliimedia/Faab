@@ -2,22 +2,29 @@ import React, { useState, useEffect, useRef } from 'react';
 
 /*
   FAAB - Founder as a Brand
-  Light, blue-dominant. Navy slogan highlight. Magenta only as the wordmark dot.
-  i18n: Dutch default, English via browser detection + footer toggle. All UI text via t().
-  Persistence via window.storage. News radar via Anthropic API + web_search.
+  Multi-channel personal branding engine (LinkedIn, Instagram, X, Facebook).
+  Light, blue-dominant. i18n NL default / EN toggle. Persistent profiles (simple login).
+  Views: intro splash, home, channel pages, onboarding, CMS (vertical tabs).
+  AI via Anthropic API (proxied outside the artifact). Zero em/en-dashes anywhere.
 */
 
 // ---------- Icons ----------
 const I = {
   user: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0-8 0"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>),
+  users: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M7 8a3 3 0 1 0 6 0a3 3 0 0 0-6 0"/><path d="M4 21v-1a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v1"/><path d="M16 4.3a3 3 0 0 1 0 5.4"/><path d="M19 15a4.5 4.5 0 0 1 2 4v2"/></svg>),
   target: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>),
   radar: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M18.364 5.636a9 9 0 1 0 1.417 11.315"/><path d="M15.536 8.464a5 5 0 1 0 .719 6.44"/><path d="M12 12l6-3"/></svg>),
+  megaphone: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M18 8a3 3 0 0 1 0 6"/><path d="M10 8v11a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1v-5"/><path d="M12 8h0l4.5-3.5A1 1 0 0 1 18 5.3v11.4a1 1 0 0 1-1.5.8L12 14H5a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2z"/></svg>),
+  message: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M8 9h8M8 13h5"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-5l-5 3v-3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3z"/></svg>),
+  coin: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="9"/><path d="M14.8 9A2 2 0 0 0 13 8h-2a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4h-2a2 2 0 0 1-1.8-1"/><path d="M12 6v2m0 8v2"/></svg>),
+  heart: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M19.5 12.572L12 20l-7.5-7.428A5 5 0 1 1 12 6.006a5 5 0 1 1 7.5 6.572"/></svg>),
   calendar: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M16 3v4M8 3v4M4 11h16"/></svg>),
   tag: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M7.5 7.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0-2 0"/><path d="M3 6v5.172a2 2 0 0 0 .586 1.414l7.71 7.71a2.41 2.41 0 0 0 3.408 0l5.592-5.592a2.41 2.41 0 0 0 0-3.408l-7.71-7.71A2 2 0 0 0 11.172 3H6a3 3 0 0 0-3 3"/></svg>),
   spark: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>),
   plus: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M12 5v14M5 12h14"/></svg>),
   x: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M18 6 6 18M6 6l12 12"/></svg>),
   upload: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><path d="M7 9l5-5 5 5M12 4v12"/></svg>),
+  copy: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>),
   arrow: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M5 12h14M13 6l6 6-6 6"/></svg>),
   refresh: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M20 11a8 8 0 1 0-2.3 5.6"/><path d="M20 5v6h-6"/></svg>),
   check: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M5 12l5 5L20 7"/></svg>),
@@ -27,14 +34,29 @@ const I = {
   shield: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>),
   eye: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0-4 0"/><path d="M21 12c-2.4 4-5.4 6-9 6s-6.6-2-9-6c2.4-4 5.4-6 9-6s6.6 2 9 6"/></svg>),
   mail: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>),
-  message: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M8 9h8M8 13h5"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-5l-5 3v-3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3z"/></svg>),
+  globe: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="9"/><path d="M3.6 9h16.8M3.6 15h16.8"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></svg>),
+  doc: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/><path d="M9 13h6M9 17h6"/></svg>),
+  trend: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>),
+  image: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M4 19l5-5 3 3 4-4 4 4"/></svg>),
+  palette: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M12 21a9 9 0 1 1 9-9c0 2-1.5 3-3 3h-2a2 2 0 0 0-2 2c0 .6.2 1 .5 1.5c.3.4.5.8.5 1.3c0 .7-.6 1.2-1.3 1.2z"/><circle cx="7.5" cy="10.5" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="16.5" cy="10.5" r="1"/></svg>),
   chevL: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M15 6l-6 6 6 6"/></svg>),
   chevR: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M9 6l6 6-6 6"/></svg>),
+  chevD: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M6 9l6 6 6-6"/></svg>),
+  logout: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M14 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2"/><path d="M9 12h12l-3-3m0 6l3-3"/></svg>),
   linkedin: (p) => (<svg viewBox="0 0 24 24" fill="currentColor" {...p}><path d="M6.94 5a2 2 0 1 1-4-.002 2 2 0 0 1 4 .002zM7 8.48H3V21h4V8.48zm6.32 0H9.34V21h3.94v-6.57c0-3.66 4.77-4 4.77 0V21H22v-7.93c0-6.17-7.06-5.94-8.72-2.91l.04-1.68z"/></svg>),
+  instagram: (p) => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.5"/><circle cx="16.7" cy="7.3" r="0.8" fill="currentColor" stroke="none"/></svg>),
+  xsocial: (p) => (<svg viewBox="0 0 24 24" fill="currentColor" {...p}><path d="M17.75 3h3.07l-6.71 7.67L22 21h-6.18l-4.84-6.33L5.44 21H2.36l7.18-8.21L2 3h6.34l4.37 5.78L17.75 3zm-1.08 16.16h1.7L7.42 4.74H5.6l11.07 14.42z"/></svg>),
+  facebook: (p) => (<svg viewBox="0 0 24 24" fill="currentColor" {...p}><path d="M13.5 21v-7h2.6l.4-3h-3V9.1c0-.87.24-1.46 1.5-1.46h1.6V4.95c-.28-.04-1.23-.12-2.34-.12c-2.32 0-3.9 1.41-3.9 4v2.17H7.75v3h2.61v7h3.14z"/></svg>),
 };
 
 // ---------- Brand logo ----------
+// AA peak mark (from the supplied logo sheet) and the full lockup with subline.
 const Logo = {
+  mark: (p) => (
+    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="4.4" strokeLinecap="round" strokeLinejoin="round" {...p}>
+      <path d="M7 34 L16.5 14 L26 34 M22 34 L31.5 14 L41 34" />
+    </svg>
+  ),
   wordmark: (p) => (
     <svg viewBox="0 0 128 56" fill="none" stroke="currentColor" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" {...p}>
       <path d="M8 8 L8 48 M8 8 L26 8 M8 28 L22 28" />
@@ -44,134 +66,141 @@ const Logo = {
       <path d="M96 28 L107 28 A11 11 0 0 1 107 48 L96 48" />
     </svg>
   ),
-  mark: (p) => (
-    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <path d="M6 36 L15 12 L24 36 L33 12 L42 36" />
-    </svg>
+  lockup: ({ animate, ...p }) => (
+    <div className={'lockup' + (animate ? ' lockup-anim' : '')} {...p}>
+      <svg className="lockup-word" viewBox="0 0 128 56" fill="none" stroke="currentColor" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round">
+        <path className="lp lp1" d="M8 8 L8 48 M8 8 L26 8 M8 28 L22 28" />
+        <path className="lp lp2" d="M32 48 L46 8 L60 48 L74 8 L88 48" />
+        <path className="lp lp3" d="M96 8 L96 48 M96 8 L106 8 A10 10 0 0 1 106 28 L96 28 M96 28 L107 28 A11 11 0 0 1 107 48 L96 48" />
+      </svg>
+      <div className="lockup-sub">FOUNDER&nbsp;&nbsp;AS&nbsp;&nbsp;A&nbsp;&nbsp;BRAND</div>
+    </div>
   ),
 };
 
 // ---------- i18n ----------
 const STR = {
   nl: {
-    connect: 'Verbinden',
-    nav_home: 'Home', nav_founder: 'Founder', nav_strategy: 'Strategie', nav_topics: 'Onderwerpen', nav_post: 'Posts',
-    tagline: 'Keur branded posts over trending onderwerpen goed, in jouw stem.', cta_funnel: 'Bekijk de funnel',
-    slogan_a: 'Van Founder naar ', slogan_b: 'Merk.',
-    eb_service: 'De dienst', service_h2a: 'Jij bent het meest overtuigende', service_h2b: 'kanaal dat je bedrijf heeft.',
-    service_lead: 'FAAB is een personal-brandingmotor voor founders, alleen voor LinkedIn. Het maakt van wie je bent en wat je denkt een gestage stroom posts die klinken als jij, reageren op wat nu speelt, en de reputatie bouwen waar je bedrijf op leunt.',
-    svc1_t: 'Stem', svc1_d: 'Bedrijf, persoonlijkheid en toon worden een stemmodel. Elke draft begint bij wie je bent.',
-    svc2_t: 'Radar', svc2_d: 'Onderwerpen scant actueel nieuws op jouw thema\u0027s en geeft je de verhalen die een mening waard zijn.',
-    svc3_t: 'Ritme', svc3_d: 'Schrijf, koppel aan een funnelfase en plan in op een kalender. Consistentie zonder gedoe.',
+    start_brand: 'Start je merk', cta_how: 'Hoe het werkt',
+    hero_slogan: 'Be the spokesperson for your brand.',
+    nav_home: 'Home', nav_how: 'Hoe het werkt', nav_channels: 'Kanalen', nav_cms: 'CMS', nav_start: 'Start je merk',
     eb_funnel: 'De funnel', funnel_h2a: 'Van bereik tot ambassadeurschap,', funnel_h2b: 'in vijf fasen.',
-    funnel_lead: 'Personal branding is niet een doel, het is een route. FAAB beweegt je publiek door vijf fasen, en elke fase is ook een postcategorie om voor te plannen. Tik op een fase om er direct voor te schrijven.',
-    eb_practice: 'In de praktijk', practice_h2a: 'Van profiel tot webcare,', practice_h2b: 'in vijf stappen.',
-    practice_lead: 'Zo ziet je week eruit met FAAB. Vijf stappen, van wie je bent tot het warm houden van het gesprek.',
-    eb_knowledge: 'Kennisbank', knowledge_h2a: 'De principes achter persoonlijke', knowledge_h2b: 'branding die werkt.',
-    knowledge_lead: 'FAAB is uitgesproken software. Dit zijn de basisprincipes van persoonlijke social-media-branding waar het op gebouwd is, dezelfde die wij toepassen bij het opzetten van founderprofielen die aandacht verdienen.',
+    eb_flow: 'Hoe het werkt', flow_h2a: 'Van profiel tot webcare,', flow_h2b: 'in vijf stappen.',
+    eb_channels: 'Kanalen', channels_h2a: 'Een stem,', channels_h2b: 'vier kanalen.',
     eb_control: 'Menselijke controle', control_h2: 'AI schrijft. Jij beslist.',
-    control_lead: 'Reputatie is niets om weg te automatiseren. FAAB houdt een menselijk beoordelingsmoment op elk punt waar jouw naam op het spel staat.',
-    ctrl1_t: 'Jij bepaalt de stem', ctrl1_d: 'Toon, thema\u0027s en templates stel jij in, niet stiekem aangeleerd. Verander ze wanneer je wilt.',
-    ctrl2_t: 'Jij keurt elk verhaal goed', ctrl2_d: 'Onderwerpen stelt voor, kiest nooit voor je. Jij bepaalt welk nieuws jouw mening verdient.',
-    ctrl3_t: 'Jij bewerkt elke draft', ctrl3_d: 'Elke post opent in een editor met live preview. Herschrijf, scherp aan of gooi weg.',
-    ctrl4_t: 'Jij drukt op publiceren', ctrl4_d: 'FAAB plant en schrijft, plaatst nooit namens jou. De definitieve tekst publiceer je zelf.',
+    ctrl1_t: 'Jij bepaalt de stem', ctrl1_d: 'Toon, thema\u0027s en templates stel jij in, niet stiekem aangeleerd.',
+    ctrl2_t: 'Jij keurt elk onderwerp goed', ctrl2_d: 'FAAB stelt voor, kiest nooit voor je.',
+    ctrl3_t: 'Jij bewerkt elke draft', ctrl3_d: 'Elke post opent in een editor met live preview.',
+    ctrl4_t: 'Jij drukt op publiceren', ctrl4_d: 'FAAB plaatst nooit namens jou.',
     eb_contact: 'Contact', contact_h2a: 'Praat met ons over', contact_h2b: 'jouw founder-merk.',
-    contact_lead: 'Hulp nodig bij je positionering, of een done-with-you traject naast de app? Stuur ons een bericht.',
-    foot_tag: 'Van founders merken maken.', foot_app: 'App', foot_learn: 'Leer',
-    foot_the_funnel: 'De funnel', foot_kb: 'Kennisbank', foot_contact: 'Contact',
-    foot_base: 'FAAB. Gebouwd voor founders die met intentie posten. Alleen voor LinkedIn.',
-    f_h2: 'Jouw merkelementen', f_p: 'Wie je bent is de bron van elke post. Dit is het fundament.',
-    f_logo: 'Logo', f_upload_logo: 'Logo uploaden',
-    f_name: 'Naam', f_role: 'Rol', f_company: 'Bedrijf',
-    f_company_desc: 'Beschrijf je bedrijf', f_company_desc_hint: 'wat het doet, voor wie', f_company_desc_ph: 'Wij helpen ... door ...',
-    f_pers_desc: 'Beschrijf je persoonlijkheid', f_pers_desc_hint: 'hoe je overkomt', f_pers_desc_ph: 'Direct, nieuwsgierig, een tikje eigenwijs ...',
-    ph_role: 'Founder', ph_company: 'Je bedrijf',
-    s_funnel_h2: 'Funnelfocus', s_funnel_p: 'Kies de fasen waar je je publiek doorheen wilt bewegen. Tik om te wisselen.',
-    s_goal_h2: 'Doel en aanpak', s_goal_p: 'Beschrijf wat je met LinkedIn wilt bereiken en hoe. FAAB maakt hier een tone of voice en keywords van.',
-    s_goal_label: 'Doel en aanpak', s_goal_hint: 'voorbeeld hieronder',
-    s_goal_ph: 'Voorbeeld: dé stem worden over praktische AI voor kleine bureaus. Twee scherpe meningen per week op nieuws, een bouwles, en lezers langzaam omzetten in demo-aanvragen.',
-    s_generate: 'Genereer toon en keywords', s_generating: 'Genereren...', s_gen_err: 'Kon niet genereren. Probeer opnieuw.',
-    s_tone_label: 'Tone of voice', s_tone_ph: 'Wordt hier gegenereerd, volledig bewerkbaar.',
-    s_keywords: 'Keywords', s_add_kw_ph: 'Voeg een keyword toe, dan Enter', s_add: 'Toevoegen', s_suggestions: 'Suggesties',
-    s_li_h: 'Stem uit je LinkedIn', s_li_p: 'Laat FAAB je openbare LinkedIn-berichten en reacties analyseren om je toon te bepalen.',
-    s_li_ph: 'Naam of profiel-URL', s_li_btn: 'Analyseer mijn LinkedIn', s_li_analyzing: 'Analyseren...',
-    s_li_note: 'Gebruikt openbaar zichtbare berichten via web search. Geen persoonlijke login nodig.', s_li_err: 'Kon je LinkedIn niet analyseren. Probeer een profiel-URL.',
-    s_tpl_h2: 'Templates', s_tpl_p: 'Poststructuren voor Onderwerpen en Posts. Haakjes zoals {hook} worden ingevuld.',
-    s_new_tpl: 'Nieuwe template', s_upload_tpl: 'Template uploaden', s_new_tpl_name: 'Nieuwe template',
-    t_h2: 'Trending onderwerpen', t_p: 'Nieuwstrends op je keywords, klaar om in te plannen als post.',
-    t_refresh: 'Ververs', t_scanning: 'Scannen...', t_empty: 'Voeg eerst keywords toe in Strategie en ververs dan.',
-    t_go_strategy: 'Naar Strategie', t_source: 'Bron', t_create_post: 'Maak post',
-    p_cal: 'Kalender', p_scheduled_h2: 'Geplande posts', p_none: 'Nog niets gepland.', p_scheduled_count: 'gepland',
-    p_add_new: 'Nieuwe post toevoegen', p_untitled: 'Naamloze draft', p_your_scheduled: 'Je geplande posts verschijnen hier.',
-    c_edit: 'Post bewerken', c_new: 'Nieuwe post', c_write_schedule: 'Schrijf en plan in',
-    c_category: 'Funnelcategorie', c_template: 'Template', c_idea: 'Idee', c_idea_hint: 'waar gaat deze post over', c_idea_ph: 'Een korte prompt voor de draft',
-    c_draft: 'Schrijf post', c_drafting: 'Schrijven...', c_draft_again: 'Opnieuw schrijven', c_draft_err: 'Schrijven mislukte. Probeer opnieuw.',
-    c_post_text: 'Posttekst', c_post_text_ph: 'Je post verschijnt hier. Vrij te bewerken.',
-    c_date: 'Datum', c_time: 'Tijd', c_schedule: 'Post inplannen', c_update: 'Planning bijwerken',
-    c_preview: 'Voorbeeld', c_draft_hint: 'Schrijf een post om het voorbeeld te zien.',
-    li_public: 'Openbaar', li_like: 'Leuk', li_comment: 'Reageren', li_share: 'Delen', li_first: '1e',
-    err_no_stories: 'Geen verhalen gevonden. Pas je keywords aan in Strategie.', err_radar: 'De radar kon geen nieuws laden. Probeer opnieuw.',
+    foot_tag: 'Founders zijn hun merk.', foot_app: 'App', foot_learn: 'Kanalen', foot_contact: 'Contact', foot_the_funnel: 'De funnel',
+    foot_base: 'FAAB. Gebouwd voor founders die met intentie posten.',
     lang_word: 'Taal',
+    // onboarding
+    ob_title: 'Start je merk', ob_step_account: 'Account', ob_step_channels: 'Kanalen', ob_step_website: 'Merkscan', ob_step_done: 'Voorbeelden',
+    ob_acc_h: 'Maak je profiel', ob_acc_p: 'Hiermee blijft je merk bewaard, ook na deze sessie.',
+    ob_name: 'Naam', ob_email: 'E-mailadres', ob_login_note: 'Bestaat je e-mailadres al, dan laden we je merk.',
+    ob_ch_h: 'Koppel je kanalen', ob_ch_p: 'Vul per kanaal je profiel-URL of handle in. FAAB gebruikt je openbare posts en reacties als input voor je tone of voice.',
+    ob_ch_ph: 'Profiel-URL of @handle',
+    ob_web_h: 'Scan je website', ob_web_p: 'FAAB haalt je merk op: beschrijving, doelgroep en kleuren.',
+    ob_web_ph: 'https://jouwbedrijf.nl', ob_scan: 'Scan website', ob_scanning: 'Scannen...',
+    ob_scan_err: 'Scan mislukte. Controleer de URL of vul het hieronder zelf in.',
+    ob_desc: 'Beschrijving van je dienst', ob_aud: 'Doelgroep', ob_colors: 'Merkkleuren', ob_logo: 'Logo',
+    ob_done_h: 'Je merk staat', ob_done_p: 'FAAB genereert nu een voorbeeldpost per gekoppeld kanaal, in jouw stem.',
+    ob_gen_examples: 'Genereer voorbeeldposts', ob_generating: 'Genereren...', ob_open_cms: 'Open het CMS',
+    ob_next: 'Volgende', ob_back: 'Terug', ob_skip: 'Overslaan',
+    ob_tone_note: 'Tone of voice wordt bepaald uit je gekoppelde kanalen en merkscan.',
+    // cms
+    cms_brand: 'Merkpersoonlijkheid', cms_strategy: 'Strategie', cms_topics: 'Onderwerpen', cms_content: 'Content', cms_schedule: 'Planning',
+    cms_exit: 'Terug naar site', cms_logout: 'Uitloggen',
+    b_h: 'Merkpersoonlijkheid', b_company: 'Bedrijf', b_role: 'Rol', b_name: 'Naam', b_website: 'Website',
+    b_desc: 'Beschrijving', b_aud: 'Doelgroep', b_pers: 'Persoonlijkheid', b_pers_ph: 'Direct, nieuwsgierig, een tikje eigenwijs ...',
+    b_colors: 'Merkkleuren', b_docs: 'Documenten', b_docs_p: 'Upload merk- of stijl-documenten (.txt, .md) als extra input.',
+    b_upload_doc: 'Document uploaden', b_tone_h: 'Basistekst tone of voice', b_tone_p: 'Deze tekst stuurt alle gegenereerde content. Volledig bewerkbaar.',
+    b_regen_tone: 'Hergenereer uit kanalen', b_tone_examples: 'Voorbeelden per gekoppeld kanaal', b_no_channels: 'Nog geen kanalen gekoppeld.',
+    b_gen_example: 'Genereer voorbeeld', b_socials: 'Gekoppelde kanalen',
+    s_h: 'Strategie per funnelfase', s_p: 'Doel en aanpak per fase. Bewerk vrij.',
+    s_goal: 'Doel', s_approach: 'Aanpak', s_gen: 'Genereer strategie', s_generating: 'Genereren...',
+    s_keywords: 'Keywords', s_add_kw_ph: 'Voeg een keyword toe, dan Enter', s_add: 'Toevoegen',
+    t_h: 'Onderwerpen', t_p: 'Zoekvolumes en trending discussies op je keywords.',
+    t_refresh: 'Onderzoek onderwerpen', t_scanning: 'Onderzoeken...', t_kw: 'Keyword / thread', t_vol: 'Zoekvolume', t_src: 'Bron', t_act: 'Actie',
+    t_use: 'Gebruik', t_add_link: 'Voeg een link toe als input', t_add_link_ph: 'https://... artikel of thread', t_added: 'Toegevoegd',
+    t_empty: 'Voeg eerst keywords toe bij Strategie.', t_err: 'Onderzoek mislukte. Probeer opnieuw.',
+    c_h: 'Content maken', c_p: 'Genereer copy vanuit je tone of voice, per kanaal en funnelfase.',
+    c_channel: 'Kanaal', c_phase: 'Funnelfase', c_angle: 'Invalshoek', c_angle_ph: 'Bijv. een les, een mening, een klantverhaal ...',
+    c_subject: 'Onderwerp', c_subject_none: 'Geen (vrije post)',
+    c_generate: 'Genereer copy', c_generating: 'Genereren...', c_err: 'Genereren mislukte. Probeer opnieuw.',
+    c_text: 'Copy', c_text_ph: 'Je copy verschijnt hier. Vrij te bewerken.',
+    c_visual: 'Beeld', c_visual_preset: 'FAAB-template', c_visual_upload: 'Eigen beeld uploaden', c_visual_none: 'Geen beeld',
+    c_headline: 'Kop op beeld', c_save_draft: 'Bewaar als concept', c_saved: 'Bewaard',
+    sch_h: 'Planning', sch_drafts: 'Concepten om in te plannen', sch_scheduled: 'Ingeplande posts',
+    sch_none_drafts: 'Nog geen concepten. Maak content in de Content-tab.', sch_none_sched: 'Nog niets ingepland.',
+    sch_schedule: 'Inplannen', sch_date: 'Datum', sch_time: 'Tijd', sch_confirm: 'Bevestig planning', sch_unschedule: 'Terug naar concepten',
+    login_h: 'Log in of maak een profiel', login_btn: 'Ga verder', login_ph_email: 'jij@bedrijf.nl',
+    err_generic: 'Er ging iets mis. Probeer opnieuw.',
+    untitled: 'Naamloos concept',
+    ch_strategy: 'Strategie', ch_placements: 'Plaatsingen', ch_examples: 'Voorbeeldcopy per funnelfase', ch_tone: 'Tone of voice op dit kanaal',
+    ch_back: 'Alle kanalen', ch_cta: 'Start je merk op', example_word: 'Voorbeeld',
   },
   en: {
-    connect: 'Connect',
-    nav_home: 'Home', nav_founder: 'Founder', nav_strategy: 'Strategy', nav_topics: 'Topics', nav_post: 'Post',
-    tagline: 'Approve branded social posts on trending topics, in your voice.', cta_funnel: 'Explore the funnel',
-    slogan_a: 'Brand ', slogan_b: 'yourself.',
-    eb_service: 'The service', service_h2a: 'You are the most convincing', service_h2b: 'channel your company has.',
-    service_lead: 'FAAB is a personal branding engine for founders, built only for LinkedIn. It turns who you are and what you think into a steady stream of posts that sound like you, react to what is happening now, and build the reputation your company borrows from.',
-    svc1_t: 'Voice', svc1_d: 'Company, personality and tone become a voice model. Every draft starts from who you are.',
-    svc2_t: 'Radar', svc2_d: 'Topics scans current news on your themes and hands you the stories worth a take.',
-    svc3_t: 'Rhythm', svc3_d: 'Draft, categorize by funnel stage and schedule on a calendar. Consistency without the grind.',
+    start_brand: 'Start your brand', cta_how: 'How it works',
+    hero_slogan: 'Be the spokesperson for your brand.',
+    nav_home: 'Home', nav_how: 'How it works', nav_channels: 'Channels', nav_cms: 'CMS', nav_start: 'Start your brand',
     eb_funnel: 'The funnel', funnel_h2a: 'From reach to ambassadorship,', funnel_h2b: 'in five stages.',
-    funnel_lead: 'Personal branding is not one goal, it is a path. FAAB moves your audience down five stages, and every stage is also a post category you can plan for. Tap a stage to draft for it.',
-    eb_practice: 'In practice', practice_h2a: 'From profile to webcare,', practice_h2b: 'in five steps.',
-    practice_lead: 'This is your week with FAAB. Five steps, from who you are to keeping the conversation warm.',
-    eb_knowledge: 'Knowledge bank', knowledge_h2a: 'The principles behind personal', knowledge_h2b: 'branding that works.',
-    knowledge_lead: 'FAAB is opinionated software. These are the base principles of personal social media branding it is built on, the same ones we apply when setting up founder profiles that earn attention.',
+    eb_flow: 'How it works', flow_h2a: 'From profile to webcare,', flow_h2b: 'in five steps.',
+    eb_channels: 'Channels', channels_h2a: 'One voice,', channels_h2b: 'four channels.',
     eb_control: 'Human control', control_h2: 'AI drafts. You decide.',
-    control_lead: 'Reputation is not something to automate away. FAAB keeps a human review moment at every point where your name is on the line.',
-    ctrl1_t: 'You define the voice', ctrl1_d: 'Tone, themes and templates are set by you, not learned behind your back. Change them any time.',
-    ctrl2_t: 'You approve every story', ctrl2_d: 'Topics suggests, it never selects for you. You choose which news deserves your take.',
-    ctrl3_t: 'You edit every draft', ctrl3_d: 'Each post opens in an editor with a live preview. Rewrite, sharpen or discard.',
-    ctrl4_t: 'You press publish', ctrl4_d: 'FAAB schedules and drafts, it never posts on your behalf. You publish the final text yourself.',
+    ctrl1_t: 'You define the voice', ctrl1_d: 'Tone, themes and templates are set by you, never learned behind your back.',
+    ctrl2_t: 'You approve every topic', ctrl2_d: 'FAAB suggests, it never selects for you.',
+    ctrl3_t: 'You edit every draft', ctrl3_d: 'Each post opens in an editor with live preview.',
+    ctrl4_t: 'You press publish', ctrl4_d: 'FAAB never posts on your behalf.',
     eb_contact: 'Contact', contact_h2a: 'Talk to us about', contact_h2b: 'your founder brand.',
-    contact_lead: 'Want help setting up your positioning, or a done-with-you program next to the app? Send us a note.',
-    foot_tag: 'Turning founders into brands.', foot_app: 'App', foot_learn: 'Learn',
-    foot_the_funnel: 'The funnel', foot_kb: 'Knowledge bank', foot_contact: 'Contact',
-    foot_base: 'FAAB. Built for founders who post with intent. Only for LinkedIn.',
-    f_h2: 'Your brand elements', f_p: 'Who you are is the source of every post. This is the foundation.',
-    f_logo: 'Logo', f_upload_logo: 'Upload logo',
-    f_name: 'Name', f_role: 'Role', f_company: 'Company',
-    f_company_desc: 'Describe your company', f_company_desc_hint: 'what it does, who it serves', f_company_desc_ph: 'We help ... by ...',
-    f_pers_desc: 'Describe your personality', f_pers_desc_hint: 'how you come across', f_pers_desc_ph: 'Direct, curious, a bit contrarian ...',
-    ph_role: 'Founder', ph_company: 'Your company',
-    s_funnel_h2: 'Funnel focus', s_funnel_p: 'Select the stages you want to move your audience through. Tap to toggle.',
-    s_goal_h2: 'Goal and approach', s_goal_p: 'Describe what you want your LinkedIn presence to achieve and how. FAAB turns this into a tone of voice and keywords.',
-    s_goal_label: 'Goal and approach', s_goal_hint: 'example below',
-    s_goal_ph: 'Example: become the go-to voice on practical AI for small agencies. Two sharp takes a week reacting to news, one build lesson, and slowly turn readers into demo requests.',
-    s_generate: 'Generate tone and keywords', s_generating: 'Generating...', s_gen_err: 'Could not generate. Try again.',
-    s_tone_label: 'Tone of voice', s_tone_ph: 'Generated here, fully editable.',
-    s_keywords: 'Keywords', s_add_kw_ph: 'Add a keyword, then Enter', s_add: 'Add', s_suggestions: 'Suggestions',
-    s_li_h: 'Voice from your LinkedIn', s_li_p: 'Let FAAB analyze your public LinkedIn posts and comments to determine your tone.',
-    s_li_ph: 'Name or profile URL', s_li_btn: 'Analyze my LinkedIn', s_li_analyzing: 'Analyzing...',
-    s_li_note: 'Uses publicly visible posts via web search. No personal login required.', s_li_err: 'Could not analyze your LinkedIn. Try a profile URL.',
-    s_tpl_h2: 'Templates', s_tpl_p: 'Post structures used across Topics and Post. Placeholders like {hook} get filled in.',
-    s_new_tpl: 'New template', s_upload_tpl: 'Upload template', s_new_tpl_name: 'New template',
-    t_h2: 'Trending topics', t_p: 'News trends on your keywords, ready to turn into a scheduled post.',
-    t_refresh: 'Refresh', t_scanning: 'Scanning...', t_empty: 'Add keywords in Strategy first, then refresh.',
-    t_go_strategy: 'Go to Strategy', t_source: 'Source', t_create_post: 'Create post',
-    p_cal: 'Calendar', p_scheduled_h2: 'Scheduled posts', p_none: 'Nothing scheduled yet.', p_scheduled_count: 'scheduled',
-    p_add_new: 'Add new post', p_untitled: 'Untitled draft', p_your_scheduled: 'Your scheduled posts will appear here.',
-    c_edit: 'Edit post', c_new: 'New post', c_write_schedule: 'Write and schedule',
-    c_category: 'Funnel category', c_template: 'Template', c_idea: 'Idea', c_idea_hint: 'what is this post about', c_idea_ph: 'A short prompt for the draft',
-    c_draft: 'Draft post', c_drafting: 'Drafting...', c_draft_again: 'Draft again', c_draft_err: 'Drafting failed. Try again.',
-    c_post_text: 'Post text', c_post_text_ph: 'Your post appears here. Edit freely.',
-    c_date: 'Date', c_time: 'Time', c_schedule: 'Schedule post', c_update: 'Update schedule',
-    c_preview: 'Preview', c_draft_hint: 'Draft a post to see the preview.',
-    li_public: 'Public', li_like: 'Like', li_comment: 'Comment', li_share: 'Share', li_first: '1st',
-    err_no_stories: 'No stories found. Adjust your keywords in Strategy.', err_radar: 'The radar could not load news. Try again.',
+    foot_tag: 'Founders are their brand.', foot_app: 'App', foot_learn: 'Channels', foot_contact: 'Contact', foot_the_funnel: 'The funnel',
+    foot_base: 'FAAB. Built for founders who post with intent.',
     lang_word: 'Language',
+    ob_title: 'Start your brand', ob_step_account: 'Account', ob_step_channels: 'Channels', ob_step_website: 'Brand scan', ob_step_done: 'Examples',
+    ob_acc_h: 'Create your profile', ob_acc_p: 'This keeps your brand saved beyond this session.',
+    ob_name: 'Name', ob_email: 'Email address', ob_login_note: 'If your email already exists, we load your brand.',
+    ob_ch_h: 'Connect your channels', ob_ch_p: 'Enter your profile URL or handle per channel. FAAB uses your public posts and comments as input for your tone of voice.',
+    ob_ch_ph: 'Profile URL or @handle',
+    ob_web_h: 'Scan your website', ob_web_p: 'FAAB pulls your brand: description, audience and colors.',
+    ob_web_ph: 'https://yourcompany.com', ob_scan: 'Scan website', ob_scanning: 'Scanning...',
+    ob_scan_err: 'Scan failed. Check the URL or fill it in below yourself.',
+    ob_desc: 'Description of your service', ob_aud: 'Target audience', ob_colors: 'Brand colors', ob_logo: 'Logo',
+    ob_done_h: 'Your brand is set', ob_done_p: 'FAAB now generates one example post per connected channel, in your voice.',
+    ob_gen_examples: 'Generate example posts', ob_generating: 'Generating...', ob_open_cms: 'Open the CMS',
+    ob_next: 'Next', ob_back: 'Back', ob_skip: 'Skip',
+    ob_tone_note: 'Tone of voice is derived from your connected channels and brand scan.',
+    cms_brand: 'Brand personality', cms_strategy: 'Strategy', cms_topics: 'Topics', cms_content: 'Content', cms_schedule: 'Schedule',
+    cms_exit: 'Back to site', cms_logout: 'Log out',
+    b_h: 'Brand personality', b_company: 'Company', b_role: 'Role', b_name: 'Name', b_website: 'Website',
+    b_desc: 'Description', b_aud: 'Audience', b_pers: 'Personality', b_pers_ph: 'Direct, curious, a bit contrarian ...',
+    b_colors: 'Brand colors', b_docs: 'Documents', b_docs_p: 'Upload brand or style documents (.txt, .md) as extra input.',
+    b_upload_doc: 'Upload document', b_tone_h: 'Tone of voice base text', b_tone_p: 'This text drives all generated content. Fully editable.',
+    b_regen_tone: 'Regenerate from channels', b_tone_examples: 'Examples per connected channel', b_no_channels: 'No channels connected yet.',
+    b_gen_example: 'Generate example', b_socials: 'Connected channels',
+    s_h: 'Strategy per funnel stage', s_p: 'Goal and approach per stage. Edit freely.',
+    s_goal: 'Goal', s_approach: 'Approach', s_gen: 'Generate strategy', s_generating: 'Generating...',
+    s_keywords: 'Keywords', s_add_kw_ph: 'Add a keyword, then Enter', s_add: 'Add',
+    t_h: 'Topics', t_p: 'Search volumes and trending discussions on your keywords.',
+    t_refresh: 'Research topics', t_scanning: 'Researching...', t_kw: 'Keyword / thread', t_vol: 'Search volume', t_src: 'Source', t_act: 'Action',
+    t_use: 'Use', t_add_link: 'Add a link as input', t_add_link_ph: 'https://... article or thread', t_added: 'Added',
+    t_empty: 'Add keywords in Strategy first.', t_err: 'Research failed. Try again.',
+    c_h: 'Create content', c_p: 'Generate copy from your tone of voice, per channel and funnel stage.',
+    c_channel: 'Channel', c_phase: 'Funnel stage', c_angle: 'Angle', c_angle_ph: 'E.g. a lesson, an opinion, a customer story ...',
+    c_subject: 'Subject', c_subject_none: 'None (free post)',
+    c_generate: 'Generate copy', c_generating: 'Generating...', c_err: 'Generation failed. Try again.',
+    c_text: 'Copy', c_text_ph: 'Your copy appears here. Edit freely.',
+    c_visual: 'Visual', c_visual_preset: 'FAAB template', c_visual_upload: 'Upload own visual', c_visual_none: 'No visual',
+    c_headline: 'Headline on visual', c_save_draft: 'Save as draft', c_saved: 'Saved',
+    sch_h: 'Schedule', sch_drafts: 'Drafts to schedule', sch_scheduled: 'Scheduled posts',
+    sch_none_drafts: 'No drafts yet. Create content in the Content tab.', sch_none_sched: 'Nothing scheduled yet.',
+    sch_schedule: 'Schedule', sch_date: 'Date', sch_time: 'Time', sch_confirm: 'Confirm schedule', sch_unschedule: 'Back to drafts',
+    login_h: 'Log in or create a profile', login_btn: 'Continue', login_ph_email: 'you@company.com',
+    err_generic: 'Something went wrong. Try again.',
+    untitled: 'Untitled draft',
+    ch_strategy: 'Strategy', ch_placements: 'Placements', ch_examples: 'Example copy per funnel stage', ch_tone: 'Tone of voice on this channel',
+    ch_back: 'All channels', ch_cta: 'Start your brand on', example_word: 'Example',
   },
 };
 const MONTHS = {
@@ -180,56 +209,123 @@ const MONTHS = {
 };
 const WD = { nl: ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'], en: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'] };
 
-// ---------- Data ----------
-const uid = () => Math.random().toString(36).slice(2, 9);
-
+// ---------- Funnel (with icons) ----------
 const FUNNEL = [
-  { id: 'reach', n: '01', t: { nl: 'Bereik', en: 'Reach' }, d: { nl: 'Kom in beeld bij de juiste mensen op LinkedIn.', en: 'Get in front of the right people on LinkedIn.' }, intent: 'maximize reach and get discovered by new people', c: '#6BA3E0', w: 100 },
-  { id: 'engagement', n: '02', t: { nl: 'Interactie', en: 'Engagement' }, d: { nl: 'Zet passieve views om in reacties en gesprek.', en: 'Turn passive views into comments and conversation.' }, intent: 'spark comments, replies and conversation', c: '#3E86D6', w: 84 },
-  { id: 'followers', n: '03', t: { nl: 'Volgers', en: 'Followers' }, d: { nl: 'Zet aandacht om in een publiek dat terugkomt.', en: 'Convert attention into an audience that returns.' }, intent: 'give a clear reason to follow and come back', c: '#0A66C2', w: 68 },
-  { id: 'revenue', n: '04', t: { nl: 'Omzet', en: 'Revenue' }, d: { nl: 'Zet vertrouwen om in inbound, pipeline en verkoop.', en: 'Turn trust into inbound, pipeline and sales.' }, intent: 'build trust that softly leads to inbound and sales', c: '#0B4E96', w: 52 },
-  { id: 'ambassadorship', n: '05', t: { nl: 'Ambassadeurschap', en: 'Ambassadorship' }, d: { nl: 'Volgers worden ambassadeurs die je merk verspreiden.', en: 'Followers become advocates who carry your brand.' }, intent: 'make existing fans want to share and advocate', c: '#06356C', w: 38 },
+  { id: 'reach', n: '01', ic: I.megaphone, t: { nl: 'Bereik', en: 'Reach' }, d: { nl: 'Kom in beeld bij de juiste mensen.', en: 'Get in front of the right people.' }, intent: 'maximize reach and get discovered by new people', c: '#6BA3E0', w: 100 },
+  { id: 'engagement', n: '02', ic: I.message, t: { nl: 'Interactie', en: 'Engagement' }, d: { nl: 'Zet views om in gesprek.', en: 'Turn views into conversation.' }, intent: 'spark comments, replies and conversation', c: '#3E86D6', w: 84 },
+  { id: 'followers', n: '03', ic: I.users, t: { nl: 'Volgers', en: 'Followers' }, d: { nl: 'Bouw een publiek dat terugkomt.', en: 'Build an audience that returns.' }, intent: 'give a clear reason to follow and come back', c: '#0A66C2', w: 68 },
+  { id: 'revenue', n: '04', ic: I.coin, t: { nl: 'Omzet', en: 'Revenue' }, d: { nl: 'Zet vertrouwen om in pipeline.', en: 'Turn trust into pipeline.' }, intent: 'build trust that softly leads to inbound and sales', c: '#0B4E96', w: 52 },
+  { id: 'ambassadorship', n: '05', ic: I.heart, t: { nl: 'Ambassadeurschap', en: 'Ambassadorship' }, d: { nl: 'Volgers verspreiden je merk.', en: 'Followers carry your brand.' }, intent: 'make existing fans want to share and advocate', c: '#06356C', w: 38 },
 ];
 const phaseById = (id) => FUNNEL.find((f) => f.id === id) || FUNNEL[0];
 
-const KNOWLEDGE = [
-  { t: { nl: 'De founder is de funnel', en: 'The founder is the funnel' }, d: { nl: 'Mensen kopen van mensen. Een founderprofiel verslaat consequent de bedrijfspagina in bereik en vertrouwen, omdat het algoritme en het publiek allebei gezichten boven logo\u0027s verkiezen.', en: 'People buy from people. A founder profile consistently beats the company page on reach and trust, because the algorithm and the audience both favor faces over logos.' } },
-  { t: { nl: 'Positionering verslaat posten', en: 'Positioning beats posting' }, d: { nl: 'Willekeurig posten bouwt ruis, geen merk. Claim twee of drie thema\u0027s. Herhaling op een smal set onderwerpen laat een publiek onthouden waar je voor staat.', en: 'Random posting builds noise, not a brand. Own two or three themes. Repetition on a narrow set of topics is what makes an audience remember what you stand for.' } },
-  { t: { nl: 'De hook beslist alles', en: 'The hook decides everything' }, d: { nl: 'LinkedIn toont twee tot drie regels boven de vouw. Als de eerste regel geen spanning of nieuwsgierigheid wekt, wordt de rest nooit gelezen. Elke FAAB-template is hook-first.', en: 'LinkedIn shows two to three lines before the fold. If the first line creates no tension or curiosity, the rest is never read. Every FAAB template is hook-first.' } },
-  { t: { nl: 'Reageer sneller dan de feed', en: 'React faster than the feed' }, d: { nl: 'Het grootste bereik gaat naar wie een scherpe mening aan nieuws toevoegt terwijl het nog nieuws is. Vroeg zijn positioneert je als bron, niet als volger. Daar is Onderwerpen voor.', en: 'The biggest reach goes to people who add a sharp take to news while it is still news. Being early positions you as a source, not a follower. That is what Topics is for.' } },
-  { t: { nl: 'Consistentie stapelt op', en: 'Consistency compounds' }, d: { nl: 'Twee tot drie posts per week, elke week, verslaat er tien in een week en dan stilte. Het algoritme beloont ritme. Inplannen laat ritme een founderagenda overleven.', en: 'Two to three posts a week, every week, beats ten in one week then silence. The algorithm rewards rhythm. Scheduling makes rhythm survive a founder calendar.' } },
-  { t: { nl: 'Authenticiteit is een systeem', en: 'Authenticity is a system' }, d: { nl: 'Klinken als jezelf op schaal is ontwerp, geen geluk: een vaste tone of voice, ik-vorm, je eigen lessen. AI schrijft de structuur, jij levert de overtuiging.', en: 'Sounding like yourself at scale is design, not luck: a defined tone of voice, first-person writing, your own lessons. AI drafts the structure, you supply the conviction.' } },
-];
-
+// ---------- Userflow ----------
 const USERFLOW = [
-  { k: 'founder', ic: I.user, t: { nl: 'Founderprofiel', en: 'Founder profile' }, d: { nl: 'Leg je merkelementen vast: wie je bent, je bedrijf en je persoonlijkheid.', en: 'Capture your brand elements: who you are, your company and personality.' } },
-  { k: 'strategy', ic: I.target, t: { nl: 'Strategie', en: 'Strategy' }, d: { nl: 'Kies je funnelfasen en genereer je tone of voice en keywords.', en: 'Pick your funnel stages and generate your tone of voice and keywords.' } },
-  { k: 'topics', ic: I.radar, t: { nl: 'Actuele onderwerpen', en: 'Current topics' }, d: { nl: 'De radar vindt actueel nieuws op jouw thema\u0027s om op te reageren.', en: 'The radar finds current news on your themes to react to.' } },
-  { k: 'posting', ic: I.calendar, t: { nl: 'Posting', en: 'Posting' }, d: { nl: 'Schrijf in jouw stem, koppel aan een funnelfase en plan in op de kalender.', en: 'Draft in your voice, tag a funnel stage and schedule on the calendar.' } },
-  { k: 'webcare', ic: I.message, t: { nl: 'Webcare', en: 'Webcare' }, d: { nl: 'Volg reacties op en houd het gesprek warm, zo groeien volgers naar ambassadeurs.', en: 'Follow up on comments and keep the conversation warm, so followers grow into advocates.' } },
+  { k: 'founder', ic: I.user, t: { nl: 'Founderprofiel', en: 'Founder profile' } },
+  { k: 'strategy', ic: I.target, t: { nl: 'Strategie', en: 'Strategy' } },
+  { k: 'topics', ic: I.radar, t: { nl: 'Actuele onderwerpen', en: 'Current topics' } },
+  { k: 'posting', ic: I.calendar, t: { nl: 'Posting', en: 'Posting' } },
+  { k: 'webcare', ic: I.message, t: { nl: 'Webcare', en: 'Webcare' } },
 ];
 
-const SUGGESTED = {
-  nl: ['AI', 'Ondernemerschap', 'Leiderschap', 'SaaS', 'Groei', 'Marketing', 'Productiviteit', 'Bedrijfscultuur', 'Fundraising', 'Innovatie', 'Sales', 'Werving'],
-  en: ['AI', 'Entrepreneurship', 'Leadership', 'SaaS', 'Growth', 'Marketing', 'Productivity', 'Company culture', 'Fundraising', 'Innovation', 'Sales', 'Hiring'],
-};
-
-function makeTemplates(lang) {
-  if (lang === 'nl') return [
-    { id: 'tpl-news', name: 'Nieuwsduiding', body: '{hook}\n\nWat er speelt: {kern}\n\nWaarom dit ertoe doet voor founders: {inzicht}\n\n{vraag}' },
-    { id: 'tpl-hot', name: 'Hot take', body: 'Onpopulaire mening: {stelling}\n\n{onderbouwing}\n\n{vraag}' },
-    { id: 'tpl-lesson', name: 'Les geleerd', body: '{hook}\n\nWat ik leerde: {les}\n\nHoe ik het toepas: {toepassing}\n\n{cta}' },
-  ];
-  return [
-    { id: 'tpl-news', name: 'News take', body: '{hook}\n\nWhat is happening: {core}\n\nWhy this matters for founders: {insight}\n\n{question}' },
-    { id: 'tpl-hot', name: 'Hot take', body: 'Unpopular opinion: {statement}\n\n{reasoning}\n\n{question}' },
-    { id: 'tpl-lesson', name: 'Lesson learned', body: '{hook}\n\nWhat I learned: {lesson}\n\nHow I apply it: {application}\n\n{cta}' },
-  ];
-}
+// ---------- Channels ----------
+const CHANNELS = [
+  {
+    id: 'linkedin', name: 'LinkedIn', ic: I.linkedin, c: '#0A66C2',
+    strat: {
+      nl: 'LinkedIn is het thuiskanaal van de founder als merk. Hier bouw je autoriteit met meningen op nieuws, geleerde lessen en zichtbare expertise. De eerste twee regels beslissen alles: schrijf hook-first, houd een idee per post en nodig expliciet uit tot reactie. Ritme wint: twee tot drie posts per week, plus dagelijks reageren op anderen in je niche.',
+      en: 'LinkedIn is the home channel of the founder as a brand. Build authority with takes on news, lessons learned and visible expertise. The first two lines decide everything: write hook-first, keep one idea per post and explicitly invite comments. Rhythm wins: two to three posts a week, plus daily commenting on others in your niche.',
+    },
+    placements: {
+      nl: ['Tekstposts met witruimte (kernformaat)', 'Documentcarrousels voor diepere lessen', 'Peilingen voor interactie', 'Reacties op posts van anderen als zichtbaarheidsmotor'],
+      en: ['Text posts with whitespace (core format)', 'Document carousels for deeper lessons', 'Polls for engagement', 'Comments on others as a visibility engine'],
+    },
+    tone: {
+      nl: 'Professioneel maar persoonlijk, in de ik-vorm. Kort van zin, concreet, met een duidelijke mening. Geen jargon, geen corporate wij-vorm.',
+      en: 'Professional but personal, first person. Short sentences, concrete, with a clear opinion. No jargon, no corporate we-voice.',
+    },
+    ex: {
+      reach: { nl: 'De meeste founders posten over hun product. Klanten kopen het verhaal erachter. Dit is het onze.', en: 'Most founders post about their product. Customers buy the story behind it. This is ours.' },
+      engagement: { nl: 'Onpopulaire mening: je website zegt minder over je merk dan je laatste tien LinkedIn-reacties. Eens of oneens?', en: 'Unpopular opinion: your website says less about your brand than your last ten LinkedIn comments. Agree or disagree?' },
+      followers: { nl: 'Elke week deel ik een les uit het bouwen van ons bedrijf. Deze week: waarom we nee zeiden tegen onze grootste klant.', en: 'Every week I share one lesson from building our company. This week: why we said no to our biggest client.' },
+      revenue: { nl: 'Drie klanten vroegen ons deze maand hetzelfde. Dus hebben we er een dienst van gemaakt. Zo werkt het.', en: 'Three clients asked us the same thing this month. So we turned it into a service. Here is how it works.' },
+      ambassadorship: { nl: 'Dit team bouwde in negentig dagen wat anderen in een jaar doen. Tag iemand die dit verdient te zien.', en: 'This team built in ninety days what others do in a year. Tag someone who deserves to see this.' },
+    },
+    sample: { nl: 'Onpopulaire mening: je founderprofiel verslaat je bedrijfspagina. Elke week weer.', en: 'Unpopular opinion: your founder profile beats your company page. Every single week.' },
+  },
+  {
+    id: 'instagram', name: 'Instagram', ic: I.instagram, c: '#C13584',
+    strat: {
+      nl: 'Instagram maakt je merk menselijk. Hier laat je de founder achter het bedrijf zien: behind-the-scenes, het team, mijlpalen en visuele storytelling. Reels dragen het bereik, carrousels dragen de diepgang, Stories dragen de band. De feed is je etalage: consistente stijl in kleur en toon herkent men in een halve seconde.',
+      en: 'Instagram humanizes your brand. Show the founder behind the company: behind-the-scenes, the team, milestones and visual storytelling. Reels carry reach, carousels carry depth, Stories carry the bond. The feed is your storefront: a consistent style in color and tone is recognized in half a second.',
+    },
+    placements: {
+      nl: ['Reels voor bereik (korte inzichten, bts)', 'Carrousels voor lessen en stappen', 'Stories voor dagelijks contact en polls', 'Feedposts als visitekaartje in merkstijl'],
+      en: ['Reels for reach (short insights, bts)', 'Carousels for lessons and steps', 'Stories for daily contact and polls', 'Feed posts as a brand-style business card'],
+    },
+    tone: {
+      nl: 'Warm, visueel en dichtbij. Kortere zinnen dan op LinkedIn, meer emotie, af en toe een emoji. Caption opent sterk, want de rest klapt in.',
+      en: 'Warm, visual and close. Shorter sentences than LinkedIn, more emotion, an occasional emoji. The caption opens strong, the rest folds away.',
+    },
+    ex: {
+      reach: { nl: 'Dag 1 vs dag 400 van ons bedrijf. Zelfde missie, ander kantoor.', en: 'Day 1 vs day 400 of our company. Same mission, different office.' },
+      engagement: { nl: 'Welke kies jij: sneller groeien of rustiger bouwen? Stem in de comments.', en: 'Which one do you pick: grow faster or build calmer? Vote in the comments.' },
+      followers: { nl: 'Elke vrijdag: een blik achter de schermen bij het bouwen van ons merk. Volg mee.', en: 'Every Friday: a look behind the scenes of building our brand. Follow along.' },
+      revenue: { nl: 'Van aanvraag tot resultaat in vier stappen. Swipe voor hoe we dat aanpakken.', en: 'From request to result in four steps. Swipe to see how we do it.' },
+      ambassadorship: { nl: 'Onze klanten zeggen het mooier dan wij. Deel dit met iemand die dit nodig heeft.', en: 'Our clients say it better than we do. Share this with someone who needs it.' },
+    },
+    sample: { nl: 'Dag 1 vs dag 400. Zelfde missie, ander verhaal. Swipe.', en: 'Day 1 vs day 400. Same mission, different story. Swipe.' },
+  },
+  {
+    id: 'x', name: 'X', ic: I.xsocial, c: '#171717',
+    strat: {
+      nl: 'X is het snelste kanaal: hier reageer je op nieuws terwijl het nog nieuws is en bouw je een reputatie met scherpe, korte gedachten. Een sterke one-liner doet meer dan een lang betoog; threads gebruik je voor de uitwerking. Wees vroeg, wees stellig en ga het gesprek aan in de replies, daar wordt het volgen verdiend.',
+      en: 'X is the fastest channel: react to news while it is still news and build a reputation with sharp, short thoughts. A strong one-liner beats a long argument; use threads for the build-out. Be early, be opinionated and join the conversation in the replies, that is where follows are earned.',
+    },
+    placements: {
+      nl: ['Losse posts met een scherpe gedachte', 'Threads voor uitwerking en lessen', 'Quote-posts op nieuws met eigen mening', 'Replies in je niche als groeimotor'],
+      en: ['Single posts with one sharp thought', 'Threads for build-out and lessons', 'Quote posts on news with your own take', 'Replies in your niche as a growth engine'],
+    },
+    tone: {
+      nl: 'Direct, puntig en met durf. Geen opwarmers, geen hashtag-stapels. Elke post kan op zichzelf staan.',
+      en: 'Direct, punchy and daring. No warm-ups, no hashtag piles. Every post can stand on its own.',
+    },
+    ex: {
+      reach: { nl: 'Je hebt geen contentkalender nodig. Je hebt een mening nodig.', en: 'You do not need a content calendar. You need an opinion.' },
+      engagement: { nl: 'Founders: wat was je duurste fout onder de 1000 euro? Ik begin.', en: 'Founders: what was your most expensive mistake under 1000 dollars? I will start.' },
+      followers: { nl: 'Ik bouw in het openbaar aan ons bedrijf. Alles wat werkt en niet werkt deel ik hier.', en: 'Building our company in public. Everything that works and does not work gets shared here.' },
+      revenue: { nl: 'We hebben dit kwartaal 3 diensten geschrapt en groeien sneller dan ooit. Thread over focus:', en: 'We cut 3 services this quarter and grow faster than ever. A thread on focus:' },
+      ambassadorship: { nl: 'De beste marketing is een klant die het doorvertelt. RT als je dit ook zo bouwt.', en: 'The best marketing is a client who passes it on. RT if you build like this too.' },
+    },
+    sample: { nl: 'Je hebt geen contentkalender nodig. Je hebt een mening nodig.', en: 'You do not need a content calendar. You need an opinion.' },
+  },
+  {
+    id: 'facebook', name: 'Facebook', ic: I.facebook, c: '#1877F2',
+    strat: {
+      nl: 'Facebook is het gemeenschapskanaal: lokaal bereik, groepen en een publiek dat verhalen leest in plaats van scant. Hier werken langere, persoonlijke verhalen, mijlpalen en vragen aan je community. Groepen rond je vakgebied zijn de verborgen groeimotor: wees daar behulpzaam zonder te verkopen.',
+      en: 'Facebook is the community channel: local reach, groups and an audience that reads stories instead of scanning. Longer personal stories, milestones and questions to your community work here. Groups around your field are the hidden growth engine: be helpful there without selling.',
+    },
+    placements: {
+      nl: ['Persoonlijke verhalen en mijlpalen op je pagina', 'Waardevolle bijdragen in vakgroepen', 'Evenementen en livesessies', 'Foto-posts met team en klanten'],
+      en: ['Personal stories and milestones on your page', 'Valuable contributions in industry groups', 'Events and live sessions', 'Photo posts with team and clients'],
+    },
+    tone: {
+      nl: 'Verhalend en toegankelijk. Iets langer mag, zolang het persoonlijk blijft. Schrijf zoals je het aan een bekende zou vertellen.',
+      en: 'Narrative and approachable. A bit longer is fine, as long as it stays personal. Write like you would tell it to someone you know.',
+    },
+    ex: {
+      reach: { nl: 'Vijf jaar geleden begon dit bedrijf aan een keukentafel. Vandaag een nieuwe mijlpaal. Het hele verhaal:', en: 'Five years ago this company started at a kitchen table. Today a new milestone. The full story:' },
+      engagement: { nl: 'Ondernemers hier: wat is het beste advies dat je ooit kreeg? De reacties worden goud.', en: 'Business owners here: what is the best advice you ever got? The comments will be gold.' },
+      followers: { nl: 'Elke maand delen we hier wat we leerden van onze klanten. Volg de pagina om niets te missen.', en: 'Every month we share what we learned from our clients here. Follow the page so you miss nothing.' },
+      revenue: { nl: 'We hebben plek voor twee nieuwe projecten deze maand. Stuur een bericht en we denken vrijblijvend mee.', en: 'We have room for two new projects this month. Send a message and we will think along, no strings attached.' },
+      ambassadorship: { nl: 'Zonder jullie was deze mijlpaal er niet. Ken je iemand die we kunnen helpen? Deel dit bericht.', en: 'This milestone would not exist without you. Know someone we can help? Share this post.' },
+    },
+    sample: { nl: 'Vijf jaar geleden: een keukentafel. Vandaag: een team van tien. Het hele verhaal in de comments.', en: 'Five years ago: a kitchen table. Today: a team of ten. Full story in the comments.' },
+  },
+];
+const channelById = (id) => CHANNELS.find((c) => c.id === id) || CHANNELS[0];
 
 // ---------- Environment shim ----------
-// Inside the Claude artifact, window.storage exists and the Anthropic endpoint is proxied for us.
-// On a normal deploy (e.g. Vercel) we fall back to localStorage and a serverless proxy at /api/anthropic.
 const IN_ARTIFACT = typeof window !== 'undefined' && !!window.storage;
 const API_URL = IN_ARTIFACT ? 'https://api.anthropic.com/v1/messages' : '/api/anthropic';
 const store = {
@@ -245,28 +341,34 @@ const store = {
 
 // ---------- API helpers ----------
 async function callClaude(messages, tools) {
-  const body = { model: 'claude-sonnet-4-6', max_tokens: 1000, messages };
+  const body = { model: 'claude-sonnet-4-6', max_tokens: 1200, messages };
   if (tools) body.tools = tools;
-  const res = await fetch(API_URL, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error('API returned status ' + res.status);
+  const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!res.ok) throw new Error('API status ' + res.status);
   const data = await res.json();
   return data.content || [];
 }
-const textOf = (content) => content.filter((b) => b.type === 'text').map((b) => b.text).join('\n');
-function stripDashes(t) { return t.replace(/\s*[\u2014\u2013]\s*/g, ', ').replace(/,\s*,/g, ',').trim(); }
+const textOf = (c) => c.filter((b) => b.type === 'text').map((b) => b.text).join('\n');
+const stripDashes = (t) => t.replace(/\s*[\u2014\u2013]\s*/g, ', ').replace(/,\s*,/g, ',').trim();
 function extractJson(text, kind) {
-  let s = text.replace(/```json/gi, '').replace(/```/g, '');
+  const s = text.replace(/```json/gi, '').replace(/```/g, '');
   const o = kind === 'array' ? ['[', ']'] : ['{', '}'];
   const a = s.indexOf(o[0]); const b = s.lastIndexOf(o[1]);
-  if (a === -1 || b === -1) throw new Error('No JSON found');
+  if (a === -1 || b === -1) throw new Error('No JSON');
   return JSON.parse(s.slice(a, b + 1));
 }
-
-// ---------- Date helpers ----------
+const uid = () => Math.random().toString(36).slice(2, 9);
 const pad = (n) => String(n).padStart(2, '0');
 const ymd = (d) => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const WEB_TOOL = [{ type: 'web_search_20250305', name: 'web_search' }];
+const langName = (l) => (l === 'nl' ? 'Dutch' : 'English');
+
+// Preset branded visual as SVG data URL.
+function presetVisual(headline, color, name) {
+  const safe = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').slice(0, 60);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800"><rect width="800" height="800" fill="${color || '#0A66C2'}"/><path d="M60 210 L120 90 L180 210 M150 210 L210 90 L270 210" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/><text x="60" y="430" fill="#FFFFFF" font-family="Georgia, serif" font-size="52" font-weight="600">${safe(headline)}</text><text x="60" y="720" fill="rgba(255,255,255,0.75)" font-family="monospace" font-size="24">${safe(name)}</text></svg>`;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
 
 // ---------- Small UI ----------
 function Chip({ active, onClick, children, removable, onRemove, dot }) {
@@ -287,252 +389,280 @@ function Field({ label, hint, children }) {
   );
 }
 
+// ---------- Default state ----------
+const emptyBrand = () => ({
+  company: '', role: '', name: '', website: '', logo: '', description: '', audience: '',
+  personality: '', colors: [], docs: [], tone: '', socials: { linkedin: '', instagram: '', x: '', facebook: '' },
+  channelExamples: {},
+});
+const emptyStrategy = () => ({
+  keywords: [],
+  perPhase: FUNNEL.reduce((acc, f) => { acc[f.id] = { goal: '', approach: '' }; return acc; }, {}),
+});
+
 // ---------- App ----------
 export default function App() {
   const [lang, setLang] = useState('nl');
   const [loaded, setLoaded] = useState(false);
-  const [view, setView] = useState('home');
-  const [tab, setTab] = useState('founder');
+  const [intro, setIntro] = useState(true);
+  const [view, setView] = useState('home'); // home | channel:<id> | onboarding | cms
   const [menu, setMenu] = useState(false);
 
-  const [founder, setFounder] = useState({ name: '', role: '', company: '', logo: '', companyDesc: '', personalityDesc: '' });
-  const [strategy, setStrategy] = useState({ phases: ['reach', 'engagement', 'followers'], goal: '', tone: '', keywords: [], linkedin: '' });
-  const [stratState, setStratState] = useState('idle');
-  const [liState, setLiState] = useState('idle');
-  const [kwInput, setKwInput] = useState('');
-  const [templates, setTemplates] = useState(() => makeTemplates('nl'));
-  const [templatesDirty, setTemplatesDirty] = useState(false);
-  const tplUpRef = useRef(null);
-  const logoRef = useRef(null);
-
-  const [news, setNews] = useState([]);
-  const [newsState, setNewsState] = useState('idle');
-  const [newsErr, setNewsErr] = useState('');
-
-  const [posts, setPosts] = useState([]);
-  const [composer, setComposer] = useState(null);
+  const [user, setUser] = useState(null); // { email, name }
+  const [brand, setBrand] = useState(emptyBrand());
+  const [strategy, setStrategy] = useState(emptyStrategy());
+  const [topics, setTopics] = useState([]);
+  const [drafts, setDrafts] = useState([]);
+  const [scheduled, setScheduled] = useState([]);
 
   const t = (k) => (STR[lang] && STR[lang][k]) || STR.en[k] || k;
-  const langLabel = lang === 'nl' ? 'Dutch' : 'English';
+  const setupDone = !!(user && brand.tone);
 
-  // Load persisted state + browser language detection
+  // ----- load: last user + language -----
   useEffect(() => {
-    let langSet = false;
     (async () => {
+      let langSet = false;
       try {
-        const r = await store.get('faab:data');
-        if (r && r.value) {
-          const d = JSON.parse(r.value);
-          if (d.founder) setFounder(d.founder);
-          if (d.strategy) setStrategy(d.strategy);
-          if (Array.isArray(d.templates)) setTemplates(d.templates);
-          if (typeof d.templatesDirty === 'boolean') setTemplatesDirty(d.templatesDirty);
-          if (Array.isArray(d.posts)) setPosts(d.posts);
-          if (d.lang) { setLang(d.lang); langSet = true; }
+        const last = await store.get('faab:last');
+        if (last && last.value) {
+          const email = last.value;
+          const r = await store.get('faab:user:' + email);
+          if (r && r.value) { applyData(JSON.parse(r.value)); langSet = true; }
         }
       } catch (e) { /* ignore */ }
       if (!langSet) {
-        try {
-          const bl = (navigator.language || 'nl').toLowerCase();
-          setLang(bl.startsWith('en') ? 'en' : 'nl');
-        } catch (e) { /* keep nl */ }
+        try { setLang((navigator.language || 'nl').toLowerCase().startsWith('en') ? 'en' : 'nl'); } catch (e) { /* nl */ }
       }
       setLoaded(true);
+      setTimeout(() => setIntro(false), 2600);
     })();
   }, []);
 
-  // Retranslate default templates when language changes, unless user edited them
-  useEffect(() => {
-    if (!loaded) return;
-    if (!templatesDirty) setTemplates(makeTemplates(lang));
-  }, [lang, loaded]);
+  function applyData(d) {
+    if (d.user) setUser(d.user);
+    if (d.brand) setBrand({ ...emptyBrand(), ...d.brand, socials: { ...emptyBrand().socials, ...(d.brand.socials || {}) } });
+    if (d.strategy) setStrategy({ ...emptyStrategy(), ...d.strategy, perPhase: { ...emptyStrategy().perPhase, ...(d.strategy.perPhase || {}) } });
+    if (Array.isArray(d.topics)) setTopics(d.topics);
+    if (Array.isArray(d.drafts)) setDrafts(d.drafts);
+    if (Array.isArray(d.scheduled)) setScheduled(d.scheduled);
+    if (d.lang) setLang(d.lang);
+  }
 
-  // Persist
+  // ----- persist per user -----
   useEffect(() => {
-    if (!loaded) return;
+    if (!loaded || !user || !user.email) return;
     (async () => {
       try {
-        await store.set('faab:data', JSON.stringify({ founder, strategy, templates, templatesDirty, posts, lang }));
+        await store.set('faab:user:' + user.email, JSON.stringify({ user, brand, strategy, topics, drafts, scheduled, lang }));
+        await store.set('faab:last', user.email);
       } catch (e) { /* ignore */ }
     })();
-  }, [founder, strategy, templates, templatesDirty, posts, lang, loaded]);
+  }, [user, brand, strategy, topics, drafts, scheduled, lang, loaded]);
 
-  useEffect(() => {
-    if (view === 'app' && tab === 'topics' && news.length === 0 && newsState === 'idle') fetchNews();
-  }, [view, tab]);
   useEffect(() => { document.body.style.overflow = menu ? 'hidden' : ''; }, [menu]);
 
-  const go = (v, tb) => { setView(v); if (tb) setTab(tb); setMenu(false); };
-  const changeLang = (l) => { setLang(l); };
+  const go = (v) => { setView(v); setMenu(false); window.scrollTo(0, 0); };
 
-  function setF(k, v) { setFounder((p) => ({ ...p, [k]: v })); }
-  function setS(k, v) { setStrategy((p) => ({ ...p, [k]: v })); }
-  function togglePhase(id) { setStrategy((p) => ({ ...p, phases: p.phases.includes(id) ? p.phases.filter((x) => x !== id) : [...p.phases, id] })); }
-  const editTemplates = (fn) => { setTemplatesDirty(true); setTemplates(fn); };
+  async function loginOrCreate(email, name) {
+    const e = email.trim().toLowerCase();
+    if (!e) return;
+    try {
+      const r = await store.get('faab:user:' + e);
+      if (r && r.value) { applyData(JSON.parse(r.value)); return; }
+    } catch (err) { /* new */ }
+    setUser({ email: e, name: name.trim() });
+    setBrand((b) => ({ ...b, name: name.trim() }));
+  }
+  function logout() { setUser(null); setBrand(emptyBrand()); setStrategy(emptyStrategy()); setTopics([]); setDrafts([]); setScheduled([]); store.set('faab:last', ''); go('home'); }
 
-  function addKeyword(val) {
-    const s = (val || '').trim();
-    if (!s || strategy.keywords.some((k) => k.toLowerCase() === s.toLowerCase())) return;
-    setS('keywords', [...strategy.keywords, s]);
-  }
-  function toggleKeyword(s) {
-    setS('keywords', strategy.keywords.some((k) => k.toLowerCase() === s.toLowerCase())
-      ? strategy.keywords.filter((x) => x.toLowerCase() !== s.toLowerCase())
-      : [...strategy.keywords, s]);
+  const setB = (k, v) => setBrand((p) => ({ ...p, [k]: v }));
+  const setSocial = (ch, v) => setBrand((p) => ({ ...p, socials: { ...p.socials, [ch]: v } }));
+
+  // ----- AI: website brand scan (Waryte mechanism) -----
+  const [scanState, setScanState] = useState('idle');
+  async function scanWebsite() {
+    const url = (brand.website || '').trim();
+    if (!url) return;
+    setScanState('loading');
+    try {
+      const prompt = `Visit and research this company website: ${url}. Extract the brand.
+
+Return ONLY a JSON object:
+- company: company name.
+- description: 2 sentences in ${langName(lang)} describing the service.
+- audience: 1 sentence in ${langName(lang)} describing the target audience.
+- colors: array of 2 to 4 hex color codes that match the site brand (best guess).
+
+No markdown. Do not use em-dashes or en-dashes.`;
+      const out = extractJson(textOf(await callClaude([{ role: 'user', content: prompt }], WEB_TOOL)), 'object');
+      setBrand((p) => ({
+        ...p,
+        company: p.company || stripDashes(String(out.company || '')),
+        description: stripDashes(String(out.description || p.description)),
+        audience: stripDashes(String(out.audience || p.audience)),
+        colors: Array.isArray(out.colors) && out.colors.length ? out.colors.map(String).slice(0, 4) : p.colors,
+      }));
+      setScanState('done');
+    } catch (e) { setScanState('error'); }
   }
 
-  function onLogo(e) {
-    const f = e.target.files && e.target.files[0]; if (!f) return;
-    const r = new FileReader(); r.onload = () => setF('logo', String(r.result)); r.readAsDataURL(f);
-  }
-  function onTplUpload(e) {
-    const f = e.target.files && e.target.files[0]; if (!f) return;
-    const r = new FileReader();
-    r.onload = () => editTemplates((arr) => [...arr, { id: uid(), name: f.name.replace(/\.[^.]+$/, ''), body: stripDashes(String(r.result)) }]);
-    r.readAsText(f);
+  // ----- AI: tone of voice from connected channels + brand -----
+  const [toneState, setToneState] = useState('idle');
+  async function generateTone() {
+    setToneState('loading');
+    try {
+      const socials = Object.entries(brand.socials).filter(([, v]) => v.trim()).map(([k, v]) => `${channelById(k).name}: ${v}`).join('\n');
+      const docs = brand.docs.map((d) => d.text).join('\n').slice(0, 3000);
+      const prompt = `You are a senior brand voice strategist. Determine the tone of voice for this founder, based on how they actually write publicly.
+
+${socials ? 'Connected public profiles (search the web for their public posts and comments, study sentence length, vocabulary, formality, humor and recurring themes):\n' + socials + '\n' : ''}Company: ${brand.company || 'n/a'}
+Description: ${brand.description || 'n/a'}
+Audience: ${brand.audience || 'n/a'}
+Personality: ${brand.personality || 'n/a'}
+${docs ? 'Brand documents excerpt:\n' + docs + '\n' : ''}
+Write a tone of voice base text in ${langName(lang)}: 4 to 6 short lines covering voice adjectives, sentence rhythm, point of view, what to lean into and what to avoid. Concrete and usable, matching how this person already writes. Return only the text, no JSON, no markdown headers. Do not use em-dashes or en-dashes.`;
+      const text = stripDashes(textOf(await callClaude([{ role: 'user', content: prompt }], socials ? WEB_TOOL : undefined)));
+      setBrand((p) => ({ ...p, tone: text }));
+      setToneState('done');
+    } catch (e) { setToneState('error'); }
   }
 
+  // ----- AI: example post per connected channel -----
+  const [exState, setExState] = useState('idle');
+  async function generateExamples() {
+    setExState('loading');
+    try {
+      const connected = CHANNELS.filter((c) => (brand.socials[c.id] || '').trim());
+      const targets = connected.length ? connected : [CHANNELS[0]];
+      const results = {};
+      for (const ch of targets) {
+        const text = await genPost({ channel: ch.id, phase: 'reach', angle: '', subject: '' });
+        results[ch.id] = text;
+      }
+      setBrand((p) => ({ ...p, channelExamples: { ...p.channelExamples, ...results } }));
+      setExState('done');
+    } catch (e) { setExState('error'); }
+  }
+  async function generateExampleFor(chId) {
+    const text = await genPost({ channel: chId, phase: 'reach', angle: '', subject: '' });
+    setBrand((p) => ({ ...p, channelExamples: { ...p.channelExamples, [chId]: text } }));
+  }
+
+  // ----- AI: strategy per funnel phase -----
+  const [stratState, setStratState] = useState('idle');
   async function generateStrategy() {
     setStratState('loading');
     try {
-      const prompt = `You are a senior LinkedIn personal-branding strategist for founders. You know the fundamentals cold: the founder profile outperforms the company page, positioning on two or three themes beats random posting, the first line is a hook that decides everything, reacting fast to news wins reach, consistency compounds, and authentic first-person writing is what builds trust.
+      const prompt = `You are a personal branding strategist. For this founder brand, define a goal and an approach for each funnel stage of social media personal branding.
 
-Founder context:
-- Company: ${founder.company || 'unknown'}
-- Company description: ${founder.companyDesc || 'n/a'}
-- Founder personality: ${founder.personalityDesc || 'n/a'}
-- Goal and approach: ${strategy.goal || 'n/a'}
-- Funnel focus: ${strategy.phases.map((p) => phaseById(p).t.en).join(', ') || 'n/a'}
+Brand: ${brand.company || 'n/a'}. ${brand.description || ''}
+Audience: ${brand.audience || 'n/a'}
+Tone: ${brand.tone ? brand.tone.slice(0, 400) : 'n/a'}
+Stages: reach, engagement, followers, revenue, ambassadorship.
 
-Define the tone of voice this specific founder should use on LinkedIn. Make it concrete and usable, grounded in their real personality and goal, not a generic template.
-
-Return ONLY a JSON object with these fields:
-- tone: 3 to 4 short lines in ${langLabel}. Cover, in plain language: the voice in a few sharp adjectives, the sentence rhythm and structure, the point of view, and one thing to lean into plus one thing to avoid. No buzzwords, no filler.
-- keywords: array of 6 sharp content themes in ${langLabel} (1 to 2 words each) that this founder can credibly own and repeat.
-
-No markdown, no prose outside the JSON. Do not use em-dashes or en-dashes.`;
+Return ONLY a JSON object with a key per stage id, each value an object with:
+- goal: 1 short sentence in ${langName(lang)}.
+- approach: 1 to 2 short sentences in ${langName(lang)} with the concrete content approach for that stage.
+Also include key "keywords": array of 6 short content themes in ${langName(lang)}.
+No markdown. Do not use em-dashes or en-dashes.`;
       const out = extractJson(textOf(await callClaude([{ role: 'user', content: prompt }])), 'object');
-      setStrategy((p) => ({
-        ...p,
-        tone: stripDashes(String(out.tone || p.tone)),
-        keywords: Array.from(new Set([...(p.keywords || []), ...((out.keywords || []).map((k) => stripDashes(String(k))))])).slice(0, 10),
-      }));
+      setStrategy((p) => {
+        const per = { ...p.perPhase };
+        FUNNEL.forEach((f) => {
+          const v = out[f.id];
+          if (v) per[f.id] = { goal: stripDashes(String(v.goal || per[f.id].goal)), approach: stripDashes(String(v.approach || per[f.id].approach)) };
+        });
+        const kws = Array.isArray(out.keywords) ? out.keywords.map((k) => stripDashes(String(k))) : [];
+        return { ...p, perPhase: per, keywords: Array.from(new Set([...p.keywords, ...kws])).slice(0, 10) };
+      });
       setStratState('done');
     } catch (e) { setStratState('error'); }
   }
 
-  async function analyzeLinkedIn() {
-    const q = (strategy.linkedin || '').trim();
-    if (!q) return;
-    setLiState('loading');
+  // ----- AI: topics research (search volumes + reddit) -----
+  const [topicState, setTopicState] = useState('idle');
+  async function researchTopics() {
+    if (!strategy.keywords.length) { setTopicState('empty'); return; }
+    setTopicState('loading');
     try {
-      const prompt = `Search the public web for the LinkedIn presence of: ${q}. Study how this person actually writes in their public posts and comments: sentence length, vocabulary, level of formality, humor, structure and recurring themes.
+      const prompt = `Research content topics for these themes: ${strategy.keywords.join(', ')}.
 
-Based on their real public writing style, return ONLY a JSON object:
-- tone: 3 to 4 short lines in ${langLabel} describing their tone of voice concretely (adjectives, sentence rhythm, point of view, one thing to lean into and one to avoid), matching how they already write.
-- keywords: array of 6 short content themes in ${langLabel} they already talk about or could credibly own.
+Use web search. Return ONLY a JSON array of 8 items, mixing two kinds:
+- keyword items: { "type": "keyword", "title": short search keyword, "volume": estimated monthly searches as a string like "2.4K" or "18K", "source": "Search" }
+- reddit items: { "type": "reddit", "title": title of a trending relevant reddit thread, "volume": approximate upvotes as a string like "1.2K", "source": subreddit name like "r/entrepreneur", "url": link if known else "" }
 
-If public writing is limited, infer a sensible professional tone from what is available. No markdown, no prose outside the JSON. Do not use em-dashes or en-dashes.`;
-      const out = extractJson(textOf(await callClaude([{ role: 'user', content: prompt }], [{ type: 'web_search_20250305', name: 'web_search' }])), 'object');
-      setStrategy((p) => ({
-        ...p,
-        tone: stripDashes(String(out.tone || p.tone)),
-        keywords: Array.from(new Set([...(p.keywords || []), ...((out.keywords || []).map((k) => stripDashes(String(k))))])).slice(0, 10),
-      }));
-      setLiState('done');
-    } catch (e) { setLiState('error'); }
+Titles in ${langName(lang)} for keyword items; reddit titles stay as found. No markdown. Do not use em-dashes or en-dashes.`;
+      const arr = extractJson(textOf(await callClaude([{ role: 'user', content: prompt }], WEB_TOOL)), 'array');
+      setTopics(arr.map((it) => ({
+        id: uid(), type: String(it.type || 'keyword'), title: stripDashes(String(it.title || '')),
+        volume: stripDashes(String(it.volume || '')), source: stripDashes(String(it.source || 'Search')), url: String(it.url || ''),
+      })).filter((x) => x.title));
+      setTopicState('done');
+    } catch (e) { setTopicState('error'); }
+  }
+  function addLinkTopic(url) {
+    const u = url.trim(); if (!u) return;
+    setTopics((arr) => [{ id: uid(), type: 'link', title: u, volume: '', source: 'Link', url: u }, ...arr]);
   }
 
-  async function fetchNews() {
-    if (strategy.keywords.length === 0) { setNewsState('empty'); return; }
-    setNewsState('loading'); setNewsErr('');
-    try {
-      const prompt = `You are a news radar for LinkedIn thought leadership. Find current news from the past two weeks matching these founder themes: ${strategy.keywords.join(', ')}.
+  // ----- AI: content generation -----
+  async function genPost({ channel, phase, angle, subject }) {
+    const ch = channelById(channel);
+    const ph = phaseById(phase);
+    const per = strategy.perPhase[phase] || { goal: '', approach: '' };
+    const prompt = `You are an expert social media ghostwriter for founders. Write one ${ch.name} post.
 
-Return exactly 5 items. Each object: title (short), source (publication name), url (link if known else ""), summary (1 short sentence), angle (1 sentence on why it matters for a founder on LinkedIn), keyword (best matching theme). Write title, summary and angle in ${langLabel}.
+Author: ${brand.name || 'the founder'}${brand.role ? ', ' + brand.role : ''}${brand.company ? ' at ' + brand.company : ''}.
+Brand: ${brand.description || 'n/a'} Audience: ${brand.audience || 'n/a'}
+Tone of voice (match exactly):
+${brand.tone || 'personal, clear, first person'}
+Channel conventions for ${ch.name}: ${ch.tone.en}
+Funnel stage: ${ph.t.en}. Stage intent: ${ph.intent}.${per.goal ? ' Stage goal: ' + per.goal : ''}${per.approach ? ' Approach: ' + per.approach : ''}
+${subject ? 'Subject to react to: ' + subject : ''}${angle ? '\nAngle: ' + angle : ''}
 
-Reply ONLY with a JSON array, no markdown. Do not use em-dashes or en-dashes.`;
-      const content = await callClaude([{ role: 'user', content: prompt }], [{ type: 'web_search_20250305', name: 'web_search' }]);
-      const items = extractJson(textOf(content), 'array').map((it) => ({
-        id: uid(), title: stripDashes(String(it.title || '')), source: stripDashes(String(it.source || 'Web')),
-        url: String(it.url || ''), summary: stripDashes(String(it.summary || '')),
-        angle: stripDashes(String(it.angle || '')), keyword: stripDashes(String(it.keyword || '')),
-      })).filter((it) => it.title);
-      setNews(items); setNewsState(items.length ? 'done' : 'error');
-      if (!items.length) setNewsErr('err_no_stories');
-    } catch (e) { setNewsState('error'); setNewsErr('err_radar'); }
-  }
-
-  function newPost(preset) {
-    const now = new Date(); now.setDate(now.getDate() + 1);
-    setComposer({ id: null, source: preset && preset.source ? preset.source : null, category: (preset && preset.category) || strategy.phases[0] || 'reach', tplId: templates[0] ? templates[0].id : '', date: (preset && preset.date) || ymd(now), time: '09:00', text: '', notes: '', gen: 'idle' });
-    setView('app'); setTab('post');
-  }
-  function editPost(p) {
-    setComposer({ id: p.id, source: p.source || null, category: p.category, tplId: templates[0] ? templates[0].id : '', date: p.date, time: p.time, text: p.text, notes: '', gen: 'idle' });
-  }
-  function savePost() {
-    if (!composer) return;
-    const rec = { id: composer.id || uid(), source: composer.source, category: composer.category, date: composer.date, time: composer.time, text: composer.text, status: 'scheduled' };
-    setPosts((arr) => composer.id ? arr.map((x) => x.id === rec.id ? rec : x) : [...arr, rec]);
-    setComposer(null); setTab('post'); setView('app');
-  }
-  function deletePost(id) { setPosts((arr) => arr.filter((x) => x.id !== id)); }
-
-  async function generateComposer() {
-    if (!composer) return;
-    setComposer((c) => ({ ...c, gen: 'loading' }));
-    try {
-      const tpl = templates.find((x) => x.id === composer.tplId) || templates[0];
-      const ph = phaseById(composer.category);
-      const who = founder.name + (founder.role ? ', ' + founder.role : '') + (founder.company ? ' at ' + founder.company : '');
-      const src = composer.source ? `Topic (news): ${composer.source.title}\nCore: ${composer.source.summary || ''}\nRelevance: ${composer.source.angle || ''}` : `Idea: ${composer.notes || 'a valuable insight for my audience'}`;
-      const prompt = `You are an expert LinkedIn ghostwriter for founders. You write posts that stop the scroll and build a personal brand, and you never sound like generic AI content.
-
-Author: ${who}.
-${strategy.tone ? 'Tone of voice to match exactly:\n' + strategy.tone + '\n' : ''}${founder.personalityDesc ? 'Founder personality: ' + founder.personalityDesc + '\n' : ''}${founder.companyDesc ? 'Company: ' + founder.companyDesc + '\n' : ''}
-Funnel stage: ${ph.t.en}. Goal of this post: ${ph.intent}.
-
-${src}
-
-Structure to follow (fill the placeholders naturally and drop the braces):
-${tpl.body}
-
-Write in ${langLabel}. Craft rules:
-- Line 1 is a scroll-stopping hook: a bold claim, a surprising fact, a sharp question or a specific number. Never a generic wind-up.
-- One idea per post. Cut everything that does not serve it.
-- Very short paragraphs, often a single sentence, with a blank line between them so it scans on mobile.
-- Be concrete: real detail, numbers and lived experience over vague advice.
-- Sound human and first person. No corporate jargon, no buzzwords, no cliches like a fast-paced world.
-- End with 1 clear call to action or a question that invites comments.
-- Add 2 to 3 relevant, specific hashtags on the last line.
+Write in ${langName(lang)}. Rules:
+- Line 1 is a scroll-stopping hook. One idea per post. Very short paragraphs.
+- Concrete and human, first person. No corporate jargon, no cliches.
+- Fit the length and format norms of ${ch.name}.
+- End with one clear question or call to action.
 - Do NOT use em-dashes or en-dashes. Use a regular hyphen or a comma.
-- Return only the post text, nothing else.`;
-      const text = stripDashes(textOf(await callClaude([{ role: 'user', content: prompt }])));
-      setComposer((c) => ({ ...c, text, gen: 'done' }));
-    } catch (e) { setComposer((c) => ({ ...c, gen: 'error' })); }
+- Return only the post text.`;
+    return stripDashes(textOf(await callClaude([{ role: 'user', content: prompt }])));
+  }
+
+  // ----- drafts & schedule -----
+  function saveDraft(d) { setDrafts((arr) => [{ id: uid(), created: Date.now(), ...d }, ...arr]); }
+  function deleteDraft(id) { setDrafts((arr) => arr.filter((x) => x.id !== id)); }
+  function schedulePost(draft, date, time) {
+    setScheduled((arr) => [...arr, { ...draft, date, time }]);
+    setDrafts((arr) => arr.filter((x) => x.id !== draft.id));
+  }
+  function unschedule(p) {
+    setScheduled((arr) => arr.filter((x) => x.id !== p.id));
+    setDrafts((arr) => [{ ...p }, ...arr]);
   }
 
   const MENU = [
     { k: 'home', label: t('nav_home'), act: () => go('home') },
-    { k: 'founder', label: t('nav_founder'), act: () => go('app', 'founder') },
-    { k: 'strategy', label: t('nav_strategy'), act: () => go('app', 'strategy') },
-    { k: 'topics', label: t('nav_topics'), act: () => go('app', 'topics') },
-    { k: 'post', label: t('nav_post'), act: () => go('app', 'post') },
-  ];
-  const TABS = [
-    { k: 'founder', label: t('nav_founder'), ic: I.user },
-    { k: 'strategy', label: t('nav_strategy'), ic: I.target },
-    { k: 'topics', label: t('nav_topics'), ic: I.radar },
-    { k: 'post', label: t('nav_post'), ic: I.calendar },
+    { k: 'how', label: t('nav_how'), act: () => { go('home'); setTimeout(() => { const el = document.getElementById('flow'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 60); } },
+    { k: 'channels', label: t('nav_channels'), act: () => { go('home'); setTimeout(() => { const el = document.getElementById('channels'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 60); } },
+    ...(setupDone ? [{ k: 'cms', label: t('nav_cms'), act: () => go('cms') }] : []),
+    { k: 'start', label: t('nav_start'), act: () => go('onboarding') },
   ];
 
   return (
     <div className="faab">
       <style>{CSS}</style>
 
+      {intro && (
+        <div className="intro" onClick={() => setIntro(false)}>
+          {Logo.lockup({ animate: true })}
+        </div>
+      )}
+
       <header className="topbar">
         <button className="brand" onClick={() => go('home')} aria-label="FAAB home">
+          {Logo.mark({ className: 'brand-mark' })}
           {Logo.wordmark({ className: 'brand-logo' })}
         </button>
         <button className={'burger' + (menu ? ' burger-on' : '')} onClick={() => setMenu((m) => !m)} aria-label="Menu" aria-expanded={menu}>
@@ -550,129 +680,97 @@ Write in ${langLabel}. Craft rules:
             </button>
           ))}
         </nav>
-        <div className="menu-foot" style={{ '--i': 5 }}>
-          <button className="btn btn-blue" onClick={() => go('app', 'founder')}><I.linkedin width="18" height="18" /> {t('connect')}</button>
+        <div className="menu-foot" style={{ '--i': MENU.length }}>
+          <button className="btn btn-blue" onClick={() => go('onboarding')}>{t('start_brand')} <I.arrow width="18" height="18" /></button>
         </div>
       </div>
 
-      {view === 'home' && <Home t={t} lang={lang} go={go} onPhase={(id) => newPost({ category: id })} />}
-
-      {view === 'app' && (
-        <main className="wrap app">
-          <div className="tabbar">
-            {TABS.map((tb) => (
-              <button key={tb.k} className={'tabbtn' + (tab === tb.k ? ' tab-on' : '')} onClick={() => setTab(tb.k)}>
-                {tb.ic({ width: 17, height: 17 })}<span>{tb.label}</span>
-              </button>
-            ))}
-          </div>
-
-          {tab === 'founder' && <FounderTab t={t} founder={founder} setF={setF} logoRef={logoRef} onLogo={onLogo} />}
-          {tab === 'strategy' && (
-            <StrategyTab t={t} lang={lang}
-              strategy={strategy} setS={setS} togglePhase={togglePhase}
-              kwInput={kwInput} setKwInput={setKwInput} addKeyword={addKeyword} toggleKeyword={toggleKeyword}
-              onGenerate={generateStrategy} stratState={stratState}
-              onAnalyze={analyzeLinkedIn} liState={liState}
-              templates={templates} editTemplates={editTemplates} tplUpRef={tplUpRef} onTplUpload={onTplUpload} />
-          )}
-          {tab === 'topics' && (
-            <TopicsTab t={t} strategy={strategy} news={news} newsState={newsState} newsErr={newsErr}
-              onRefresh={fetchNews} onSchedule={(it) => newPost({ source: it, category: strategy.phases[0] || 'reach' })}
-              goStrategy={() => setTab('strategy')} />
-          )}
-          {tab === 'post' && (
-            <PostTab t={t} lang={lang} posts={posts} onAdd={(date) => newPost(date ? { date } : {})} onEdit={editPost} onDelete={deletePost} />
-          )}
-        </main>
+      {view === 'home' && <Home t={t} lang={lang} go={go} />}
+      {view.startsWith('channel:') && <ChannelPage t={t} lang={lang} id={view.split(':')[1]} go={go} />}
+      {view === 'onboarding' && (
+        <Onboarding t={t} lang={lang} user={user} brand={brand} setB={setB} setSocial={setSocial}
+          loginOrCreate={loginOrCreate} scanWebsite={scanWebsite} scanState={scanState}
+          generateTone={generateTone} toneState={toneState}
+          generateExamples={generateExamples} exState={exState} go={go} />
+      )}
+      {view === 'cms' && (
+        <CMS t={t} lang={lang} user={user} brand={brand} setB={setB} setBrand={setBrand} setSocial={setSocial}
+          strategy={strategy} setStrategy={setStrategy}
+          generateTone={generateTone} toneState={toneState} generateExampleFor={generateExampleFor}
+          generateStrategy={generateStrategy} stratState={stratState}
+          topics={topics} topicState={topicState} researchTopics={researchTopics} addLinkTopic={addLinkTopic}
+          genPost={genPost} drafts={drafts} saveDraft={saveDraft} deleteDraft={deleteDraft}
+          scheduled={scheduled} schedulePost={schedulePost} unschedule={unschedule}
+          logout={logout} go={go} />
       )}
 
-      {composer && (
-        <Composer t={t} lang={lang} composer={composer} setComposer={setComposer} founder={founder} strategy={strategy}
-          templates={templates} onGenerate={generateComposer} onSave={savePost} onClose={() => setComposer(null)} />
+      {setupDone && view !== 'cms' && (
+        <button className="cms-fab" onClick={() => go('cms')} aria-label="Open CMS">
+          <I.palette width="24" height="24" />
+        </button>
       )}
 
-      <footer className="foot">
-        <div className="foot-grid">
-          <div>
-            {Logo.wordmark({ className: 'brand-logo sm' })}
-            <p className="foot-tag">{t('foot_tag')}</p>
+      {view !== 'cms' && (
+        <footer className="foot">
+          <div className="foot-grid">
+            <div>
+              {Logo.wordmark({ className: 'brand-logo sm' })}
+              <p className="foot-tag">{t('foot_tag')}</p>
+            </div>
+            <div className="foot-col">
+              <span className="foot-h">{t('foot_app')}</span>
+              <button className="foot-link" onClick={() => go('onboarding')}>{t('start_brand')}</button>
+              {setupDone && <button className="foot-link" onClick={() => go('cms')}>CMS</button>}
+              <a className="foot-link" href="#funnel">{t('foot_the_funnel')}</a>
+            </div>
+            <div className="foot-col">
+              <span className="foot-h">{t('foot_learn')}</span>
+              {CHANNELS.map((c) => <button className="foot-link" key={c.id} onClick={() => go('channel:' + c.id)}>{c.name}</button>)}
+            </div>
           </div>
-          <div className="foot-col">
-            <span className="foot-h">{t('foot_app')}</span>
-            <button className="foot-link" onClick={() => go('app', 'founder')}>{t('nav_founder')}</button>
-            <button className="foot-link" onClick={() => go('app', 'strategy')}>{t('nav_strategy')}</button>
-            <button className="foot-link" onClick={() => go('app', 'topics')}>{t('nav_topics')}</button>
-            <button className="foot-link" onClick={() => go('app', 'post')}>{t('nav_post')}</button>
+          <div className="foot-base">
+            <span>{t('foot_base')}</span>
+            <div className="lang-toggle" role="group" aria-label={t('lang_word')}>
+              <button className={lang === 'nl' ? 'lang-on' : ''} onClick={() => setLang('nl')}>NL</button>
+              <button className={lang === 'en' ? 'lang-on' : ''} onClick={() => setLang('en')}>EN</button>
+            </div>
           </div>
-          <div className="foot-col">
-            <span className="foot-h">{t('foot_learn')}</span>
-            <a className="foot-link" href="#funnel">{t('foot_the_funnel')}</a>
-            <a className="foot-link" href="#knowledge">{t('foot_kb')}</a>
-            <a className="foot-link" href="#contact">{t('foot_contact')}</a>
-          </div>
-        </div>
-        <div className="foot-base">
-          <span>{t('foot_base')}</span>
-          <div className="lang-toggle" role="group" aria-label={t('lang_word')}>
-            <button className={lang === 'nl' ? 'lang-on' : ''} onClick={() => changeLang('nl')}>NL</button>
-            <button className={lang === 'en' ? 'lang-on' : ''} onClick={() => changeLang('en')}>EN</button>
-          </div>
-        </div>
-      </footer>
+        </footer>
+      )}
     </div>
   );
 }
 
 // ---------- Home ----------
-function Home({ t, lang, go, onPhase }) {
+function Home({ t, lang, go }) {
   return (
     <main>
       <section className="hero wrap">
-        <h1 className="slogan">{t('slogan_a')}<span className="hl">{t('slogan_b')}</span></h1>
-        <p className="tagline">{t('tagline')}</p>
+        {Logo.lockup({ animate: true, className: 'hero-lockup' })}
+        <p className="tagline">{t('hero_slogan')}</p>
         <div className="hero-cta">
-          <button className="btn btn-blue lg" onClick={() => go('app', 'founder')}><I.linkedin width="19" height="19" /> {t('connect')}</button>
-          <a className="btn btn-ghost lg" href="#funnel">{t('cta_funnel')}</a>
-        </div>
-      </section>
-
-      <section id="service" className="sect wrap">
-        <div className="eyebrow">{t('eb_service')}</div>
-        <h2 className="h2">{t('service_h2a')}<br className="bk" /> {t('service_h2b')}</h2>
-        <p className="sect-lead">{t('service_lead')}</p>
-        <div className="cards3">
-          {[[I.user, 'svc1_t', 'svc1_d'], [I.radar, 'svc2_t', 'svc2_d'], [I.calendar, 'svc3_t', 'svc3_d']].map(([ic, tk, dk]) => (
-            <div className="card" key={tk}>
-              <div className="card-head">
-                <span className="card-ic">{ic({ width: 22, height: 22 })}</span>
-                <h3>{t(tk)}</h3>
-              </div>
-              <p>{t(dk)}</p>
-            </div>
-          ))}
+          <button className="btn btn-blue lg" onClick={() => go('onboarding')}>{t('start_brand')} <I.arrow width="18" height="18" /></button>
+          <a className="btn btn-ghost lg" href="#flow">{t('cta_how')}</a>
         </div>
       </section>
 
       <section id="funnel" className="sect wrap">
         <div className="eyebrow">{t('eb_funnel')}</div>
         <h2 className="h2">{t('funnel_h2a')}<br className="bk" /> {t('funnel_h2b')}</h2>
-        <p className="sect-lead">{t('funnel_lead')}</p>
         <div className="funnel">
           {FUNNEL.map((f) => (
-            <button className="f-seg" key={f.id} style={{ '--fw': f.w + '%', background: f.c }} onClick={() => onPhase(f.id)}>
-              <span className="f-n">{f.n}</span>
+            <div className="f-seg" key={f.id} style={{ '--fw': f.w + '%', background: f.c }}>
+              <span className="f-ic">{f.ic({ width: 21, height: 21 })}</span>
               <span className="f-body"><span className="f-t">{f.t[lang]}</span><span className="f-d">{f.d[lang]}</span></span>
-              <span className="f-go"><I.arrow width="16" height="16" /></span>
-            </button>
+              <span className="f-n">{f.n}</span>
+            </div>
           ))}
         </div>
       </section>
 
       <section id="flow" className="sect wrap">
-        <div className="eyebrow">{t('eb_practice')}</div>
-        <h2 className="h2">{t('practice_h2a')}<br className="bk" /> {t('practice_h2b')}</h2>
-        <p className="sect-lead">{t('practice_lead')}</p>
+        <div className="eyebrow">{t('eb_flow')}</div>
+        <h2 className="h2">{t('flow_h2a')}<br className="bk" /> {t('flow_h2b')}</h2>
         <div className="flow">
           {USERFLOW.map((s, i) => (
             <React.Fragment key={s.k}>
@@ -680,7 +778,6 @@ function Home({ t, lang, go, onPhase }) {
                 <span className="flow-ic">{s.ic({ width: 22, height: 22 })}</span>
                 <span className="flow-n">0{i + 1}</span>
                 <h3>{s.t[lang]}</h3>
-                <p>{s.d[lang]}</p>
               </div>
               {i < USERFLOW.length - 1 && <span className="flow-arrow"><I.arrow width="22" height="22" /></span>}
             </React.Fragment>
@@ -688,12 +785,29 @@ function Home({ t, lang, go, onPhase }) {
         </div>
       </section>
 
-      <section id="knowledge" className="sect wrap">
-        <div className="eyebrow">{t('eb_knowledge')}</div>
-        <h2 className="h2">{t('knowledge_h2a')}<br className="bk" /> {t('knowledge_h2b')}</h2>
-        <p className="sect-lead">{t('knowledge_lead')}</p>
-        <div className="kb-grid">
-          {KNOWLEDGE.map((k) => (<article className="kb" key={k.t.en}><h3>{k.t[lang]}</h3><p>{k.d[lang]}</p></article>))}
+      <section id="channels" className="sect wrap">
+        <div className="eyebrow">{t('eb_channels')}</div>
+        <h2 className="h2">{t('channels_h2a')}<br className="bk" /> {t('channels_h2b')}</h2>
+        <div className="ch-grid">
+          {CHANNELS.map((c) => (
+            <button className="ch-card" key={c.id} onClick={() => go('channel:' + c.id)}>
+              <div className="ch-post">
+                <div className="ch-post-top">
+                  <span className="ch-ava" style={{ background: c.c }}>{Logo.mark({ width: 18, height: 18 })}</span>
+                  <div><div className="ch-post-name">Founder</div><div className="ch-post-sub">{c.name}</div></div>
+                </div>
+                <p className="ch-post-text">{c.sample[lang]}</p>
+              </div>
+              <span className="ch-label" style={{ color: c.c }}>{c.ic({ width: 22, height: 22 })} {c.name} <I.arrow width="15" height="15" /></span>
+            </button>
+          ))}
+        </div>
+        <div className="ch-icons">
+          {CHANNELS.map((c) => (
+            <button className="ch-icon" key={c.id} onClick={() => go('channel:' + c.id)} aria-label={c.name} style={{ '--cc': c.c }}>
+              {c.ic({ width: 24, height: 24 })}
+            </button>
+          ))}
         </div>
       </section>
 
@@ -703,9 +817,8 @@ function Home({ t, lang, go, onPhase }) {
             <span className="ctrl-ic"><I.shield width="26" height="26" /></span>
             <div><div className="eyebrow">{t('eb_control')}</div><h2 className="h2">{t('control_h2')}</h2></div>
           </div>
-          <p className="sect-lead">{t('control_lead')}</p>
           <div className="ctrl-grid">
-            {[[I.user, 'ctrl1_t', 'ctrl1_d'], [I.eye, 'ctrl2_t', 'ctrl2_d'], [I.edit, 'ctrl3_t', 'ctrl3_d'], [I.linkedin, 'ctrl4_t', 'ctrl4_d']].map(([ic, tk, dk]) => (
+            {[[I.user, 'ctrl1_t', 'ctrl1_d'], [I.eye, 'ctrl2_t', 'ctrl2_d'], [I.edit, 'ctrl3_t', 'ctrl3_d'], [I.megaphone, 'ctrl4_t', 'ctrl4_d']].map(([ic, tk, dk]) => (
               <div className="ctrl-item" key={tk}>
                 <span className="ctrl-item-ic">{ic({ width: 19, height: 19 })}</span>
                 <div><h3>{t(tk)}</h3><p>{t(dk)}</p></div>
@@ -720,12 +833,10 @@ function Home({ t, lang, go, onPhase }) {
           <div>
             <div className="eyebrow">{t('eb_contact')}</div>
             <h2 className="h2">{t('contact_h2a')}<br />{t('contact_h2b')}</h2>
-            <p className="sect-lead">{t('contact_lead')}</p>
           </div>
           <div className="contact-card">
             <a className="contact-row" href="mailto:hello@faab.app"><I.mail width="18" height="18" /> hello@faab.app</a>
-            <a className="contact-row" href="https://www.linkedin.com" target="_blank" rel="noreferrer"><I.linkedin width="18" height="18" /> FAAB on LinkedIn</a>
-            <button className="btn btn-blue" onClick={() => go('app', 'founder')}><I.linkedin width="17" height="17" /> {t('connect')}</button>
+            <button className="btn btn-blue" onClick={() => go('onboarding')}>{t('start_brand')} <I.arrow width="17" height="17" /></button>
           </div>
         </div>
       </section>
@@ -733,147 +844,548 @@ function Home({ t, lang, go, onPhase }) {
   );
 }
 
-// ---------- Founder tab ----------
-function FounderTab({ t, founder, setF, logoRef, onLogo }) {
+// ---------- Channel page ----------
+function ChannelPage({ t, lang, id, go }) {
+  const ch = channelById(id);
   return (
-    <section className="panel">
-      <div className="panel-head"><h2>{t('f_h2')}</h2><p>{t('f_p')}</p></div>
-      <div className="prof-grid">
-        <div className="ava-block">
-          <div className="ava" style={founder.logo ? { backgroundImage: `url(${founder.logo})` } : {}} onClick={() => logoRef.current && logoRef.current.click()}>
-            {!founder.logo && <span className="ava-hint">{t('f_logo')}</span>}
-          </div>
-          <button className="btn btn-ghost sm" onClick={() => logoRef.current && logoRef.current.click()}><I.upload width="15" height="15" /> {t('f_upload_logo')}</button>
-          <input ref={logoRef} type="file" accept="image/*" hidden onChange={onLogo} />
-        </div>
-        <div className="prof-fields">
-          <div className="row2">
-            <Field label={t('f_name')}><input className="input" value={founder.name} onChange={(e) => setF('name', e.target.value)} placeholder="Sten Bossong" /></Field>
-            <Field label={t('f_role')}><input className="input" value={founder.role} onChange={(e) => setF('role', e.target.value)} placeholder={t('ph_role')} /></Field>
-          </div>
-          <Field label={t('f_company')}><input className="input" value={founder.company} onChange={(e) => setF('company', e.target.value)} placeholder={t('ph_company')} /></Field>
-          <Field label={t('f_company_desc')} hint={t('f_company_desc_hint')}><textarea className="input textarea" rows={3} value={founder.companyDesc} onChange={(e) => setF('companyDesc', e.target.value)} placeholder={t('f_company_desc_ph')} /></Field>
-          <Field label={t('f_pers_desc')} hint={t('f_pers_desc_hint')}><textarea className="input textarea" rows={3} value={founder.personalityDesc} onChange={(e) => setF('personalityDesc', e.target.value)} placeholder={t('f_pers_desc_ph')} /></Field>
-        </div>
+    <main className="wrap chpage">
+      <button className="btn btn-ghost sm back-btn" onClick={() => go('home')}><I.chevL width="16" height="16" /> {t('ch_back')}</button>
+      <div className="chpage-head">
+        <span className="chpage-ic" style={{ background: ch.c }}>{ch.ic({ width: 30, height: 30 })}</span>
+        <h1 className="chpage-title">{ch.name}</h1>
       </div>
-    </section>
-  );
-}
 
-// ---------- Strategy tab ----------
-function StrategyTab({ t, lang, strategy, setS, togglePhase, kwInput, setKwInput, addKeyword, toggleKeyword, onGenerate, stratState, onAnalyze, liState, templates, editTemplates, tplUpRef, onTplUpload }) {
-  return (
-    <div className="stack">
       <section className="panel">
-        <div className="panel-head"><h2>{t('s_funnel_h2')}</h2><p>{t('s_funnel_p')}</p></div>
-        <div className="mini-funnel">
-          {FUNNEL.map((f) => {
-            const on = strategy.phases.includes(f.id);
-            return (
-              <button key={f.id} className={'mf-seg' + (on ? ' mf-on' : '')} style={on ? { background: f.c, borderColor: f.c } : {}} onClick={() => togglePhase(f.id)}>
-                <span className="mf-n">{f.n}</span><span className="mf-t">{f.t[lang]}</span>{on && <I.check width="16" height="16" />}
-              </button>
-            );
-          })}
+        <h2 className="panel-title">{t('ch_strategy')}</h2>
+        <p className="body-text">{ch.strat[lang]}</p>
+      </section>
+
+      <section className="panel">
+        <h2 className="panel-title">{t('ch_placements')}</h2>
+        <div className="place-grid">
+          {ch.placements[lang].map((p, i) => (
+            <div className="place" key={i}><span className="place-n" style={{ background: ch.c }}>{i + 1}</span><span>{p}</span></div>
+          ))}
         </div>
       </section>
 
       <section className="panel">
-        <div className="panel-head"><h2>{t('s_goal_h2')}</h2><p>{t('s_goal_p')}</p></div>
-        <Field label={t('s_goal_label')} hint={t('s_goal_hint')}>
-          <textarea className="input textarea" rows={4} value={strategy.goal} onChange={(e) => setS('goal', e.target.value)} placeholder={t('s_goal_ph')} />
-        </Field>
-        <div className="gen-row">
-          <button className="btn btn-blue" onClick={onGenerate} disabled={stratState === 'loading'}><I.spark width="17" height="17" /> {stratState === 'loading' ? t('s_generating') : t('s_generate')}</button>
-          {stratState === 'error' && <span className="mini-err">{t('s_gen_err')}</span>}
-        </div>
-        <div className="li-source">
-          <div className="li-source-head">
-            <span className="li-source-ic"><I.linkedin width="18" height="18" /></span>
-            <div>
-              <div className="li-source-t">{t('s_li_h')}</div>
-              <div className="li-source-p">{t('s_li_p')}</div>
-            </div>
-          </div>
-          <div className="kw-add">
-            <input className="input" value={strategy.linkedin} onChange={(e) => setS('linkedin', e.target.value)} placeholder={t('s_li_ph')} />
-            <button className="btn btn-blue sm" onClick={onAnalyze} disabled={liState === 'loading'}><I.radar width="16" height="16" /> {liState === 'loading' ? t('s_li_analyzing') : t('s_li_btn')}</button>
-          </div>
-          <div className="li-source-note">{t('s_li_note')}</div>
-          {liState === 'error' && <span className="mini-err">{t('s_li_err')}</span>}
-        </div>
-        <Field label={t('s_tone_label')}><textarea className="input textarea" rows={4} value={strategy.tone} onChange={(e) => setS('tone', e.target.value)} placeholder={t('s_tone_ph')} /></Field>
-        <div className="field-label mt">{t('s_keywords')}</div>
-        <div className="kw-add">
-          <input className="input" value={kwInput} onChange={(e) => setKwInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { addKeyword(kwInput); setKwInput(''); } }} placeholder={t('s_add_kw_ph')} />
-          <button className="btn btn-blue sm" onClick={() => { addKeyword(kwInput); setKwInput(''); }}><I.plus width="16" height="16" /> {t('s_add')}</button>
-        </div>
-        {strategy.keywords.length > 0 && (
-          <div className="chips selected">{strategy.keywords.map((k) => <Chip key={k} active removable onRemove={() => setS('keywords', strategy.keywords.filter((x) => x !== k))}>{k}</Chip>)}</div>
-        )}
-        <div className="field-label mt">{t('s_suggestions')}</div>
-        <div className="chips">{SUGGESTED[lang].map((s) => <Chip key={s} active={strategy.keywords.some((k) => k.toLowerCase() === s.toLowerCase())} onClick={() => toggleKeyword(s)}>{s}</Chip>)}</div>
+        <h2 className="panel-title">{t('ch_tone')}</h2>
+        <p className="body-text">{ch.tone[lang]}</p>
       </section>
 
       <section className="panel">
-        <div className="panel-head"><h2>{t('s_tpl_h2')}</h2><p>{t('s_tpl_p')}</p></div>
-        <div className="tpl-list">
-          {templates.map((tp) => (
-            <div className="tpl" key={tp.id}>
-              <div className="tpl-top">
-                <input className="input tpl-name" value={tp.name} onChange={(e) => editTemplates((arr) => arr.map((x) => x.id === tp.id ? { ...x, name: e.target.value } : x))} />
-                {templates.length > 1 && <button className="icon-btn" onClick={() => editTemplates((arr) => arr.filter((x) => x.id !== tp.id))} aria-label="x"><I.x width="16" height="16" /></button>}
+        <h2 className="panel-title">{t('ch_examples')}</h2>
+        <div className="ex-list">
+          {FUNNEL.map((f) => (
+            <div className="ex-item" key={f.id}>
+              <div className="ex-head">
+                <span className="ex-ic" style={{ background: f.c }}>{f.ic({ width: 16, height: 16 })}</span>
+                <span className="ex-phase">{f.t[lang]}</span>
               </div>
-              <textarea className="input textarea mono" rows={4} value={tp.body} onChange={(e) => editTemplates((arr) => arr.map((x) => x.id === tp.id ? { ...x, body: e.target.value } : x))} />
+              <p className="ex-copy">{ch.ex[f.id][lang]}</p>
             </div>
           ))}
         </div>
-        <div className="tpl-actions">
-          <button className="btn btn-ghost sm" onClick={() => editTemplates((arr) => [...arr, { id: uid(), name: t('s_new_tpl_name'), body: '{hook}\n\n{core}\n\n{question}' }])}><I.plus width="16" height="16" /> {t('s_new_tpl')}</button>
-          <button className="btn btn-ghost sm" onClick={() => tplUpRef.current && tplUpRef.current.click()}><I.upload width="16" height="16" /> {t('s_upload_tpl')}</button>
-          <input ref={tplUpRef} type="file" accept=".txt,.md" hidden onChange={onTplUpload} />
+      </section>
+
+      <div className="chpage-cta">
+        <button className="btn btn-blue lg" onClick={() => go('onboarding')}>{t('ch_cta')} {ch.name} <I.arrow width="18" height="18" /></button>
+      </div>
+    </main>
+  );
+}
+
+// ---------- Onboarding ----------
+function Onboarding({ t, lang, user, brand, setB, setSocial, loginOrCreate, scanWebsite, scanState, generateTone, toneState, generateExamples, exState, go }) {
+  const [step, setStep] = useState(user ? 1 : 0);
+  const [email, setEmail] = useState(user ? user.email : '');
+  const [name, setName] = useState(user ? user.name : '');
+  const logoRef = useRef(null);
+  const steps = [t('ob_step_account'), t('ob_step_channels'), t('ob_step_website'), t('ob_step_done')];
+
+  function onLogo(e) {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    const r = new FileReader(); r.onload = () => setB('logo', String(r.result)); r.readAsDataURL(f);
+  }
+  async function nextFromAccount() {
+    if (!email.trim()) return;
+    await loginOrCreate(email, name);
+    setStep(1);
+  }
+  async function nextFromChannels() {
+    setStep(2);
+  }
+  async function finishSetup() {
+    if (!brand.tone && toneState !== 'loading') await generateTone();
+    setStep(3);
+  }
+
+  return (
+    <main className="wrap wizard">
+      <h1 className="wiz-title">{t('ob_title')}</h1>
+      <div className="steps">
+        {steps.map((s, i) => (
+          <div key={s} className={'step' + (i === step ? ' step-on' : '') + (i < step ? ' step-done' : '')}>
+            <span className="step-dot">{i < step ? <I.check width="14" height="14" /> : i + 1}</span>
+            <span className="step-name">{s}</span>
+          </div>
+        ))}
+      </div>
+
+      {step === 0 && (
+        <section className="panel">
+          <div className="panel-head"><h2>{t('ob_acc_h')}</h2><p>{t('ob_acc_p')}</p></div>
+          <div className="row2">
+            <Field label={t('ob_name')}><input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Sten Bossong" /></Field>
+            <Field label={t('ob_email')}><input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('login_ph_email')} /></Field>
+          </div>
+          <div className="li-source-note">{t('ob_login_note')}</div>
+          <div className="wiz-nav"><span />
+            <button className="btn btn-blue" disabled={!email.trim()} onClick={nextFromAccount}>{t('ob_next')} <I.arrow width="18" height="18" /></button>
+          </div>
+        </section>
+      )}
+
+      {step === 1 && (
+        <section className="panel">
+          <div className="panel-head"><h2>{t('ob_ch_h')}</h2><p>{t('ob_ch_p')}</p></div>
+          <div className="soc-list">
+            {CHANNELS.map((c) => (
+              <div className="soc-row" key={c.id}>
+                <span className="soc-ic" style={{ background: c.c }}>{c.ic({ width: 18, height: 18 })}</span>
+                <span className="soc-name">{c.name}</span>
+                <input className="input" value={brand.socials[c.id]} onChange={(e) => setSocial(c.id, e.target.value)} placeholder={t('ob_ch_ph')} />
+              </div>
+            ))}
+          </div>
+          <div className="li-source-note">{t('ob_tone_note')}</div>
+          <div className="wiz-nav">
+            <button className="btn btn-ghost" onClick={() => setStep(0)}>{t('ob_back')}</button>
+            <button className="btn btn-blue" onClick={nextFromChannels}>{t('ob_next')} <I.arrow width="18" height="18" /></button>
+          </div>
+        </section>
+      )}
+
+      {step === 2 && (
+        <section className="panel">
+          <div className="panel-head"><h2>{t('ob_web_h')}</h2><p>{t('ob_web_p')}</p></div>
+          <div className="kw-add">
+            <input className="input" value={brand.website} onChange={(e) => setB('website', e.target.value)} placeholder={t('ob_web_ph')} />
+            <button className="btn btn-blue sm" onClick={scanWebsite} disabled={scanState === 'loading'}><I.globe width="16" height="16" /> {scanState === 'loading' ? t('ob_scanning') : t('ob_scan')}</button>
+          </div>
+          {scanState === 'error' && <div className="mini-err">{t('ob_scan_err')}</div>}
+          <div className="scan-grid">
+            <div className="ava-block">
+              <div className="ava" style={brand.logo ? { backgroundImage: `url(${brand.logo})` } : {}} onClick={() => logoRef.current && logoRef.current.click()}>
+                {!brand.logo && <span className="ava-hint">{t('ob_logo')}</span>}
+              </div>
+              <button className="btn btn-ghost sm" onClick={() => logoRef.current && logoRef.current.click()}><I.upload width="15" height="15" /> {t('ob_logo')}</button>
+              <input ref={logoRef} type="file" accept="image/*" hidden onChange={onLogo} />
+            </div>
+            <div>
+              <Field label={t('b_company')}><input className="input" value={brand.company} onChange={(e) => setB('company', e.target.value)} /></Field>
+              <Field label={t('ob_desc')}><textarea className="input textarea" rows={2} value={brand.description} onChange={(e) => setB('description', e.target.value)} /></Field>
+              <Field label={t('ob_aud')}><textarea className="input textarea" rows={2} value={brand.audience} onChange={(e) => setB('audience', e.target.value)} /></Field>
+              <Field label={t('ob_colors')}>
+                <div className="colors">
+                  {brand.colors.map((c, i) => (
+                    <span className="color-chip" key={i}>
+                      <input type="color" value={/^#([0-9a-f]{6})$/i.test(c) ? c : '#0A66C2'} onChange={(e) => setB('colors', brand.colors.map((x, j) => j === i ? e.target.value : x))} />
+                      <button className="color-x" onClick={() => setB('colors', brand.colors.filter((_, j) => j !== i))}><I.x width="11" height="11" /></button>
+                    </span>
+                  ))}
+                  <button className="btn btn-ghost sm" onClick={() => setB('colors', [...brand.colors, '#0A66C2'])}><I.plus width="14" height="14" /></button>
+                </div>
+              </Field>
+            </div>
+          </div>
+          <div className="wiz-nav">
+            <button className="btn btn-ghost" onClick={() => setStep(1)}>{t('ob_back')}</button>
+            <button className="btn btn-blue" onClick={finishSetup} disabled={toneState === 'loading'}>{toneState === 'loading' ? t('ob_generating') : t('ob_next')} <I.arrow width="18" height="18" /></button>
+          </div>
+        </section>
+      )}
+
+      {step === 3 && (
+        <section className="panel">
+          <div className="panel-head"><h2>{t('ob_done_h')}</h2><p>{t('ob_done_p')}</p></div>
+          {brand.tone && (
+            <div className="tone-box">
+              <div className="field-label">{t('b_tone_h')}</div>
+              <p className="tone-text">{brand.tone}</p>
+            </div>
+          )}
+          <div className="gen-row">
+            <button className="btn btn-blue" onClick={generateExamples} disabled={exState === 'loading'}><I.spark width="17" height="17" /> {exState === 'loading' ? t('ob_generating') : t('ob_gen_examples')}</button>
+            {exState === 'error' && <span className="mini-err">{t('err_generic')}</span>}
+          </div>
+          <div className="ex-cards">
+            {CHANNELS.filter((c) => brand.channelExamples[c.id]).map((c) => (
+              <div className="ex-card" key={c.id}>
+                <div className="ex-card-head" style={{ color: c.c }}>{c.ic({ width: 18, height: 18 })} {c.name}</div>
+                <p className="ex-copy">{brand.channelExamples[c.id]}</p>
+              </div>
+            ))}
+          </div>
+          <div className="wiz-nav">
+            <button className="btn btn-ghost" onClick={() => setStep(2)}>{t('ob_back')}</button>
+            <button className="btn btn-blue" onClick={() => go('cms')}>{t('ob_open_cms')} <I.arrow width="18" height="18" /></button>
+          </div>
+        </section>
+      )}
+    </main>
+  );
+}
+
+// ---------- CMS ----------
+function CMS(props) {
+  const { t } = props;
+  const [tab, setTab] = useState('brand');
+  const [contentSubject, setContentSubject] = useState('');
+  const extra = { contentSubject, setContentSubject, goToContent: () => setTab('content') };
+  const TABS = [
+    { k: 'brand', label: t('cms_brand'), ic: I.user },
+    { k: 'strategy', label: t('cms_strategy'), ic: I.target },
+    { k: 'topics', label: t('cms_topics'), ic: I.trend },
+    { k: 'content', label: t('cms_content'), ic: I.spark },
+    { k: 'schedule', label: t('cms_schedule'), ic: I.calendar },
+  ];
+  return (
+    <div className="cms wrap-wide">
+      <aside className="cms-rail">
+        <div className="cms-rail-top">
+          {Logo.mark({ className: 'cms-mark' })}
+        </div>
+        <nav className="cms-tabs">
+          {TABS.map((tb) => (
+            <button key={tb.k} className={'cms-tab' + (tab === tb.k ? ' cms-tab-on' : '')} onClick={() => setTab(tb.k)}>
+              {tb.ic({ width: 18, height: 18 })}<span>{tb.label}</span>
+            </button>
+          ))}
+        </nav>
+        <div className="cms-rail-bottom">
+          <button className="cms-tab" onClick={() => props.go('home')}><I.chevL width="18" height="18" /><span>{t('cms_exit')}</span></button>
+          <button className="cms-tab" onClick={props.logout}><I.logout width="18" height="18" /><span>{t('cms_logout')}</span></button>
+        </div>
+      </aside>
+      <div className="cms-main">
+        {tab === 'brand' && <CmsBrand {...props} />}
+        {tab === 'strategy' && <CmsStrategy {...props} />}
+        {tab === 'topics' && <CmsTopics {...props} {...extra} />}
+        {tab === 'content' && <CmsContent {...props} {...extra} />}
+        {tab === 'schedule' && <CmsSchedule {...props} />}
+      </div>
+    </div>
+  );
+}
+
+// ----- Brand personality tab -----
+function CmsBrand({ t, brand, setB, setBrand, setSocial, generateTone, toneState, generateExampleFor }) {
+  const logoRef = useRef(null);
+  const docRef = useRef(null);
+  const [exLoading, setExLoading] = useState('');
+  function onLogo(e) {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    const r = new FileReader(); r.onload = () => setB('logo', String(r.result)); r.readAsDataURL(f);
+  }
+  function onDoc(e) {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => setBrand((p) => ({ ...p, docs: [...p.docs, { id: uid(), name: f.name, text: stripDashes(String(r.result)).slice(0, 8000) }] }));
+    r.readAsText(f);
+  }
+  async function genEx(chId) {
+    setExLoading(chId);
+    try { await generateExampleFor(chId); } catch (e) { /* shown empty */ }
+    setExLoading('');
+  }
+  const connected = CHANNELS.filter((c) => (brand.socials[c.id] || '').trim());
+  return (
+    <div className="stack">
+      <section className="panel">
+        <div className="panel-head"><h2>{t('b_h')}</h2></div>
+        <div className="scan-grid">
+          <div className="ava-block">
+            <div className="ava" style={brand.logo ? { backgroundImage: `url(${brand.logo})` } : {}} onClick={() => logoRef.current && logoRef.current.click()}>
+              {!brand.logo && <span className="ava-hint">{t('ob_logo')}</span>}
+            </div>
+            <button className="btn btn-ghost sm" onClick={() => logoRef.current && logoRef.current.click()}><I.upload width="15" height="15" /> {t('ob_logo')}</button>
+            <input ref={logoRef} type="file" accept="image/*" hidden onChange={onLogo} />
+          </div>
+          <div>
+            <div className="row2">
+              <Field label={t('b_name')}><input className="input" value={brand.name} onChange={(e) => setB('name', e.target.value)} /></Field>
+              <Field label={t('b_role')}><input className="input" value={brand.role} onChange={(e) => setB('role', e.target.value)} /></Field>
+            </div>
+            <div className="row2">
+              <Field label={t('b_company')}><input className="input" value={brand.company} onChange={(e) => setB('company', e.target.value)} /></Field>
+              <Field label={t('b_website')}><input className="input" value={brand.website} onChange={(e) => setB('website', e.target.value)} /></Field>
+            </div>
+            <Field label={t('b_desc')}><textarea className="input textarea" rows={2} value={brand.description} onChange={(e) => setB('description', e.target.value)} /></Field>
+            <Field label={t('b_aud')}><textarea className="input textarea" rows={2} value={brand.audience} onChange={(e) => setB('audience', e.target.value)} /></Field>
+            <Field label={t('b_pers')}><textarea className="input textarea" rows={2} value={brand.personality} onChange={(e) => setB('personality', e.target.value)} placeholder={t('b_pers_ph')} /></Field>
+            <Field label={t('b_colors')}>
+              <div className="colors">
+                {brand.colors.map((c, i) => (
+                  <span className="color-chip" key={i}>
+                    <input type="color" value={/^#([0-9a-f]{6})$/i.test(c) ? c : '#0A66C2'} onChange={(e) => setB('colors', brand.colors.map((x, j) => j === i ? e.target.value : x))} />
+                    <button className="color-x" onClick={() => setB('colors', brand.colors.filter((_, j) => j !== i))}><I.x width="11" height="11" /></button>
+                  </span>
+                ))}
+                <button className="btn btn-ghost sm" onClick={() => setB('colors', [...brand.colors, '#0A66C2'])}><I.plus width="14" height="14" /></button>
+              </div>
+            </Field>
+          </div>
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="panel-head"><h2>{t('b_socials')}</h2></div>
+        <div className="soc-list">
+          {CHANNELS.map((c) => (
+            <div className="soc-row" key={c.id}>
+              <span className="soc-ic" style={{ background: c.c }}>{c.ic({ width: 18, height: 18 })}</span>
+              <span className="soc-name">{c.name}</span>
+              <input className="input" value={brand.socials[c.id]} onChange={(e) => setSocial(c.id, e.target.value)} placeholder={t('ob_ch_ph')} />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="panel-head"><h2>{t('b_docs')}</h2><p>{t('b_docs_p')}</p></div>
+        <div className="doc-list">
+          {brand.docs.map((d) => (
+            <div className="doc-row" key={d.id}>
+              <I.doc width="17" height="17" /><span className="doc-name">{d.name}</span>
+              <button className="icon-btn" onClick={() => setBrand((p) => ({ ...p, docs: p.docs.filter((x) => x.id !== d.id) }))}><I.trash width="15" height="15" /></button>
+            </div>
+          ))}
+        </div>
+        <button className="btn btn-ghost sm" onClick={() => docRef.current && docRef.current.click()}><I.upload width="15" height="15" /> {t('b_upload_doc')}</button>
+        <input ref={docRef} type="file" accept=".txt,.md" hidden onChange={onDoc} />
+      </section>
+
+      <section className="panel">
+        <div className="panel-head"><h2>{t('b_tone_h')}</h2><p>{t('b_tone_p')}</p></div>
+        <textarea className="input textarea" rows={6} value={brand.tone} onChange={(e) => setB('tone', e.target.value)} />
+        <div className="gen-row" style={{ marginTop: 12 }}>
+          <button className="btn btn-blue sm" onClick={generateTone} disabled={toneState === 'loading'}><I.refresh width="15" height="15" /> {toneState === 'loading' ? t('ob_generating') : t('b_regen_tone')}</button>
+          {toneState === 'error' && <span className="mini-err">{t('err_generic')}</span>}
+        </div>
+        <div className="field-label mt">{t('b_tone_examples')}</div>
+        {connected.length === 0 && <p className="li-source-note">{t('b_no_channels')}</p>}
+        <div className="ex-cards">
+          {connected.map((c) => (
+            <div className="ex-card" key={c.id}>
+              <div className="ex-card-head" style={{ color: c.c }}>{c.ic({ width: 18, height: 18 })} {c.name}</div>
+              {brand.channelExamples[c.id]
+                ? <p className="ex-copy">{brand.channelExamples[c.id]}</p>
+                : <button className="btn btn-ghost sm" onClick={() => genEx(c.id)} disabled={exLoading === c.id}><I.spark width="14" height="14" /> {exLoading === c.id ? t('ob_generating') : t('b_gen_example')}</button>}
+            </div>
+          ))}
         </div>
       </section>
     </div>
   );
 }
 
-// ---------- Topics tab ----------
-function TopicsTab({ t, strategy, news, newsState, newsErr, onRefresh, onSchedule, goStrategy }) {
+// ----- Strategy tab -----
+function CmsStrategy({ t, lang, strategy, setStrategy, generateStrategy, stratState }) {
+  const [kwInput, setKwInput] = useState('');
+  const setPhase = (id, k, v) => setStrategy((p) => ({ ...p, perPhase: { ...p.perPhase, [id]: { ...p.perPhase[id], [k]: v } } }));
+  const addKw = (v) => {
+    const s = (v || '').trim();
+    if (!s || strategy.keywords.some((k) => k.toLowerCase() === s.toLowerCase())) return;
+    setStrategy((p) => ({ ...p, keywords: [...p.keywords, s] }));
+  };
   return (
-    <section className="panel">
-      <div className="topics-head">
-        <div className="panel-head nomb"><h2>{t('t_h2')}</h2><p>{t('t_p')}</p></div>
-        <button className="btn btn-blue sm" onClick={onRefresh} disabled={newsState === 'loading'}><I.refresh width="16" height="16" /> {newsState === 'loading' ? t('t_scanning') : t('t_refresh')}</button>
-      </div>
-      <div className="kw-strip">{strategy.keywords.map((k) => <span className="kw-pill" key={k}><I.tag width="12" height="12" /> {k}</span>)}</div>
-
-      {newsState === 'empty' && <div className="empty"><I.target width="26" height="26" /><p>{t('t_empty')}</p><button className="btn btn-ghost sm" onClick={goStrategy}>{t('t_go_strategy')}</button></div>}
-      {newsState === 'loading' && <div className="news-grid">{[0, 1, 2, 3].map((i) => <div className="news-card skeleton" key={i} />)}</div>}
-      {newsState === 'error' && <div className="empty"><I.radar width="26" height="26" /><p>{t(newsErr)}</p><button className="btn btn-ghost sm" onClick={onRefresh}>{t('t_refresh')}</button></div>}
-      {newsState === 'done' && (
-        <div className="news-grid">
-          {news.map((it) => (
-            <article className="news-card" key={it.id}>
-              <div className="news-top"><span className="src">{it.source}</span>{it.keyword && <span className="kw-pill sm"><I.tag width="11" height="11" /> {it.keyword}</span>}</div>
-              <h3 className="news-title">{it.title}</h3>
-              <p className="news-sum">{it.summary}</p>
-              {it.angle && <p className="news-angle"><I.spark width="14" height="14" /> {it.angle}</p>}
-              <div className="news-foot">
-                {it.url && <a className="news-link" href={it.url} target="_blank" rel="noreferrer"><I.link width="14" height="14" /> {t('t_source')}</a>}
-                <button className="btn btn-blue sm push" onClick={() => onSchedule(it)}><I.calendar width="15" height="15" /> {t('t_create_post')}</button>
+    <div className="stack">
+      <section className="panel">
+        <div className="panel-head"><h2>{t('s_h')}</h2><p>{t('s_p')}</p></div>
+        <div className="gen-row">
+          <button className="btn btn-blue" onClick={generateStrategy} disabled={stratState === 'loading'}><I.spark width="17" height="17" /> {stratState === 'loading' ? t('s_generating') : t('s_gen')}</button>
+          {stratState === 'error' && <span className="mini-err">{t('err_generic')}</span>}
+        </div>
+        <div className="phase-list">
+          {FUNNEL.map((f) => (
+            <div className="phase" key={f.id}>
+              <div className="phase-head">
+                <span className="ex-ic" style={{ background: f.c }}>{f.ic({ width: 16, height: 16 })}</span>
+                <span className="phase-t">{f.t[lang]}</span>
               </div>
-            </article>
+              <Field label={t('s_goal')}><input className="input" value={strategy.perPhase[f.id].goal} onChange={(e) => setPhase(f.id, 'goal', e.target.value)} /></Field>
+              <Field label={t('s_approach')}><textarea className="input textarea" rows={2} value={strategy.perPhase[f.id].approach} onChange={(e) => setPhase(f.id, 'approach', e.target.value)} /></Field>
+            </div>
           ))}
         </div>
-      )}
-    </section>
+      </section>
+
+      <section className="panel">
+        <div className="panel-head"><h2>{t('s_keywords')}</h2></div>
+        <div className="kw-add">
+          <input className="input" value={kwInput} onChange={(e) => setKwInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { addKw(kwInput); setKwInput(''); } }} placeholder={t('s_add_kw_ph')} />
+          <button className="btn btn-blue sm" onClick={() => { addKw(kwInput); setKwInput(''); }}><I.plus width="16" height="16" /> {t('s_add')}</button>
+        </div>
+        {strategy.keywords.length > 0 && (
+          <div className="chips selected">
+            {strategy.keywords.map((k) => <Chip key={k} active removable onRemove={() => setStrategy((p) => ({ ...p, keywords: p.keywords.filter((x) => x !== k) }))}>{k}</Chip>)}
+          </div>
+        )}
+      </section>
+    </div>
   );
 }
 
-// ---------- Post tab ----------
-function PostTab({ t, lang, posts, onAdd, onEdit, onDelete }) {
+// ----- Topics tab -----
+function CmsTopics({ t, topics, topicState, researchTopics, addLinkTopic, goToContent, setContentSubject }) {
+  const [linkInput, setLinkInput] = useState('');
+  const [added, setAdded] = useState(false);
+  return (
+    <div className="stack">
+      <section className="panel">
+        <div className="topics-head">
+          <div className="panel-head nomb"><h2>{t('t_h')}</h2><p>{t('t_p')}</p></div>
+          <button className="btn btn-blue sm" onClick={researchTopics} disabled={topicState === 'loading'}><I.trend width="16" height="16" /> {topicState === 'loading' ? t('t_scanning') : t('t_refresh')}</button>
+        </div>
+        {topicState === 'empty' && <div className="empty small"><I.target width="24" height="24" /><p>{t('t_empty')}</p></div>}
+        {topicState === 'error' && <div className="empty small"><I.radar width="24" height="24" /><p>{t('t_err')}</p></div>}
+        {topicState === 'loading' && <div className="empty small"><I.radar width="24" height="24" /><p>{t('t_scanning')}</p></div>}
+        {topics.length > 0 && (
+          <div className="topic-table">
+            <div className="tt-row tt-head">
+              <span>{t('t_kw')}</span><span>{t('t_vol')}</span><span>{t('t_src')}</span><span>{t('t_act')}</span>
+            </div>
+            {topics.map((tp) => (
+              <div className="tt-row" key={tp.id}>
+                <span className="tt-title">{tp.url ? <a href={tp.url} target="_blank" rel="noreferrer" className="tt-link">{tp.title} <I.link width="12" height="12" /></a> : tp.title}</span>
+                <span className="tt-vol">{tp.volume || '-'}</span>
+                <span className="tt-src">{tp.source}</span>
+                <span><button className="btn btn-blue sm" onClick={() => { setContentSubject(tp.title); goToContent(); }}>{t('t_use')}</button></span>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="panel">
+        <div className="panel-head nomb"><h2>{t('t_add_link')}</h2></div>
+        <div className="kw-add" style={{ marginTop: 14 }}>
+          <input className="input" value={linkInput} onChange={(e) => setLinkInput(e.target.value)} placeholder={t('t_add_link_ph')} />
+          <button className="btn btn-blue sm" onClick={() => { addLinkTopic(linkInput); setLinkInput(''); setAdded(true); setTimeout(() => setAdded(false), 1500); }}><I.plus width="16" height="16" /> {added ? t('t_added') : t('s_add')}</button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+// ----- Content tab -----
+function CmsContent({ t, lang, brand, topics, genPost, saveDraft, contentSubject, setContentSubject }) {
+  const [channel, setChannel] = useState('linkedin');
+  const [phase, setPhase] = useState('reach');
+  const [angle, setAngle] = useState('');
+  const [subject, setSubject] = useState(contentSubject || '');
+  const [text, setText] = useState('');
+  const [gen, setGen] = useState('idle');
+  const [visualMode, setVisualMode] = useState('none'); // none | preset | upload
+  const [headline, setHeadline] = useState('');
+  const [uploadImg, setUploadImg] = useState('');
+  const [savedFlag, setSavedFlag] = useState(false);
+  const imgRef = useRef(null);
+  useEffect(() => { if (contentSubject) { setSubject(contentSubject); setContentSubject(''); } }, [contentSubject]);
+
+  const ch = channelById(channel);
+  const brandColor = (brand.colors && brand.colors[0]) || ch.c;
+  const visual = visualMode === 'preset' ? presetVisual(headline || subject || brand.company, brandColor, brand.company || 'FAAB')
+    : visualMode === 'upload' ? uploadImg : '';
+
+  async function generate() {
+    setGen('loading');
+    try {
+      const out = await genPost({ channel, phase, angle, subject });
+      setText(out); setGen('done');
+    } catch (e) { setGen('error'); }
+  }
+  function onImg(e) {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    const r = new FileReader(); r.onload = () => { setUploadImg(String(r.result)); setVisualMode('upload'); }; r.readAsDataURL(f);
+  }
+  function save() {
+    if (!text) return;
+    saveDraft({ channel, category: phase, text, visual, headline });
+    setSavedFlag(true); setTimeout(() => setSavedFlag(false), 1600);
+  }
+
+  return (
+    <div className="stack">
+      <section className="panel">
+        <div className="panel-head"><h2>{t('c_h')}</h2><p>{t('c_p')}</p></div>
+        <div className="content-grid">
+          <div className="content-left">
+            <Field label={t('c_channel')}>
+              <div className="chips">{CHANNELS.map((c) => <Chip key={c.id} active={channel === c.id} dot={c.c} onClick={() => setChannel(c.id)}>{c.name}</Chip>)}</div>
+            </Field>
+            <Field label={t('c_phase')}>
+              <div className="chips">{FUNNEL.map((f) => <Chip key={f.id} active={phase === f.id} dot={f.c} onClick={() => setPhase(f.id)}>{f.t[lang]}</Chip>)}</div>
+            </Field>
+            <Field label={t('c_subject')}>
+              <input className="input" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder={t('c_subject_none')} />
+            </Field>
+            <Field label={t('c_angle')}><input className="input" value={angle} onChange={(e) => setAngle(e.target.value)} placeholder={t('c_angle_ph')} /></Field>
+            <button className="btn btn-blue" onClick={generate} disabled={gen === 'loading'}><I.spark width="17" height="17" /> {gen === 'loading' ? t('c_generating') : t('c_generate')}</button>
+            {gen === 'error' && <div className="mini-err">{t('c_err')}</div>}
+            <Field label={t('c_text')}><textarea className="input textarea tall" value={text} onChange={(e) => setText(e.target.value)} placeholder={t('c_text_ph')} /></Field>
+            <Field label={t('c_visual')}>
+              <div className="chips">
+                <Chip active={visualMode === 'none'} onClick={() => setVisualMode('none')}>{t('c_visual_none')}</Chip>
+                <Chip active={visualMode === 'preset'} onClick={() => setVisualMode('preset')}>{t('c_visual_preset')}</Chip>
+                <Chip active={visualMode === 'upload'} onClick={() => imgRef.current && imgRef.current.click()}>{t('c_visual_upload')}</Chip>
+              </div>
+              <input ref={imgRef} type="file" accept="image/*" hidden onChange={onImg} />
+            </Field>
+            {visualMode === 'preset' && <Field label={t('c_headline')}><input className="input" value={headline} onChange={(e) => setHeadline(e.target.value)} /></Field>}
+            <button className="btn btn-blue" onClick={save} disabled={!text}>{savedFlag ? <><I.check width="16" height="16" /> {t('c_saved')}</> : <><I.doc width="16" height="16" /> {t('c_save_draft')}</>}</button>
+          </div>
+          <div className="content-right">
+            <div className="field-label">{t('example_word')}</div>
+            <PostPreview brand={brand} channel={ch} text={text} visual={visual} t={t} />
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function PostPreview({ brand, channel, text, visual, t }) {
+  return (
+    <div className="li-card">
+      <div className="li-top">
+        <span className="ava-mini" style={brand.logo ? { backgroundImage: `url(${brand.logo})`, backgroundColor: 'transparent' } : { background: channel.c }}>
+          {!brand.logo && (brand.name ? brand.name[0].toUpperCase() : Logo.mark({ width: 18, height: 18 }))}
+        </span>
+        <div className="li-meta">
+          <div className="li-name">{brand.name || 'Founder'}</div>
+          <div className="li-role">{[brand.role, brand.company].filter(Boolean).join(' | ') || channel.name}</div>
+        </div>
+        <span className="li-in" style={{ color: channel.c }}>{channel.ic({ width: 18, height: 18 })}</span>
+      </div>
+      <div className="li-text">{text || t('c_text_ph')}</div>
+      {visual && <img className="li-visual" src={visual} alt="" />}
+    </div>
+  );
+}
+
+// ----- Schedule tab -----
+function CmsSchedule({ t, lang, brand, drafts, deleteDraft, scheduled, schedulePost, unschedule }) {
   const [month, setMonth] = useState(() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); });
+  const [openDrafts, setOpenDrafts] = useState(true);
+  const [openSched, setOpenSched] = useState(true);
+  const [planning, setPlanning] = useState(null); // draft id being scheduled
+  const [pDate, setPDate] = useState(() => { const d = new Date(); d.setDate(d.getDate() + 1); return ymd(d); });
+  const [pTime, setPTime] = useState('09:00');
+  const [openPost, setOpenPost] = useState('');
+
   const y = month.getFullYear(), m = month.getMonth();
   const firstDow = (new Date(y, m, 1).getDay() + 6) % 7;
   const days = new Date(y, m + 1, 0).getDate();
@@ -881,13 +1393,13 @@ function PostTab({ t, lang, posts, onAdd, onEdit, onDelete }) {
   for (let i = 0; i < firstDow; i++) cells.push(null);
   for (let d = 1; d <= days; d++) cells.push(d);
   const byDate = {};
-  posts.forEach((p) => { (byDate[p.date] = byDate[p.date] || []).push(p); });
+  scheduled.forEach((p) => { (byDate[p.date] = byDate[p.date] || []).push(p); });
   const todayStr = ymd(new Date());
-  const upcoming = [...posts].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  const upcoming = [...scheduled].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
 
   return (
-    <section className="stack">
-      <div className="panel">
+    <div className="stack">
+      <section className="panel">
         <div className="cal-head">
           <h2>{MONTHS[lang][m]} {y}</h2>
           <div className="cal-nav">
@@ -902,100 +1414,92 @@ function PostTab({ t, lang, posts, onAdd, onEdit, onDelete }) {
             const ds = y + '-' + pad(m + 1) + '-' + pad(d);
             const list = byDate[ds] || [];
             return (
-              <button className={'cal-cell' + (ds === todayStr ? ' cal-today' : '')} key={ds} onClick={() => onAdd(ds)}>
+              <div className={'cal-cell' + (ds === todayStr ? ' cal-today' : '')} key={ds}>
                 <span className="cal-d">{d}</span>
                 <span className="cal-dots">
-                  {list.slice(0, 3).map((p) => <span key={p.id} className="cal-dot" style={{ background: phaseById(p.category).c }} />)}
+                  {list.slice(0, 3).map((p) => <span key={p.id} className="cal-dot" style={{ background: channelById(p.channel).c }} />)}
                   {list.length > 3 && <span className="cal-more">+{list.length - 3}</span>}
                 </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="panel">
-        <div className="panel-head nomb"><h2>{t('p_scheduled_h2')}</h2><p>{upcoming.length ? upcoming.length + ' ' + t('p_scheduled_count') : t('p_none')}</p></div>
-        <div className="sched-list">
-          {upcoming.map((p) => {
-            const ph = phaseById(p.category);
-            return (
-              <div className="sched" key={p.id}>
-                <div className="sched-date"><span className="sd-d">{p.date.slice(8)}</span><span className="sd-m">{MONTHS[lang][Number(p.date.slice(5, 7)) - 1].slice(0, 3)}</span></div>
-                <div className="sched-body">
-                  <div className="sched-meta"><span className="cat-pill" style={{ background: ph.c }}>{ph.t[lang]}</span><span className="sched-time">{p.time}</span></div>
-                  <p className="sched-text">{p.text ? p.text.split('\n')[0] : t('p_untitled')}</p>
-                </div>
-                <div className="sched-actions">
-                  <button className="icon-btn" onClick={() => onEdit(p)} aria-label="edit"><I.edit width="16" height="16" /></button>
-                  <button className="icon-btn" onClick={() => onDelete(p.id)} aria-label="delete"><I.trash width="16" height="16" /></button>
-                </div>
               </div>
             );
           })}
-          {!upcoming.length && <div className="empty small"><I.calendar width="24" height="24" /><p>{t('p_your_scheduled')}</p></div>}
         </div>
-        <button className="btn btn-blue add-btn" onClick={() => onAdd()}><I.plus width="18" height="18" /> {t('p_add_new')}</button>
-      </div>
-    </section>
-  );
-}
+      </section>
 
-// ---------- Composer ----------
-function Composer({ t, lang, composer, setComposer, founder, strategy, templates, onGenerate, onSave, onClose }) {
-  useEffect(() => {
-    const h = (e) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h);
-  }, []);
-  const set = (k, v) => setComposer((c) => ({ ...c, [k]: v }));
-  const ph = phaseById(composer.category);
-
-  return (
-    <div className="overlay" onClick={onClose}>
-      <div className="composer" onClick={(e) => e.stopPropagation()}>
-        <div className="comp-head">
-          <div><div className="eyebrow">{composer.id ? t('c_edit') : t('c_new')}</div><h2 className="comp-title">{composer.source ? composer.source.title : t('c_write_schedule')}</h2></div>
-          <button className="icon-btn" onClick={onClose} aria-label="close"><I.x width="18" height="18" /></button>
-        </div>
-
-        <div className="comp-body">
-          <div className="comp-left">
-            <Field label={t('c_category')}>
-              <div className="chips">{FUNNEL.map((f) => <Chip key={f.id} active={composer.category === f.id} dot={f.c} onClick={() => set('category', f.id)}>{f.t[lang]}</Chip>)}</div>
-            </Field>
-            <Field label={t('c_template')}>
-              <div className="chips">{templates.map((tp) => <Chip key={tp.id} active={composer.tplId === tp.id} onClick={() => set('tplId', tp.id)}>{tp.name}</Chip>)}</div>
-            </Field>
-            {!composer.source && <Field label={t('c_idea')} hint={t('c_idea_hint')}><input className="input" value={composer.notes} onChange={(e) => set('notes', e.target.value)} placeholder={t('c_idea_ph')} /></Field>}
-            <button className="btn btn-blue" onClick={onGenerate} disabled={composer.gen === 'loading'}><I.spark width="17" height="17" /> {composer.gen === 'loading' ? t('c_drafting') : composer.text ? t('c_draft_again') : t('c_draft')}</button>
-            {composer.gen === 'error' && <div className="mini-err">{t('c_draft_err')}</div>}
-            <Field label={t('c_post_text')}><textarea className="input textarea tall" value={composer.text} onChange={(e) => set('text', e.target.value)} placeholder={t('c_post_text_ph')} /></Field>
-            <div className="row2">
-              <Field label={t('c_date')}><input className="input" type="date" value={composer.date} onChange={(e) => set('date', e.target.value)} /></Field>
-              <Field label={t('c_time')}><input className="input" type="time" value={composer.time} onChange={(e) => set('time', e.target.value)} /></Field>
-            </div>
-            <button className="btn btn-blue" onClick={onSave} disabled={!composer.text}><I.calendar width="17" height="17" /> {composer.id ? t('c_update') : t('c_schedule')}</button>
-          </div>
-
-          <div className="comp-right">
-            <div className="field-label">{t('c_preview')}</div>
-            <div className="li-card">
-              <div className="li-top">
-                <span className="ava-mini" style={founder.logo ? { backgroundImage: `url(${founder.logo})` } : {}}>{!founder.logo && (founder.name[0] || 'F').toUpperCase()}</span>
-                <div className="li-meta">
-                  <div className="li-name">{founder.name || 'Founder'} <span className="li-first">{t('li_first')}</span></div>
-                  <div className="li-role">{[founder.role, founder.company].filter(Boolean).join(' at ') || 'Founder'}</div>
-                  <div className="li-time">{composer.date} . <span className="li-globe">{t('li_public')}</span></div>
+      <section className="panel">
+        <button className="fold-head" onClick={() => setOpenDrafts((v) => !v)}>
+          <h2>{t('sch_drafts')}</h2>
+          <span className={'fold-chev' + (openDrafts ? ' fold-open' : '')}><I.chevD width="18" height="18" /></span>
+        </button>
+        {openDrafts && (
+          <div className="sched-list">
+            {!drafts.length && <div className="empty small"><I.doc width="22" height="22" /><p>{t('sch_none_drafts')}</p></div>}
+            {drafts.map((d) => {
+              const ch = channelById(d.channel);
+              const ph = phaseById(d.category);
+              return (
+                <div className="sched" key={d.id}>
+                  <span className="soc-ic" style={{ background: ch.c }}>{ch.ic({ width: 17, height: 17 })}</span>
+                  <div className="sched-body">
+                    <div className="sched-meta"><span className="cat-pill" style={{ background: ph.c }}>{ph.t[lang]}</span></div>
+                    <p className="sched-text">{d.text ? d.text.split('\n')[0] : t('untitled')}</p>
+                    {planning === d.id && (
+                      <div className="plan-row">
+                        <input className="input" type="date" value={pDate} onChange={(e) => setPDate(e.target.value)} />
+                        <input className="input" type="time" value={pTime} onChange={(e) => setPTime(e.target.value)} />
+                        <button className="btn btn-blue sm" onClick={() => { schedulePost(d, pDate, pTime); setPlanning(null); }}><I.check width="15" height="15" /> {t('sch_confirm')}</button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="sched-actions">
+                    {planning !== d.id && <button className="btn btn-blue sm" onClick={() => setPlanning(d.id)}><I.calendar width="15" height="15" /> {t('sch_schedule')}</button>}
+                    <button className="icon-btn" onClick={() => deleteDraft(d.id)} aria-label="delete"><I.trash width="16" height="16" /></button>
+                  </div>
                 </div>
-                <span className="li-in"><I.linkedin width="18" height="18" /></span>
-              </div>
-              <div className="li-text">{composer.text || t('c_draft_hint')}</div>
-              <div className="li-cat"><span className="cat-pill" style={{ background: ph.c }}>{ph.t[lang]}</span></div>
-              <div className="li-react"><span className="li-emos">+</span><span>{t('li_like')}</span><span>{t('li_comment')}</span><span>{t('li_share')}</span></div>
-            </div>
+              );
+            })}
           </div>
-        </div>
-      </div>
+        )}
+      </section>
+
+      <section className="panel">
+        <button className="fold-head" onClick={() => setOpenSched((v) => !v)}>
+          <h2>{t('sch_scheduled')}</h2>
+          <span className={'fold-chev' + (openSched ? ' fold-open' : '')}><I.chevD width="18" height="18" /></span>
+        </button>
+        {openSched && (
+          <div className="sched-list">
+            {!upcoming.length && <div className="empty small"><I.calendar width="22" height="22" /><p>{t('sch_none_sched')}</p></div>}
+            {upcoming.map((p) => {
+              const ch = channelById(p.channel);
+              const ph = phaseById(p.category);
+              const open = openPost === p.id;
+              return (
+                <div className="sched sched-col" key={p.id}>
+                  <button className="sched-row" onClick={() => setOpenPost(open ? '' : p.id)}>
+                    <div className="sched-date"><span className="sd-d">{p.date.slice(8)}</span><span className="sd-m">{MONTHS[lang][Number(p.date.slice(5, 7)) - 1].slice(0, 3)}</span></div>
+                    <span className="soc-ic" style={{ background: ch.c }}>{ch.ic({ width: 17, height: 17 })}</span>
+                    <div className="sched-body">
+                      <div className="sched-meta"><span className="cat-pill" style={{ background: ph.c }}>{ph.t[lang]}</span><span className="sched-time">{p.time}</span></div>
+                      <p className="sched-text">{p.text ? p.text.split('\n')[0] : t('untitled')}</p>
+                    </div>
+                    <span className={'fold-chev' + (open ? ' fold-open' : '')}><I.chevD width="17" height="17" /></span>
+                  </button>
+                  {open && (
+                    <div className="sched-detail">
+                      <PostPreview brand={brand} channel={ch} text={p.text} visual={p.visual} t={t} />
+                      <div className="plan-row">
+                        <span className="kw-pill"><I.calendar width="12" height="12" /> {p.date} {p.time}</span>
+                        <button className="btn btn-ghost sm" onClick={() => unschedule(p)}><I.chevL width="14" height="14" /> {t('sch_unschedule')}</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
@@ -1013,16 +1517,34 @@ const CSS = `
 .faab :focus-visible { outline:2px solid var(--blue); outline-offset:2px; border-radius:8px; }
 
 .eyebrow { display:inline-flex; align-items:center; gap:7px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--blue); }
-.eyebrow.light { color:#9CC2EC; }
 .field-label { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.13em; text-transform:uppercase; color:var(--dim); display:flex; gap:8px; align-items:baseline; }
 .field-label.mt { display:block; margin:20px 0 10px; }
 .field-hint { text-transform:none; letter-spacing:0; font-family:Inter; font-size:11.5px; color:var(--dim); }
 
-.topbar { display:flex; align-items:center; justify-content:space-between; padding:16px 26px; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:60; background:rgba(255,255,255,0.9); backdrop-filter:blur(14px); }
-.brand { display:flex; align-items:center; background:none; border:none; padding:0; }
-.brand-logo { height:26px; width:auto; color:var(--ink); display:block; }
+/* intro splash */
+.intro { position:fixed; inset:0; z-index:100; background:var(--white); display:flex; align-items:center; justify-content:center; animation:introFade .5s ease 2s forwards; cursor:pointer; }
+@keyframes introFade { to { opacity:0; visibility:hidden; } }
+
+/* lockup */
+.lockup { display:flex; flex-direction:column; align-items:center; gap:14px; color:var(--ink); }
+.lockup-word { width:min(340px,64vw); height:auto; display:block; }
+.lockup-sub { font-family:'IBM Plex Mono',monospace; font-size:clamp(10px,2.4vw,14px); letter-spacing:0.42em; color:var(--mut); text-indent:0.42em; }
+.lockup-anim .lp { stroke-dasharray:240; stroke-dashoffset:240; animation:draw 1.1s ease forwards; }
+.lockup-anim .lp2 { animation-delay:.25s; }
+.lockup-anim .lp3 { animation-delay:.5s; }
+.lockup-anim .lockup-sub, .lockup-anim + .tagline { animation:none; }
+.lockup-anim .lockup-sub { opacity:0; animation:fadeUp .7s ease 1.2s forwards; }
+@keyframes draw { to { stroke-dashoffset:0; } }
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* topbar */
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:14px 26px; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:60; background:rgba(255,255,255,0.9); backdrop-filter:blur(14px); }
+.brand { display:flex; align-items:center; gap:12px; background:none; border:none; padding:0; color:var(--ink); }
+.brand-mark { height:26px; width:auto; display:block; }
+.brand-logo { height:22px; width:auto; display:block; }
 .brand-logo.sm { height:20px; }
 
+/* burger */
 .burger { position:relative; width:40px; height:40px; border:1px solid var(--line); border-radius:12px; background:var(--white); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; }
 .burger:hover { border-color:var(--blue); }
 .burger-bar { width:18px; height:2px; background:var(--ink); border-radius:2px; transition:transform .34s cubic-bezier(.6,.05,.1,1), opacity .2s ease; }
@@ -1030,22 +1552,23 @@ const CSS = `
 .burger-on .b2 { opacity:0; transform:scaleX(0.4); }
 .burger-on .b3 { transform:translateY(-7px) rotate(-45deg); }
 
+/* menu */
 .menu { position:fixed; inset:0; z-index:50; background:var(--blue); color:#fff; padding:96px 26px 40px;
   opacity:0; visibility:hidden; transform:scale(1.02); transition:opacity .4s ease, transform .5s cubic-bezier(.6,.05,.1,1), visibility 0s .45s; display:flex; flex-direction:column; justify-content:center; }
 .menu-on { opacity:1; visibility:visible; transform:scale(1); transition:opacity .4s ease, transform .5s cubic-bezier(.6,.05,.1,1), visibility 0s; }
 .menu-nav { max-width:1120px; margin:0 auto; width:100%; }
-.menu-item { display:flex; align-items:center; gap:20px; width:100%; background:none; border:none; padding:14px 0; color:#fff; border-bottom:1px solid rgba(255,255,255,0.18);
+.menu-item { display:flex; align-items:center; gap:20px; width:100%; background:none; border:none; padding:13px 0; color:#fff; border-bottom:1px solid rgba(255,255,255,0.18);
   opacity:0; transform:translateY(24px); transition:opacity .5s ease, transform .5s cubic-bezier(.6,.05,.1,1); }
 .menu-on .menu-item { opacity:1; transform:translateY(0); transition-delay:calc(var(--i) * 60ms + 120ms); }
 .menu-i { font-family:'IBM Plex Mono',monospace; font-size:13px; color:rgba(255,255,255,0.6); width:34px; }
-.menu-label { font-family:'Fraunces',serif; font-weight:400; font-size:clamp(32px,7vw,58px); letter-spacing:-0.01em; flex:1; text-align:left; }
+.menu-label { font-family:'Fraunces',serif; font-weight:400; font-size:clamp(28px,6.4vw,52px); letter-spacing:-0.01em; flex:1; text-align:left; }
 .menu-item svg { color:rgba(255,255,255,0.55); transition:transform .3s ease; }
 .menu-item:hover svg { transform:translateX(6px); color:#fff; }
 .menu-foot { max-width:1120px; margin:34px auto 0; width:100%; opacity:0; transform:translateY(24px); transition:opacity .5s ease, transform .5s ease; }
 .menu-on .menu-foot { opacity:1; transform:translateY(0); transition-delay:calc(var(--i) * 60ms + 120ms); }
 .menu-foot .btn-blue { background:#fff; color:var(--blue); box-shadow:none; }
-.menu-foot .btn-blue:hover { background:var(--blue-tint); }
 
+/* buttons */
 .btn { display:inline-flex; align-items:center; gap:9px; border:none; border-radius:999px; padding:13px 22px; font-size:15px; font-weight:600; transition:transform .15s ease, box-shadow .2s ease, background .2s; }
 .btn.sm { padding:9px 15px; font-size:13.5px; }
 .btn.lg { padding:15px 26px; font-size:16px; }
@@ -1059,90 +1582,114 @@ const CSS = `
 .icon-btn:hover { color:var(--blue); border-color:var(--blue); }
 
 .wrap { max-width:1120px; margin:0 auto; padding:0 26px; }
+.wrap-wide { max-width:1320px; margin:0 auto; }
 
-.hero { padding-top:96px; padding-bottom:90px; text-align:center; }
-.slogan { font-family:'Fraunces',serif; font-weight:400; font-size:clamp(52px,11vw,132px); line-height:0.95; letter-spacing:-0.03em; margin:0; text-wrap:balance; }
-.slogan .hl { font-style:italic; color:var(--navy); }
-.tagline { font-family:'Fraunces',serif; font-style:italic; font-size:clamp(18px,3vw,26px); color:var(--mut); margin:22px auto 34px; max-width:30ch; line-height:1.3; text-wrap:balance; }
+/* hero */
+.hero { padding-top:80px; padding-bottom:80px; text-align:center; display:flex; flex-direction:column; align-items:center; }
+.hero-lockup .lockup-word { width:min(520px,82vw); }
+.tagline { font-family:'Fraunces',serif; font-style:italic; font-size:clamp(19px,3.4vw,30px); color:var(--ink); margin:30px auto 34px; max-width:26ch; line-height:1.3; text-wrap:balance; }
 .hero-cta { display:flex; gap:13px; justify-content:center; flex-wrap:wrap; }
 
+/* sections */
 .sect { padding-top:88px; }
-.h2 { font-family:'Fraunces',serif; font-weight:400; font-size:clamp(28px,4vw,42px); letter-spacing:-0.02em; line-height:1.12; margin:14px 0 16px; text-wrap:balance; }
-.h2.on-dark { color:#fff; margin-bottom:0; }
-.sect-lead { font-size:16.5px; line-height:1.65; color:var(--mut); max-width:64ch; margin:0 0 34px; text-wrap:pretty; }
+.h2 { font-family:'Fraunces',serif; font-weight:400; font-size:clamp(28px,4vw,42px); letter-spacing:-0.02em; line-height:1.12; margin:14px 0 28px; text-wrap:balance; }
 
-.cards3 { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
-.card { background:var(--paper); border:1px solid var(--line); border-radius:18px; padding:26px; }
-.card-head { display:flex; align-items:center; gap:13px; margin-bottom:12px; }
-.card-ic { display:inline-flex; width:44px; height:44px; align-items:center; justify-content:center; border-radius:12px; background:var(--blue-soft); color:var(--blue); flex:none; }
-.card h3 { font-family:'Fraunces',serif; font-weight:500; font-size:22px; margin:0; }
-.card p { color:var(--mut); font-size:14.5px; line-height:1.55; margin:0; }
-
+/* funnel */
 .funnel { display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:8px; }
-.f-seg { width:100%; max-width:var(--fw,100%); display:flex; align-items:center; gap:18px; padding:20px 26px; border:none; border-radius:16px; color:#fff; text-align:left; transition:transform .16s ease, box-shadow .2s; box-shadow:0 8px 22px rgba(10,102,194,0.14); }
-.f-seg:hover { transform:translateY(-2px); box-shadow:0 12px 28px rgba(10,102,194,0.24); }
-.f-n { font-family:'IBM Plex Mono',monospace; font-size:13px; opacity:0.72; flex:none; }
-.f-body { display:flex; flex-direction:column; gap:3px; flex:1; }
-.f-t { font-family:'Fraunces',serif; font-weight:500; font-size:21px; }
+.f-seg { width:100%; max-width:var(--fw,100%); display:flex; align-items:center; gap:16px; padding:18px 24px; border-radius:16px; color:#fff; text-align:left; box-shadow:0 8px 22px rgba(10,102,194,0.14); }
+.f-ic { display:inline-flex; width:40px; height:40px; border-radius:11px; background:rgba(255,255,255,0.16); align-items:center; justify-content:center; flex:none; }
+.f-body { display:flex; flex-direction:column; gap:2px; flex:1; min-width:0; }
+.f-t { font-family:'Fraunces',serif; font-weight:500; font-size:20px; }
 .f-d { font-size:13.5px; opacity:0.85; }
-.f-go { opacity:0.75; flex:none; }
+.f-n { font-family:'IBM Plex Mono',monospace; font-size:13px; opacity:0.72; flex:none; }
 
+/* userflow */
 .flow { display:flex; align-items:stretch; gap:10px; margin-top:8px; }
-.flow-step { flex:1; min-width:0; background:var(--paper); border:1px solid var(--line); border-radius:18px; padding:24px 20px; display:flex; flex-direction:column; gap:10px; }
-.flow-ic { width:46px; height:46px; border-radius:13px; background:var(--blue); color:#fff; display:inline-flex; align-items:center; justify-content:center; }
+.flow-step { flex:1; min-width:0; background:var(--paper); border:1px solid var(--line); border-radius:18px; padding:22px 18px; display:flex; flex-direction:column; gap:10px; align-items:flex-start; }
+.flow-ic { width:44px; height:44px; border-radius:12px; background:var(--blue); color:#fff; display:inline-flex; align-items:center; justify-content:center; }
 .flow-n { font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; color:var(--blue); }
-.flow-step h3 { font-family:'Fraunces',serif; font-weight:500; font-size:18px; margin:0; line-height:1.2; }
-.flow-step p { color:var(--mut); font-size:13.5px; line-height:1.55; margin:0; }
+.flow-step h3 { font-family:'Fraunces',serif; font-weight:500; font-size:17px; margin:0; line-height:1.25; }
 .flow-arrow { display:flex; align-items:center; justify-content:center; color:var(--dim); flex:none; }
 
-.band-in { background:var(--ink); color:var(--paper); border-radius:24px; padding:48px; display:grid; grid-template-columns:1fr 1fr; gap:36px; align-items:center; }
-.band-copy p { color:rgba(244,243,246,0.78); font-size:16px; line-height:1.65; margin:0 0 14px; }
-.band-copy p:last-child { margin-bottom:0; }
+/* channels */
+.ch-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+.ch-card { background:none; border:none; padding:0; text-align:left; display:flex; flex-direction:column; gap:12px; }
+.ch-post { background:var(--white); border:1px solid var(--line); border-radius:16px; padding:16px; box-shadow:0 10px 26px rgba(23,23,23,0.05); transition:transform .16s ease, border-color .2s; width:100%; }
+.ch-card:hover .ch-post { transform:translateY(-3px); border-color:var(--blue); }
+.ch-post-top { display:flex; gap:10px; align-items:center; margin-bottom:10px; }
+.ch-ava { width:34px; height:34px; border-radius:50%; color:#fff; display:inline-flex; align-items:center; justify-content:center; flex:none; }
+.ch-post-name { font-weight:600; font-size:13.5px; }
+.ch-post-sub { color:var(--dim); font-size:11.5px; }
+.ch-post-text { margin:0; font-size:13.5px; line-height:1.5; color:var(--ink); }
+.ch-label { display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:14.5px; }
+.ch-icons { display:flex; gap:14px; justify-content:center; margin-top:34px; }
+.ch-icon { width:54px; height:54px; border-radius:16px; border:1px solid var(--line); background:var(--white); color:var(--cc); display:inline-flex; align-items:center; justify-content:center; transition:transform .15s ease, border-color .2s, background .2s; }
+.ch-icon:hover { transform:translateY(-2px); border-color:var(--cc); background:var(--paper); }
 
-.kb-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
-.kb { background:var(--white); border:1px solid var(--line); border-left:3px solid var(--blue); border-radius:14px; padding:22px; }
-.kb h3 { font-family:'Fraunces',serif; font-weight:500; font-size:18px; margin:0 0 9px; }
-.kb p { color:var(--mut); font-size:14px; line-height:1.6; margin:0; }
-
-.ctrl { background:var(--blue-tint); border:1px solid var(--line); border-radius:24px; padding:44px; }
-.ctrl-head { display:flex; gap:18px; align-items:center; margin-bottom:14px; }
+/* control */
+.ctrl { background:var(--blue-tint); border:1px solid var(--line); border-radius:24px; padding:40px; }
+.ctrl-head { display:flex; gap:18px; align-items:center; margin-bottom:20px; }
 .ctrl-ic { display:inline-flex; width:56px; height:56px; align-items:center; justify-content:center; border-radius:16px; background:var(--blue); color:#fff; flex:none; }
 .ctrl-head .h2 { margin:8px 0 0; }
-.ctrl-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+.ctrl-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
 .ctrl-item { display:flex; gap:14px; background:var(--white); border:1px solid var(--line); border-radius:14px; padding:18px; }
 .ctrl-item-ic { display:inline-flex; width:36px; height:36px; align-items:center; justify-content:center; border-radius:10px; background:var(--blue-soft); color:var(--blue); flex:none; }
 .ctrl-item h3 { font-family:'Fraunces',serif; font-weight:500; font-size:16.5px; margin:0 0 5px; }
 .ctrl-item p { color:var(--mut); font-size:13.5px; line-height:1.55; margin:0; }
 
+/* contact */
 .contact { display:grid; grid-template-columns:1.1fr 0.9fr; gap:36px; align-items:center; }
 .contact-card { background:var(--paper); border:1px solid var(--line); border-radius:20px; padding:28px; display:flex; flex-direction:column; gap:14px; align-items:flex-start; }
 .contact-row { display:inline-flex; align-items:center; gap:11px; font-size:15.5px; font-weight:500; }
 .contact-row svg { color:var(--blue); }
-.contact-row:hover { color:var(--blue); }
 
-.app { padding-top:26px; padding-bottom:60px; }
-.tabbar { display:flex; gap:6px; background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:6px; margin-bottom:22px; position:sticky; top:73px; z-index:20; }
-.tabbtn { flex:1; display:inline-flex; align-items:center; justify-content:center; gap:8px; border:none; background:none; color:var(--mut); font-size:14px; font-weight:600; padding:11px 10px; border-radius:10px; }
-.tabbtn:hover { color:var(--ink); }
-.tab-on { background:var(--blue); color:#fff; box-shadow:0 4px 12px rgba(10,102,194,0.22); }
+/* channel page */
+.chpage { padding-top:34px; padding-bottom:60px; display:flex; flex-direction:column; gap:18px; }
+.back-btn { align-self:flex-start; }
+.chpage-head { display:flex; align-items:center; gap:18px; margin:6px 0 8px; }
+.chpage-ic { width:60px; height:60px; border-radius:17px; color:#fff; display:inline-flex; align-items:center; justify-content:center; flex:none; }
+.chpage-title { font-family:'Fraunces',serif; font-weight:400; font-size:clamp(34px,6vw,52px); margin:0; letter-spacing:-0.02em; }
+.panel-title { font-family:'Fraunces',serif; font-weight:500; font-size:21px; margin:0 0 14px; }
+.body-text { color:var(--mut); font-size:15.5px; line-height:1.7; margin:0; max-width:72ch; }
+.place-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+.place { display:flex; gap:12px; align-items:center; background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:14px; font-size:14.5px; }
+.place-n { width:26px; height:26px; border-radius:50%; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:600; flex:none; }
+.ex-list { display:flex; flex-direction:column; gap:12px; }
+.ex-item { background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:16px; }
+.ex-head { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.ex-ic { width:28px; height:28px; border-radius:8px; color:#fff; display:inline-flex; align-items:center; justify-content:center; flex:none; }
+.ex-phase { font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--mut); }
+.ex-copy { margin:0; font-size:14.5px; line-height:1.55; white-space:pre-wrap; }
+.chpage-cta { display:flex; justify-content:center; margin-top:10px; }
 
-.stack { display:flex; flex-direction:column; gap:18px; }
-.panel { background:var(--white); border:1px solid var(--line); border-radius:20px; padding:28px; box-shadow:0 8px 24px rgba(23,23,23,0.04); }
-.panel-head { margin-bottom:22px; }
+/* wizard / onboarding */
+.wizard { max-width:780px; padding-top:38px; padding-bottom:60px; }
+.wiz-title { font-family:'Fraunces',serif; font-weight:400; font-size:clamp(30px,5vw,42px); margin:0 0 20px; letter-spacing:-0.02em; }
+.steps { display:flex; gap:10px; margin-bottom:22px; }
+.step { display:flex; align-items:center; gap:9px; flex:1; padding:11px 13px; border-radius:12px; background:var(--paper); border:1px solid var(--line); color:var(--dim); }
+.step-on { border-color:var(--blue); color:var(--ink); background:var(--white); }
+.step-done { color:var(--mut); }
+.step-dot { width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; background:var(--white); border:1px solid var(--line); flex:none; }
+.step-on .step-dot { background:var(--blue); border:none; color:#fff; }
+.step-done .step-dot { background:var(--navy); border:none; color:#fff; }
+.step-name { font-size:13px; font-weight:500; }
+.wiz-nav { display:flex; justify-content:space-between; align-items:center; margin-top:20px; }
+
+.panel { background:var(--white); border:1px solid var(--line); border-radius:20px; padding:26px; box-shadow:0 8px 24px rgba(23,23,23,0.04); }
+.panel-head { margin-bottom:20px; }
 .panel-head.nomb { margin-bottom:0; }
-.panel-head h2 { font-family:'Fraunces',serif; font-weight:500; font-size:23px; margin:0 0 6px; letter-spacing:-0.01em; }
+.panel-head h2 { font-family:'Fraunces',serif; font-weight:500; font-size:22px; margin:0 0 6px; letter-spacing:-0.01em; }
 .panel-head p { color:var(--mut); font-size:14.5px; margin:0; }
+.stack { display:flex; flex-direction:column; gap:18px; }
 
-.field { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+.field { display:flex; flex-direction:column; gap:8px; margin-bottom:15px; }
 .row2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 .input { background:var(--paper); border:1px solid var(--line); border-radius:11px; padding:12px 14px; color:var(--ink); font-size:15px; font-family:inherit; width:100%; }
 .input::placeholder { color:var(--dim); }
 .input:focus { border-color:var(--blue); outline:none; background:var(--white); }
 .textarea { resize:vertical; line-height:1.5; }
-.textarea.mono { font-family:'IBM Plex Mono',monospace; font-size:13px; }
 .textarea.tall { min-height:200px; }
 
-.prof-grid { display:grid; grid-template-columns:130px 1fr; gap:26px; }
 .ava-block { display:flex; flex-direction:column; align-items:center; gap:12px; }
 .ava { width:104px; height:104px; border-radius:20px; background:var(--paper) center/cover; border:1px solid var(--line); display:flex; align-items:center; justify-content:center; color:var(--dim); cursor:pointer; }
 .ava:hover { border-color:var(--blue); }
@@ -1155,61 +1702,94 @@ const CSS = `
 .chip-on { background:var(--blue-soft); border-color:var(--blue); color:var(--blue); font-weight:600; }
 .chip-dot { width:9px; height:9px; border-radius:50%; }
 .chip-x { display:inline-flex; opacity:0.7; }
-.chip-x:hover { opacity:1; }
 .kw-add { display:flex; gap:10px; }
 .kw-add .input { flex:1; }
 .gen-row { display:flex; align-items:center; gap:14px; margin-bottom:16px; flex-wrap:wrap; }
 .mini-err { color:var(--mag); font-size:13px; }
-.li-source { background:var(--blue-tint); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:16px; display:flex; flex-direction:column; gap:12px; }
-.li-source-head { display:flex; gap:12px; align-items:flex-start; }
-.li-source-ic { width:34px; height:34px; border-radius:9px; background:var(--blue); color:#fff; display:inline-flex; align-items:center; justify-content:center; flex:none; }
-.li-source-t { font-family:'Fraunces',serif; font-weight:500; font-size:16px; }
-.li-source-p { color:var(--mut); font-size:13px; line-height:1.5; margin-top:2px; }
-.li-source-note { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--dim); letter-spacing:0.02em; }
+.li-source-note { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--dim); letter-spacing:0.02em; margin-top:8px; }
 
-.mini-funnel { display:flex; flex-direction:column; gap:8px; }
-.mf-seg { display:flex; align-items:center; gap:14px; padding:14px 18px; border:1px solid var(--line); border-radius:12px; background:var(--paper); color:var(--ink); text-align:left; transition:border-color .2s, background .2s; }
-.mf-seg:hover { border-color:var(--blue); }
-.mf-on { color:#fff; }
-.mf-n { font-family:'IBM Plex Mono',monospace; font-size:12px; opacity:0.7; }
-.mf-t { font-family:'Fraunces',serif; font-weight:500; font-size:17px; flex:1; }
+/* socials */
+.soc-list { display:flex; flex-direction:column; gap:10px; }
+.soc-row { display:flex; align-items:center; gap:12px; }
+.soc-ic { width:36px; height:36px; border-radius:10px; color:#fff; display:inline-flex; align-items:center; justify-content:center; flex:none; }
+.soc-name { width:84px; font-weight:600; font-size:14px; flex:none; }
+.soc-row .input { flex:1; }
 
-.tpl-list { display:flex; flex-direction:column; gap:14px; }
-.tpl { background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:14px; }
-.tpl-top { display:flex; gap:10px; margin-bottom:10px; }
-.tpl-name { font-weight:600; background:var(--white); }
-.tpl .textarea { background:var(--white); }
-.tpl-actions { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+/* scan */
+.scan-grid { display:grid; grid-template-columns:130px 1fr; gap:24px; margin-top:18px; }
+.colors { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.color-chip { position:relative; display:inline-flex; }
+.color-chip input[type=color] { width:44px; height:44px; border:1px solid var(--line); border-radius:11px; padding:2px; background:var(--white); cursor:pointer; }
+.color-x { position:absolute; top:-6px; right:-6px; width:18px; height:18px; border-radius:50%; border:none; background:var(--ink); color:#fff; display:inline-flex; align-items:center; justify-content:center; }
 
-.topics-head { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:18px; flex-wrap:wrap; }
-.kw-strip { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:22px; }
-.kw-pill { display:inline-flex; align-items:center; gap:6px; background:var(--paper); border:1px solid var(--line); color:var(--mut); padding:6px 11px; border-radius:999px; font-size:12.5px; font-family:'IBM Plex Mono',monospace; }
-.kw-pill.sm { padding:4px 9px; font-size:11px; }
-.news-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
-.news-card { background:var(--white); border:1px solid var(--line); border-radius:18px; padding:22px; display:flex; flex-direction:column; transition:transform .16s ease, box-shadow .2s, border-color .2s; }
-.news-card:hover { transform:translateY(-3px); border-color:var(--blue); box-shadow:0 14px 34px rgba(23,23,23,0.08); }
-.news-card.skeleton { height:220px; background:linear-gradient(100deg,var(--paper) 30%,var(--white) 50%,var(--paper) 70%); background-size:200% 100%; animation:sheen 1.3s linear infinite; }
-@keyframes sheen { to { background-position:-200% 0; } }
-.news-top { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; }
-.src { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--blue); }
-.news-title { font-family:'Fraunces',serif; font-weight:500; font-size:20px; line-height:1.22; margin:0 0 10px; letter-spacing:-0.01em; }
-.news-sum { color:var(--mut); font-size:14px; line-height:1.5; margin:0 0 12px; }
-.news-angle { display:flex; gap:8px; align-items:flex-start; color:var(--ink); font-size:13.5px; line-height:1.45; background:var(--blue-soft); border:1px solid rgba(10,102,194,0.16); border-radius:12px; padding:10px 12px; margin:0 0 16px; }
-.news-angle svg { color:var(--blue); flex:none; margin-top:1px; }
-.news-foot { display:flex; align-items:center; gap:12px; margin-top:auto; }
-.news-link { display:inline-flex; align-items:center; gap:6px; color:var(--mut); font-size:13px; }
-.news-link:hover { color:var(--blue); }
-.push { margin-left:auto; }
-.empty { text-align:center; padding:56px 20px; color:var(--mut); display:flex; flex-direction:column; align-items:center; gap:14px; }
-.empty.small { padding:34px 20px; }
+/* tone / examples */
+.tone-box { background:var(--blue-tint); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:16px; }
+.tone-text { margin:8px 0 0; font-size:14.5px; line-height:1.6; white-space:pre-wrap; }
+.ex-cards { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-top:12px; }
+.ex-card { background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:16px; }
+.ex-card-head { display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:14px; margin-bottom:8px; }
 
+/* docs */
+.doc-list { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+.doc-row { display:flex; align-items:center; gap:10px; background:var(--paper); border:1px solid var(--line); border-radius:11px; padding:10px 12px; }
+.doc-row svg { color:var(--blue); flex:none; }
+.doc-name { flex:1; font-size:14px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* CMS shell */
+.cms { display:grid; grid-template-columns:230px 1fr; min-height:calc(100vh - 69px); }
+.cms-rail { border-right:1px solid var(--line); background:var(--paper); padding:22px 14px; display:flex; flex-direction:column; gap:18px; position:sticky; top:69px; height:calc(100vh - 69px); }
+.cms-rail-top { display:flex; justify-content:center; padding:4px 0 2px; }
+.cms-mark { height:30px; width:auto; color:var(--ink); }
+.cms-tabs { display:flex; flex-direction:column; gap:5px; flex:1; }
+.cms-tab { display:flex; align-items:center; gap:11px; width:100%; border:none; background:none; color:var(--mut); font-size:14px; font-weight:600; padding:11px 13px; border-radius:11px; text-align:left; }
+.cms-tab:hover { color:var(--ink); background:var(--white); }
+.cms-tab-on { background:var(--blue); color:#fff; box-shadow:0 4px 12px rgba(10,102,194,0.22); }
+.cms-tab-on:hover { color:#fff; background:var(--blue); }
+.cms-rail-bottom { display:flex; flex-direction:column; gap:5px; border-top:1px solid var(--line); padding-top:12px; }
+.cms-main { padding:26px; min-width:0; }
+
+/* floating CMS button */
+.cms-fab { position:fixed; right:22px; bottom:22px; z-index:40; width:58px; height:58px; border-radius:50%; border:none; background:var(--blue); color:#fff; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 12px 30px rgba(10,102,194,0.4); transition:transform .15s ease, background .2s; }
+.cms-fab:hover { transform:translateY(-2px) scale(1.04); background:var(--blue-d); }
+
+/* strategy phases */
+.phase-list { display:flex; flex-direction:column; gap:14px; }
+.phase { background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:16px; }
+.phase .input { background:var(--white); }
+.phase-head { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.phase-t { font-family:'Fraunces',serif; font-weight:500; font-size:17px; }
+
+/* topics table */
+.topics-head { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:16px; flex-wrap:wrap; }
+.topic-table { display:flex; flex-direction:column; border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+.tt-row { display:grid; grid-template-columns:1fr 110px 130px 96px; gap:12px; align-items:center; padding:12px 16px; border-bottom:1px solid var(--line); font-size:14px; }
+.tt-row:last-child { border-bottom:none; }
+.tt-head { background:var(--paper); font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--dim); }
+.tt-title { min-width:0; overflow-wrap:anywhere; }
+.tt-link { display:inline-flex; align-items:center; gap:5px; color:var(--blue); }
+.tt-vol { font-family:'IBM Plex Mono',monospace; font-size:13px; }
+.tt-src { color:var(--mut); font-size:13px; }
+
+/* content tab */
+.content-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.content-left { display:flex; flex-direction:column; gap:4px; }
+.li-card { background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:18px; margin-top:10px; }
+.li-top { display:flex; gap:11px; align-items:flex-start; margin-bottom:14px; }
+.ava-mini { width:44px; height:44px; border-radius:50%; background:var(--blue) center/cover; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; color:#fff; flex:none; }
+.li-meta { flex:1; min-width:0; }
+.li-name { font-weight:600; font-size:15px; }
+.li-role { color:var(--mut); font-size:12.5px; }
+.li-in { flex:none; }
+.li-text { white-space:pre-wrap; line-height:1.55; font-size:14.5px; color:var(--ink); }
+.li-visual { width:100%; border-radius:11px; margin-top:12px; display:block; }
+
+/* schedule */
 .cal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
 .cal-head h2 { font-family:'Fraunces',serif; font-weight:500; font-size:22px; margin:0; text-transform:capitalize; }
 .cal-nav { display:flex; gap:8px; }
 .cal { display:grid; grid-template-columns:repeat(7,1fr); gap:7px; }
 .cal-wd { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--dim); text-align:center; padding-bottom:4px; text-transform:uppercase; letter-spacing:0.08em; }
-.cal-cell { min-height:64px; border:1px solid var(--line); border-radius:11px; background:var(--paper); padding:8px; display:flex; flex-direction:column; align-items:flex-start; gap:6px; transition:border-color .15s, background .15s; }
-.cal-cell:hover { border-color:var(--blue); background:var(--white); }
+.cal-cell { min-height:60px; border:1px solid var(--line); border-radius:11px; background:var(--paper); padding:8px; display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
 .cal-cell.empty-cell { border:none; background:none; }
 .cal-cell.cal-today { border-color:var(--blue); box-shadow:inset 0 0 0 1px var(--blue); }
 .cal-d { font-size:13px; font-weight:600; color:var(--mut); }
@@ -1217,42 +1797,34 @@ const CSS = `
 .cal-dot { width:8px; height:8px; border-radius:50%; }
 .cal-more { font-size:10px; color:var(--dim); }
 
-.sched-list { display:flex; flex-direction:column; gap:12px; margin:18px 0; }
-.sched { display:flex; gap:16px; align-items:center; background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:14px 16px; }
-.sched-date { display:flex; flex-direction:column; align-items:center; width:46px; flex:none; }
-.sd-d { font-family:'Fraunces',serif; font-weight:500; font-size:22px; line-height:1; }
+.fold-head { display:flex; justify-content:space-between; align-items:center; width:100%; background:none; border:none; padding:0; }
+.fold-head h2 { font-family:'Fraunces',serif; font-weight:500; font-size:20px; margin:0; }
+.fold-chev { color:var(--dim); display:inline-flex; transition:transform .25s ease; }
+.fold-chev.fold-open { transform:rotate(180deg); }
+
+.sched-list { display:flex; flex-direction:column; gap:12px; margin-top:16px; }
+.sched { display:flex; gap:14px; align-items:flex-start; background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:14px 16px; }
+.sched-col { flex-direction:column; align-items:stretch; }
+.sched-row { display:flex; gap:14px; align-items:center; width:100%; background:none; border:none; padding:0; text-align:left; }
+.sched-date { display:flex; flex-direction:column; align-items:center; width:44px; flex:none; }
+.sd-d { font-family:'Fraunces',serif; font-weight:500; font-size:21px; line-height:1; }
 .sd-m { font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; color:var(--dim); letter-spacing:0.06em; }
 .sched-body { flex:1; min-width:0; }
 .sched-meta { display:flex; align-items:center; gap:10px; margin-bottom:5px; flex-wrap:wrap; }
 .cat-pill { color:#fff; font-size:11px; font-weight:600; padding:3px 10px; border-radius:999px; }
 .sched-time { font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--dim); }
 .sched-text { margin:0; font-size:14px; color:var(--ink); line-height:1.45; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-.sched-actions { display:flex; gap:8px; flex:none; }
-.add-btn { width:100%; justify-content:center; }
+.sched-actions { display:flex; gap:8px; flex:none; align-items:center; }
+.plan-row { display:flex; gap:10px; align-items:center; margin-top:10px; flex-wrap:wrap; }
+.plan-row .input { width:auto; }
+.sched-detail { margin-top:6px; }
+.kw-pill { display:inline-flex; align-items:center; gap:6px; background:var(--white); border:1px solid var(--line); color:var(--mut); padding:6px 11px; border-radius:999px; font-size:12.5px; font-family:'IBM Plex Mono',monospace; }
+.empty { text-align:center; padding:50px 20px; color:var(--mut); display:flex; flex-direction:column; align-items:center; gap:14px; }
+.empty.small { padding:30px 16px; }
 
-.overlay { position:fixed; inset:0; background:rgba(23,23,23,0.42); backdrop-filter:blur(5px); display:flex; align-items:center; justify-content:center; padding:18px; z-index:70; }
-.composer { background:var(--white); border:1px solid var(--line); border-radius:22px; width:min(1000px,100%); max-height:92vh; overflow:auto; padding:26px; }
-.comp-head { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:22px; }
-.comp-title { font-family:'Fraunces',serif; font-weight:500; font-size:22px; margin:6px 0 0; line-height:1.2; letter-spacing:-0.01em; }
-.comp-body { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
-.comp-left { display:flex; flex-direction:column; gap:14px; }
-
-.li-card { background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:18px; margin-top:10px; }
-.li-top { display:flex; gap:11px; align-items:flex-start; margin-bottom:14px; }
-.ava-mini { width:44px; height:44px; border-radius:50%; background:var(--blue) center/cover; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; color:#fff; flex:none; }
-.li-meta { flex:1; }
-.li-name { font-weight:600; font-size:15px; display:flex; align-items:center; gap:6px; }
-.li-first { color:var(--dim); font-weight:400; font-size:12px; }
-.li-role { color:var(--mut); font-size:12.5px; }
-.li-time { color:var(--dim); font-size:11.5px; }
-.li-in { color:var(--blue); }
-.li-text { white-space:pre-wrap; line-height:1.55; font-size:14.5px; color:var(--ink); }
-.li-cat { margin-top:12px; }
-.li-react { display:flex; gap:18px; align-items:center; margin-top:16px; padding-top:12px; border-top:1px solid var(--line); color:var(--mut); font-size:13px; }
-.li-emos { width:22px; height:22px; border-radius:50%; background:var(--blue); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:14px; }
-
+/* footer */
 .foot { border-top:1px solid var(--line); margin-top:88px; background:var(--paper); }
-.foot-grid { max-width:1120px; margin:0 auto; padding:44px 26px 26px; display:grid; grid-template-columns:1.2fr 0.9fr 0.9fr; gap:30px; }
+.foot-grid { max-width:1120px; margin:0 auto; padding:44px 26px 26px; display:grid; grid-template-columns:1.2fr 0.9fr 0.9fr; gap:30px; color:var(--ink); }
 .foot-tag { font-family:'Fraunces',serif; font-style:italic; color:var(--mut); font-size:16px; margin:12px 0 0; }
 .foot-col { display:flex; flex-direction:column; gap:9px; align-items:flex-start; }
 .foot-h { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--dim); margin-bottom:4px; }
@@ -1261,32 +1833,45 @@ const CSS = `
 .foot-base { max-width:1120px; margin:0 auto; padding:16px 26px 28px; border-top:1px solid var(--line); color:var(--dim); font-size:13px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
 .lang-toggle { display:inline-flex; border:1px solid var(--line); border-radius:999px; overflow:hidden; background:var(--white); }
 .lang-toggle button { border:none; background:none; padding:6px 14px; font-size:12.5px; font-weight:600; color:var(--mut); font-family:'IBM Plex Mono',monospace; }
-.lang-toggle button:hover { color:var(--blue); }
 .lang-toggle .lang-on { background:var(--blue); color:#fff; }
 
-@media (max-width:880px) {
-  .hero { padding-top:56px; padding-bottom:56px; }
-  .cards3, .kb-grid { grid-template-columns:1fr; }
-  .band-in { grid-template-columns:1fr; padding:30px; }
-  .ctrl { padding:26px; } .ctrl-grid { grid-template-columns:1fr; }
-  .contact { grid-template-columns:1fr; }
-  .news-grid { grid-template-columns:1fr; }
-  .comp-body { grid-template-columns:1fr; }
-  .prof-grid { grid-template-columns:1fr; }
-  .row2 { grid-template-columns:1fr; }
-  .foot-grid { grid-template-columns:1fr; }
-  .sect { padding-top:60px; }
-  .tabbar { position:static; }
-  .tabbtn { flex-direction:column; gap:4px; padding:10px 6px; font-size:11px; }
-  .cal-cell { min-height:52px; padding:6px; }
+@media (max-width:920px) {
+  .hero { padding-top:48px; padding-bottom:52px; }
   .flow { flex-direction:column; }
   .flow-arrow { transform:rotate(90deg); padding:4px 0; }
   .f-seg { max-width:100%; }
+  .ch-grid { grid-template-columns:repeat(2,1fr); }
+  .ctrl { padding:24px; } .ctrl-grid { grid-template-columns:1fr; }
+  .contact { grid-template-columns:1fr; }
+  .content-grid { grid-template-columns:1fr; }
+  .scan-grid { grid-template-columns:1fr; }
+  .row2 { grid-template-columns:1fr; }
+  .ex-cards { grid-template-columns:1fr; }
+  .place-grid { grid-template-columns:1fr; }
+  .foot-grid { grid-template-columns:1fr; }
+  .sect { padding-top:58px; }
+  .steps { flex-direction:column; }
+  .cms { grid-template-columns:1fr; }
+  .cms-rail { position:static; height:auto; flex-direction:row; align-items:center; overflow-x:auto; padding:10px 12px; gap:8px; }
+  .cms-rail-top { display:none; }
+  .cms-tabs { flex-direction:row; flex:none; }
+  .cms-tab span { display:none; }
+  .cms-tab { padding:11px; }
+  .cms-rail-bottom { flex-direction:row; border-top:none; padding-top:0; margin-left:auto; }
+  .cms-main { padding:16px; }
+  .tt-row { grid-template-columns:1fr 70px 90px; }
+  .tt-row > span:nth-child(4) { grid-column:1 / -1; }
+  .tt-head > span:nth-child(4) { display:none; }
+  .soc-name { width:auto; min-width:0; display:none; }
+  .cal-cell { min-height:50px; padding:6px; }
   .bk { display:none; }
 }
+@media (max-width:560px) { .ch-grid { grid-template-columns:1fr; } }
 @media (prefers-reduced-motion:reduce) {
-  .news-card.skeleton { animation:none; }
-  .btn-blue:hover, .news-card:hover, .f-seg:hover { transform:none; }
-  .menu, .menu-item, .burger-bar { transition:none; }
+  .btn-blue:hover, .ch-icon:hover, .cms-fab:hover { transform:none; }
+  .menu, .menu-item, .burger-bar, .fold-chev { transition:none; }
+  .lockup-anim .lp { animation:none; stroke-dashoffset:0; }
+  .lockup-anim .lockup-sub { animation:none; opacity:1; }
+  .intro { animation-duration:0.01s; animation-delay:0.6s; }
 }
 `;
