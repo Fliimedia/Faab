@@ -665,6 +665,7 @@ Write in ${langName(lang)}. Rules:
         {bursts.map((b) => <span key={b.id} className="ripple-burst" style={{ left: b.x + 'px', top: b.y + 'px' }} />)}
       </div>
 
+      <div className="app-content">
       {intro && (
         <div className="intro" onClick={() => setIntro(false)}>
           {Logo.lockup({ animate: true })}
@@ -745,6 +746,7 @@ Write in ${langName(lang)}. Rules:
           </div>
         </footer>
       )}
+      </div>
     </div>
   );
 }
@@ -1645,6 +1647,7 @@ const CSS = `
 .hero-mark { position:relative; z-index:1; width:min(138px,31vw); height:auto; color:var(--ink); animation:fadeUp .8s ease both; }
 .hero-subline { position:relative; z-index:1; width:min(210px,47vw); height:auto; color:var(--mut); margin-top:16px; animation:fadeUp .8s ease .15s both; }
 .ripple-layer { position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:0; }
+.app-content { position:relative; z-index:1; }
 .ripple-center { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
 .ripple-center span { position:absolute; width:min(420px,80vw); height:min(420px,80vw); border-radius:50%;
   background:radial-gradient(circle, rgba(0,0,0,0) 56%, rgba(23,23,23,0.045) 65%, rgba(255,255,255,0.9) 71%, rgba(23,23,23,0.028) 77%, rgba(0,0,0,0) 84%);
