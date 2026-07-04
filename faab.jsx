@@ -33,6 +33,24 @@ const I = {
   linkedin: (p) => (<svg viewBox="0 0 24 24" fill="currentColor" {...p}><path d="M6.94 5a2 2 0 1 1-4-.002 2 2 0 0 1 4 .002zM7 8.48H3V21h4V8.48zm6.32 0H9.34V21h3.94v-6.57c0-3.66 4.77-4 4.77 0V21H22v-7.93c0-6.17-7.06-5.94-8.72-2.91l.04-1.68z"/></svg>),
 };
 
+// ---------- Brand logo ----------
+const Logo = {
+  wordmark: (p) => (
+    <svg viewBox="0 0 128 56" fill="none" stroke="currentColor" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+      <path d="M8 8 L8 48 M8 8 L26 8 M8 28 L22 28" />
+      <path d="M32 48 L46 8 L60 48 L74 8 L88 48" />
+      <path d="M96 8 L96 48" />
+      <path d="M96 8 L106 8 A10 10 0 0 1 106 28 L96 28" />
+      <path d="M96 28 L107 28 A11 11 0 0 1 107 48 L96 48" />
+    </svg>
+  ),
+  mark: (p) => (
+    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" {...p}>
+      <path d="M6 36 L15 12 L24 36 L33 12 L42 36" />
+    </svg>
+  ),
+};
+
 // ---------- i18n ----------
 const STR = {
   nl: {
@@ -485,8 +503,8 @@ Write in ${langLabel}. Craft rules:
       <style>{CSS}</style>
 
       <header className="topbar">
-        <button className="brand" onClick={() => go('home')}>
-          <span className="wordmark">FAAB<span className="wm-dot">.</span></span>
+        <button className="brand" onClick={() => go('home')} aria-label="FAAB home">
+          {Logo.wordmark({ className: 'brand-logo' })}
         </button>
         <button className={'burger' + (menu ? ' burger-on' : '')} onClick={() => setMenu((m) => !m)} aria-label="Menu" aria-expanded={menu}>
           <span className="burger-bar b1" /><span className="burger-bar b2" /><span className="burger-bar b3" />
@@ -547,7 +565,7 @@ Write in ${langLabel}. Craft rules:
       <footer className="foot">
         <div className="foot-grid">
           <div>
-            <span className="wordmark sm">FAAB<span className="wm-dot">.</span></span>
+            {Logo.wordmark({ className: 'brand-logo sm' })}
             <p className="foot-tag">{t('foot_tag')}</p>
           </div>
           <div className="foot-col">
@@ -956,10 +974,9 @@ const CSS = `
 .field-hint { text-transform:none; letter-spacing:0; font-family:Inter; font-size:11.5px; color:var(--dim); }
 
 .topbar { display:flex; align-items:center; justify-content:space-between; padding:16px 26px; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:60; background:rgba(255,255,255,0.9); backdrop-filter:blur(14px); }
-.brand { background:none; border:none; padding:0; }
-.wordmark { font-family:'Fraunces',serif; font-weight:500; font-size:26px; letter-spacing:0.01em; color:var(--ink); }
-.wordmark.sm { font-size:21px; }
-.wm-dot { color:var(--mag); }
+.brand { display:flex; align-items:center; background:none; border:none; padding:0; }
+.brand-logo { height:26px; width:auto; color:var(--ink); display:block; }
+.brand-logo.sm { height:20px; }
 
 .burger { position:relative; width:40px; height:40px; border:1px solid var(--line); border-radius:12px; background:var(--white); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; }
 .burger:hover { border-color:var(--blue); }
