@@ -203,11 +203,27 @@ function makeTemplates(lang) {
   ];
 }
 
+// ---------- Environment shim ----------
+// Inside the Claude artifact, window.storage exists and the Anthropic endpoint is proxied for us.
+// On a normal deploy (e.g. Vercel) we fall back to localStorage and a serverless proxy at /api/anthropic.
+const IN_ARTIFACT = typeof window !== 'undefined' && !!window.storage;
+const API_URL = IN_ARTIFACT ? 'https://api.anthropic.com/v1/messages' : '/api/anthropic';
+const store = {
+  async get(k) {
+    if (IN_ARTIFACT) { try { return await window.storage.get(k); } catch (e) { return null; } }
+    try { const v = localStorage.getItem(k); return v ? { value: v } : null; } catch (e) { return null; }
+  },
+  async set(k, v) {
+    if (IN_ARTIFACT) { try { return await window.storage.set(k, v); } catch (e) { return null; } }
+    try { localStorage.setItem(k, v); } catch (e) { /* ignore */ } return null;
+  },
+};
+
 // ---------- API helpers ----------
 async function callClaude(messages, tools) {
   const body = { model: 'claude-sonnet-4-6', max_tokens: 1000, messages };
   if (tools) body.tools = tools;
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  const res = await fetch(API_URL, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error('API returned status ' + res.status);
@@ -279,17 +295,15 @@ export default function App() {
     let langSet = false;
     (async () => {
       try {
-        if (typeof window !== 'undefined' && window.storage) {
-          const r = await window.storage.get('faab:data');
-          if (r && r.value) {
-            const d = JSON.parse(r.value);
-            if (d.founder) setFounder(d.founder);
-            if (d.strategy) setStrategy(d.strategy);
-            if (Array.isArray(d.templates)) setTemplates(d.templates);
-            if (typeof d.templatesDirty === 'boolean') setTemplatesDirty(d.templatesDirty);
-            if (Array.isArray(d.posts)) setPosts(d.posts);
-            if (d.lang) { setLang(d.lang); langSet = true; }
-          }
+        const r = await store.get('faab:data');
+        if (r && r.value) {
+          const d = JSON.parse(r.value);
+          if (d.founder) setFounder(d.founder);
+          if (d.strategy) setStrategy(d.strategy);
+          if (Array.isArray(d.templates)) setTemplates(d.templates);
+          if (typeof d.templatesDirty === 'boolean') setTemplatesDirty(d.templatesDirty);
+          if (Array.isArray(d.posts)) setPosts(d.posts);
+          if (d.lang) { setLang(d.lang); langSet = true; }
         }
       } catch (e) { /* ignore */ }
       if (!langSet) {
@@ -313,9 +327,7 @@ export default function App() {
     if (!loaded) return;
     (async () => {
       try {
-        if (typeof window !== 'undefined' && window.storage) {
-          await window.storage.set('faab:data', JSON.stringify({ founder, strategy, templates, templatesDirty, posts, lang }));
-        }
+        await store.set('faab:data', JSON.stringify({ founder, strategy, templates, templatesDirty, posts, lang }));
       } catch (e) { /* ignore */ }
     })();
   }, [founder, strategy, templates, templatesDirty, posts, lang, loaded]);
