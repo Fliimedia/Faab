@@ -51,32 +51,34 @@ const I = {
 
 // ---------- Brand logo ----------
 // AA peak mark (from the supplied logo sheet) and the full lockup with subline.
+/* Exact logo paths, traced from the supplied artwork (potrace, IoU 99%+) */
+const MARK_D = "M0 784 L431.8 0 L857.7 784 L726.8 784 L431.3 239.4 L134.8 784 Z M857.7 784 L1289.8 3.4 L1719.8 784 L1589.7 784 L1290.4 234.7 L989.1 784 Z";
+const WORD_D = "M11684 7320 c-172 -25 -353 -125 -486 -269 -71 -76 -84 -97 -273 -422 -55 -95 -111 -191 -124 -213 -13 -23 -32 -56 -42 -73 -43 -76 -205 -350 -238 -405 -9 -15 -52 -88 -96 -164 -44 -75 -91 -156 -105 -179 -14 -23 -77 -131 -140 -240 -63 -109 -124 -213 -135 -231 -11 -18 -58 -98 -105 -179 -47 -81 -95 -163 -108 -183 -12 -21 -27 -47 -32 -59 -5 -12 -31 -57 -58 -100 -27 -43 -84 -140 -128 -216 -43 -76 -86 -151 -95 -165 -9 -15 -25 -43 -36 -62 -11 -19 -55 -93 -98 -165 -79 -131 -159 -268 -429 -735 -82 -140 -178 -304 -216 -365 -37 -60 -119 -200 -183 -310 -63 -110 -140 -240 -170 -290 -31 -49 -109 -182 -175 -295 -66 -113 -175 -299 -242 -415 -112 -191 -291 -498 -585 -1005 -59 -102 -129 -222 -156 -267 -48 -80 -59 -116 -39 -128 5 -3 220 -5 477 -5 545 0 479 -16 570 143 32 56 68 117 80 136 13 20 31 51 40 68 20 36 207 357 238 409 65 107 122 205 143 244 14 25 33 57 43 72 11 14 19 29 19 32 0 4 19 37 85 148 5 9 37 63 70 119 33 57 69 117 80 135 11 17 58 98 105 178 47 81 92 159 101 174 25 41 241 411 279 477 38 66 172 296 240 410 41 69 237 405 347 593 65 112 127 218 138 236 11 18 47 79 80 135 33 56 67 115 76 129 57 94 205 346 345 587 327 561 399 686 417 718 10 17 55 95 101 172 47 77 155 263 243 413 87 149 177 305 200 345 77 131 125 163 234 155 70 -5 102 -25 142 -89 38 -60 169 -283 306 -519 62 -107 141 -242 177 -300 35 -58 71 -120 81 -137 79 -142 316 -549 398 -683 56 -91 128 -212 160 -270 32 -58 98 -170 145 -250 48 -80 120 -201 160 -270 40 -69 123 -210 185 -315 62 -104 160 -271 217 -370 214 -371 511 -874 595 -1010 31 -49 96 -162 146 -250 49 -88 167 -290 262 -450 95 -159 200 -339 234 -400 35 -60 100 -173 146 -250 46 -77 144 -246 219 -375 74 -129 146 -248 160 -265 l24 -30 464 -3 c482 -3 502 -2 512 23 5 13 -105 215 -241 443 -12 20 -27 46 -32 57 -6 11 -42 72 -80 135 -39 63 -122 205 -186 315 -64 110 -120 207 -125 215 -5 8 -24 41 -42 73 -18 33 -42 73 -53 91 -11 18 -47 79 -80 135 -33 56 -69 118 -80 136 -11 19 -73 126 -138 237 -65 112 -123 210 -128 218 -41 65 -137 228 -235 400 -122 212 -428 729 -494 835 -21 33 -84 141 -140 240 -57 99 -164 284 -240 410 -170 286 -267 451 -585 995 -60 102 -154 262 -210 355 -56 94 -149 251 -205 350 -57 99 -157 270 -223 380 -66 110 -149 252 -185 315 -283 500 -369 603 -598 718 -144 72 -461 106 -690 72z M28941 7316 c-14 -17 -15 -765 0 -803 l9 -23 2452 0 c1486 0 2488 -4 2543 -10 606 -64 1035 -523 1035 -1105 -1 -618 -397 -1060 -1030 -1150 -91 -13 -440 -15 -2552 -15 -2421 0 -2447 0 -2458 -20 -16 -30 -13 -4012 3 -4034 14 -20 5083 -25 5410 -6 326 20 671 115 895 246 384 224 661 525 815 884 16 36 32 74 37 85 15 32 55 154 78 235 50 180 57 242 57 510 0 304 -11 385 -87 630 -23 78 -75 199 -110 262 -21 37 -38 70 -38 72 0 27 -186 285 -272 378 -122 133 -464 377 -578 413 -31 10 -25 46 13 72 77 53 293 291 364 401 40 63 146 272 158 312 4 14 11 30 15 35 4 6 19 51 33 100 240 824 -6 1632 -651 2133 -249 193 -506 304 -887 384 l-110 23 -2566 3 c-2216 2 -2568 1 -2578 -12z m5224 -3956 c412 -20 673 -133 928 -400 386 -405 429 -1062 97 -1502 -197 -260 -476 -418 -827 -468 -170 -24 -4567 -32 -4591 -8 -21 21 -17 2352 4 2372 18 19 4025 24 4389 6z M22615 7314 c-231 -54 -349 -115 -473 -241 -83 -85 -134 -165 -469 -743 -50 -85 -143 -245 -208 -355 -65 -110 -155 -263 -200 -340 -45 -77 -129 -219 -185 -315 -57 -96 -157 -267 -223 -380 -162 -279 -113 -194 -400 -680 -44 -74 -143 -243 -220 -375 -77 -132 -147 -252 -156 -267 -89 -149 -119 -199 -139 -238 -14 -25 -30 -52 -37 -60 -6 -8 -42 -69 -79 -135 -83 -148 -69 -125 -163 -279 -105 -173 -108 -179 -263 -446 -74 -128 -144 -248 -155 -266 -11 -18 -74 -126 -140 -240 -66 -114 -129 -222 -140 -240 -31 -50 -118 -197 -131 -219 -24 -43 -54 -94 -114 -195 -35 -58 -72 -121 -82 -140 -10 -19 -30 -53 -43 -75 -14 -22 -30 -49 -35 -60 -5 -11 -20 -37 -32 -57 -46 -75 -154 -259 -275 -468 -68 -118 -136 -232 -149 -252 -15 -20 -24 -47 -22 -60 l3 -23 470 -3 c259 -1 479 0 490 3 21 5 50 45 98 135 16 30 34 61 39 68 6 7 18 25 27 41 27 47 214 370 238 409 12 20 29 51 37 67 9 17 45 77 80 135 35 58 126 211 201 340 75 129 174 298 220 375 46 77 125 212 176 300 51 88 127 219 169 290 43 72 130 220 195 330 65 110 146 247 180 305 35 58 77 131 94 163 17 32 87 151 155 265 68 114 215 362 327 552 111 190 281 478 377 640 96 162 223 378 282 480 95 166 241 415 553 945 226 385 235 395 344 395 105 0 125 -21 291 -310 71 -124 173 -299 227 -390 55 -91 155 -262 223 -380 130 -226 219 -377 412 -700 64 -107 134 -226 155 -265 21 -38 77 -135 125 -215 48 -80 139 -235 203 -345 63 -110 140 -240 171 -290 30 -49 135 -229 233 -399 98 -170 188 -325 200 -345 13 -20 31 -50 40 -68 30 -53 171 -293 218 -368 24 -38 114 -193 202 -344 188 -326 178 -309 258 -441 35 -58 98 -166 141 -240 65 -112 131 -224 303 -512 9 -15 70 -120 136 -234 66 -114 129 -222 140 -240 11 -18 34 -56 51 -86 47 -80 18 -75 454 -80 493 -6 574 -2 578 29 3 21 -66 145 -315 568 -55 94 -138 233 -183 310 -45 77 -90 152 -99 167 -9 15 -61 104 -116 199 -55 94 -110 188 -122 208 -12 20 -38 63 -58 96 -19 33 -45 77 -58 97 -12 20 -78 134 -147 253 -69 119 -132 227 -140 240 -8 13 -69 117 -135 231 -66 114 -132 228 -147 253 -16 25 -45 75 -65 109 -21 35 -47 78 -57 95 -11 18 -24 41 -30 52 -20 36 -127 217 -219 370 -50 83 -98 164 -107 180 -9 17 -28 48 -41 71 -13 22 -51 86 -84 143 -33 56 -65 110 -70 119 -6 9 -37 62 -69 117 -32 55 -69 116 -81 135 -13 19 -34 55 -48 80 -23 43 -46 83 -86 153 -10 17 -39 66 -65 107 -25 41 -50 85 -56 98 -5 12 -49 87 -97 165 -47 78 -95 158 -105 177 -10 19 -29 52 -41 72 -12 20 -74 126 -137 234 -63 109 -126 216 -140 239 -39 65 -263 451 -283 488 -10 17 -46 79 -82 137 -35 58 -90 149 -122 204 -32 54 -66 113 -77 130 -10 17 -34 59 -52 92 -18 34 -46 83 -63 110 -16 27 -55 92 -85 146 -143 246 -309 388 -550 470 -59 20 -486 37 -551 22z M1330 7290 c-209 -32 -345 -80 -549 -196 -326 -184 -575 -584 -627 -1004 -17 -146 -21 -5858 -4 -5891 10 -18 25 -19 405 -19 216 0 396 4 399 9 3 5 6 671 6 1481 1 959 4 1479 11 1491 9 18 65 19 1837 19 1564 0 1830 2 1848 14 11 8 38 41 60 73 22 32 101 144 174 248 74 105 157 224 186 265 29 41 71 101 93 133 45 63 51 91 22 106 -12 7 -732 10 -2111 11 -1409 0 -2097 3 -2105 10 -24 20 -11 1835 13 1935 51 204 154 333 338 420 146 70 -18 66 2868 64 2098 -2 2595 0 2611 10 11 7 41 42 65 77 25 36 81 115 125 177 44 62 123 173 175 247 85 121 148 211 196 278 15 21 15 24 -1 42 -27 29 -5844 29 -6035 0z";
+const SUB_D = "M2335 1224 c-98 -23 -149 -41 -200 -68 -398 -210 -355 -857 67 -1008 90 -33 301 -33 401 0 365 117 477 634 199 912 -115 115 -341 194 -467 164z m187 -125 c378 -130 423 -651 73 -836 -195 -102 -472 -5 -571 200 -165 345 156 753 498 636z M17464 1201 c-161 -46 -243 -169 -219 -328 18 -123 104 -188 325 -247 221 -59 296 -118 288 -228 -9 -119 -85 -173 -248 -173 -117 0 -181 21 -264 88 -64 52 -65 52 -102 16 -45 -43 -43 -51 19 -100 235 -187 628 -140 707 84 35 98 22 195 -37 273 -46 61 -99 87 -293 139 -210 58 -280 111 -280 213 0 176 256 240 469 117 13 -7 28 -21 33 -29 15 -26 42 -17 66 21 l23 36 -22 24 c-91 96 -305 140 -465 94z M580 1200 c-113 -4 -253 -5 -311 -3 -104 4 -107 4 -112 -19 -3 -13 -4 -252 -3 -533 l1 -510 58 -3 57 -3 0 220 c0 186 2 222 16 235 13 13 47 16 207 17 106 0 212 1 237 2 l45 2 0 48 0 49 -240 4 c-210 4 -242 6 -252 21 -22 28 -18 347 4 368 17 18 483 18 511 1 32 -20 60 40 42 89 -7 18 -16 24 -32 23 -13 -1 -115 -5 -228 -8z M4855 1198 c-2 -7 -6 -177 -7 -378 l-3 -365 -27 -52 c-132 -249 -488 -241 -589 13 -23 57 -24 71 -29 419 l-5 360 -50 0 -50 0 0 -370 c0 -356 1 -373 23 -442 55 -177 173 -252 412 -261 215 -7 347 69 406 233 23 66 45 815 24 840 -15 19 -99 21 -105 3z M6183 1202 c-14 -9 -20 -1059 -6 -1073 4 -4 31 -5 58 -1 l50 7 1 398 c1 244 5 402 11 408 14 14 60 -6 68 -30 3 -11 50 -77 103 -145 53 -69 133 -173 177 -232 44 -58 116 -153 160 -210 44 -57 95 -124 113 -149 l33 -46 57 3 57 3 0 535 0 535 -34 3 c-19 2 -44 1 -56 -2 l-22 -6 1 -405 c1 -504 21 -483 -196 -211 -104 129 -178 227 -367 479 -96 128 -105 137 -136 137 -18 0 -39 2 -47 5 -7 3 -18 1 -25 -3z M8292 1193 c-8 -14 -11 -1015 -3 -1055 3 -18 443 -8 521 11 255 62 401 254 400 525 -1 223 -101 385 -298 485 -67 34 -138 42 -361 41 -119 -1 -224 2 -233 5 -10 4 -20 0 -26 -12z m553 -128 c295 -141 321 -607 43 -768 -99 -58 -452 -86 -478 -38 -12 23 -14 823 -2 835 4 5 90 6 192 4 178 -5 187 -6 245 -33z M10520 1201 l-155 -6 -3 -534 -2 -533 352 4 353 5 0 47 0 46 -280 6 c-344 6 -312 -14 -314 197 -2 210 -28 192 270 194 269 2 266 1 253 67 l-6 35 -97 -5 c-126 -7 -387 8 -403 24 -18 18 -23 325 -6 339 8 7 115 13 293 15 l280 4 0 49 0 49 -190 1 c-104 1 -260 -1 -345 -4z M12260 1195 c-8 -9 -13 -464 -11 -882 l1 -183 54 0 c68 0 65 -10 64 213 -2 216 -8 206 122 209 145 4 133 13 270 -195 65 -100 127 -192 135 -204 13 -20 25 -23 75 -23 72 0 80 10 43 54 -15 19 -50 69 -77 113 -28 43 -71 111 -98 151 -63 95 -62 105 10 141 237 120 233 453 -8 577 -53 28 -59 28 -240 31 -102 2 -218 4 -258 6 -41 1 -77 -2 -82 -8z m391 -98 c211 -9 318 -192 202 -344 -57 -75 -98 -88 -288 -91 -219 -5 -202 -21 -208 203 -7 247 -8 245 128 239 39 -2 113 -5 166 -7z M15656 1198 c-7 -4 -21 -26 -30 -50 -10 -24 -26 -63 -37 -88 -53 -132 -136 -326 -164 -385 -8 -16 -53 -127 -100 -245 -47 -118 -95 -232 -106 -253 -24 -45 -18 -50 61 -45 59 3 57 1 94 98 39 102 73 167 91 174 9 3 123 6 254 6 262 0 271 -2 290 -63 12 -37 40 -113 66 -175 l18 -42 69 0 c74 0 82 8 54 53 -7 12 -35 72 -61 132 -26 61 -55 128 -65 150 -10 22 -28 65 -40 95 -12 30 -28 69 -36 85 -7 17 -47 113 -88 215 -77 192 -135 332 -142 339 -7 7 -115 6 -128 -1z m116 -278 c44 -108 99 -240 135 -318 25 -56 23 -91 -5 -93 -37 -4 -378 3 -384 8 -15 8 -8 65 10 91 11 15 22 36 25 47 3 11 20 56 37 100 17 44 45 118 62 165 50 139 65 139 120 0z M20650 1200 c-13 -8 -202 -452 -374 -880 -26 -63 -53 -127 -61 -142 -24 -42 -19 -48 38 -48 68 0 74 7 131 144 25 60 50 114 56 120 13 14 452 21 502 9 37 -10 48 -28 108 -178 l36 -90 54 -3 c74 -4 75 -1 24 128 -24 63 -59 151 -76 195 -17 44 -62 145 -99 225 -63 137 -199 470 -199 489 0 27 -107 51 -140 31z m99 -212 c5 -13 18 -50 31 -83 12 -33 39 -100 61 -148 21 -48 39 -96 39 -105 0 -9 9 -30 20 -47 54 -82 29 -95 -187 -99 -224 -4 -258 9 -209 80 13 18 105 237 143 339 8 22 19 50 24 63 6 16 17 22 39 22 22 0 33 -6 39 -22z M23491 1190 c-3 -8 -6 -249 -6 -535 l0 -520 260 0 c285 0 338 8 421 64 72 50 98 102 102 207 5 126 -25 182 -130 246 -40 25 -38 60 7 88 55 34 80 90 79 180 -1 155 -81 247 -232 270 -120 18 -493 18 -501 0z m477 -99 c92 -18 156 -121 132 -211 -22 -83 -81 -130 -179 -142 -121 -14 -286 -7 -306 13 -23 22 -28 306 -6 332 15 19 273 24 359 8z m38 -476 c232 -71 179 -367 -68 -377 -156 -7 -306 2 -322 18 -24 24 -23 329 1 356 22 24 311 27 389 3z M25414 1199 c-2 -5 -7 -941 -4 -1057 0 -9 16 -12 58 -10 l57 3 3 191 c3 230 -2 221 122 224 160 4 138 16 225 -127 43 -71 84 -139 92 -153 7 -14 30 -50 51 -80 l37 -55 73 -3 c49 -2 72 1 72 9 0 15 -204 321 -230 344 -39 36 -27 68 45 114 264 171 209 537 -88 592 -66 12 -506 19 -513 8z m484 -109 c136 -30 207 -215 126 -331 -58 -83 -87 -93 -284 -97 -101 -2 -181 1 -189 7 -35 23 -44 378 -11 411 23 23 264 30 358 10z M27720 1201 c-52 -7 -53 -9 -156 -251 -31 -74 -96 -225 -144 -335 -49 -110 -109 -254 -135 -320 -26 -66 -51 -124 -56 -130 -25 -26 -9 -36 53 -33 l62 3 22 45 c34 70 71 153 79 178 13 45 55 52 299 52 123 0 232 -3 241 -6 20 -8 60 -86 91 -178 32 -92 36 -96 105 -96 62 0 80 20 44 50 -8 7 -15 17 -15 22 0 5 -20 55 -44 111 -24 56 -62 149 -86 207 -23 58 -60 146 -80 195 -21 50 -52 124 -68 165 -116 288 -139 335 -162 328 -3 0 -25 -4 -50 -7z m44 -203 c7 -13 17 -36 21 -53 9 -40 120 -306 146 -350 24 -40 20 -80 -8 -87 -10 -2 -103 -1 -208 2 l-190 5 -4 25 c-1 14 6 43 17 65 11 22 32 69 47 105 15 36 33 79 41 97 8 17 14 35 14 40 0 4 7 21 15 36 8 16 20 47 26 70 19 70 54 90 83 45z M29344 1199 c-6 -9 -9 -209 -9 -539 l0 -525 49 -3 c27 -2 53 1 57 5 7 7 12 645 6 768 -2 50 39 64 67 23 54 -78 180 -246 264 -351 53 -68 133 -174 177 -236 162 -228 157 -223 233 -212 l43 6 0 528 c0 290 -3 532 -6 537 -9 14 -92 12 -101 -1 -3 -6 -6 -191 -5 -410 3 -504 16 -492 -213 -184 -70 94 -166 221 -214 283 -85 110 -185 243 -220 291 -21 29 -111 43 -128 20z M31428 1192 c-7 -8 -9 -181 -5 -535 l5 -522 215 -3 c329 -4 481 42 584 175 251 325 97 817 -277 883 -89 15 -510 18 -522 2z m556 -131 c300 -141 324 -620 39 -764 -111 -57 -421 -89 -461 -49 -19 19 -25 814 -6 843 5 9 53 10 183 7 172 -5 178 -6 245 -37z";
+
 const Logo = {
   mark: (p) => (
-    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="4.4" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <path d="M7 34 L16.5 14 L26 34 M22 34 L31.5 14 L41 34" />
+    <svg viewBox="0 0 1719.8 784" fill="currentColor" {...p}>
+      <path d={MARK_D} />
     </svg>
   ),
   wordmark: (p) => (
-    <svg viewBox="0 0 128 56" fill="none" stroke="currentColor" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" {...p}>
-      <path d="M8 8 L8 48 M8 8 L26 8 M8 28 L22 28" />
-      <path d="M32 48 L46 8 L60 48 L74 8 L88 48" />
-      <path d="M96 8 L96 48" />
-      <path d="M96 8 L106 8 A10 10 0 0 1 106 28 L96 28" />
-      <path d="M96 28 L107 28 A11 11 0 0 1 107 48 L96 48" />
+    <svg viewBox="0 0 3636 748" fill="currentColor" {...p}>
+      <g transform="translate(0,748) scale(0.1,-0.1)"><path d={WORD_D} /></g>
     </svg>
   ),
-  lockup: ({ animate, ...p }) => (
-    <div className={'lockup' + (animate ? ' lockup-anim' : '')} {...p}>
-      <svg className="lockup-word" viewBox="0 0 128 56" fill="none" stroke="currentColor" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round">
-        <path className="lp lp1" d="M8 8 L8 48 M8 8 L26 8 M8 28 L22 28" />
-        <path className="lp lp2" d="M32 48 L46 8 L60 48 L74 8 L88 48" />
-        <path className="lp lp3" d="M96 8 L96 48 M96 8 L106 8 A10 10 0 0 1 106 28 L96 28 M96 28 L107 28 A11 11 0 0 1 107 48 L96 48" />
-      </svg>
-      <div className="lockup-sub">FOUNDER&nbsp;&nbsp;AS&nbsp;&nbsp;A&nbsp;&nbsp;BRAND</div>
+  subline: (p) => (
+    <svg viewBox="0 0 3248 140" fill="currentColor" {...p}>
+      <g transform="translate(0,140) scale(0.1,-0.1)"><path d={SUB_D} /></g>
+    </svg>
+  ),
+  lockup: ({ animate, className = '', ...p }) => (
+    <div className={'lockup' + (animate ? ' lockup-anim' : '') + (className ? ' ' + className : '')} {...p}>
+      <svg className="lockup-word" viewBox="0 0 3636 748" fill="currentColor"><g transform="translate(0,748) scale(0.1,-0.1)"><path d={WORD_D} /></g></svg>
+      <svg className="lockup-sub" viewBox="0 0 3248 140" fill="currentColor"><g transform="translate(0,140) scale(0.1,-0.1)"><path d={SUB_D} /></g></svg>
     </div>
   ),
-};
+}
 
 // ---------- i18n ----------
 const STR = {
@@ -97,19 +99,20 @@ const STR = {
     foot_base: 'FAAB. Gebouwd voor founders die met intentie posten.',
     lang_word: 'Taal',
     // onboarding
-    ob_title: 'Start je merk', ob_step_account: 'Account', ob_step_channels: 'Kanalen', ob_step_website: 'Merkscan', ob_step_done: 'Voorbeelden',
-    ob_acc_h: 'Maak je profiel', ob_acc_p: 'Hiermee blijft je merk bewaard, ook na deze sessie.',
-    ob_name: 'Naam', ob_email: 'E-mailadres', ob_login_note: 'Bestaat je e-mailadres al, dan laden we je merk.',
+    ob_title: 'Start je merk', ob_ind_account: 'Account', ob_ind_channels: 'Kanalen', ob_ind_brand: 'Merk',
+    ob_choice_h: 'Hoe wil je starten?',
+    ob_login: 'Inloggen', ob_register: 'Registreren', ob_guest: 'Doorgaan zonder account',
+    ob_guest_note: 'Zonder account blijft je merk alleen op dit apparaat bewaard.',
+    ob_username: 'Gebruikersnaam', ob_password: 'Wachtwoord', ob_name: 'Naam',
+    ob_auth_exists: 'Deze gebruikersnaam bestaat al. Log in.', ob_auth_wrong: 'Onjuiste gebruikersnaam of wachtwoord.',
     ob_ch_h: 'Koppel je kanalen', ob_ch_p: 'Vul per kanaal je profiel-URL of handle in. FAAB gebruikt je openbare posts en reacties als input voor je tone of voice.',
     ob_ch_ph: 'Profiel-URL of @handle',
     ob_web_h: 'Scan je website', ob_web_p: 'FAAB haalt je merk op: beschrijving, doelgroep en kleuren.',
     ob_web_ph: 'https://jouwbedrijf.nl', ob_scan: 'Scan website', ob_scanning: 'Scannen...',
     ob_scan_err: 'Scan mislukte. Controleer de URL of vul het hieronder zelf in.',
     ob_desc: 'Beschrijving van je dienst', ob_aud: 'Doelgroep', ob_colors: 'Merkkleuren', ob_logo: 'Logo',
-    ob_done_h: 'Je merk staat', ob_done_p: 'FAAB genereert nu een voorbeeldpost per gekoppeld kanaal, in jouw stem.',
-    ob_gen_examples: 'Genereer voorbeeldposts', ob_generating: 'Genereren...', ob_open_cms: 'Open het CMS',
-    ob_next: 'Volgende', ob_back: 'Terug', ob_skip: 'Overslaan',
-    ob_tone_note: 'Tone of voice wordt bepaald uit je gekoppelde kanalen en merkscan.',
+    ob_save: 'Opslaan', ob_saving: 'Opslaan...', ob_back: 'Terug',
+    ob_tone_note: 'Bij opslaan bepaalt FAAB je tone of voice uit je kanalen en merkscan. Daarna opent het CMS.',
     // cms
     cms_brand: 'Merkpersoonlijkheid', cms_strategy: 'Strategie', cms_topics: 'Onderwerpen', cms_content: 'Content', cms_schedule: 'Planning',
     cms_exit: 'Terug naar site', cms_logout: 'Uitloggen',
@@ -136,7 +139,6 @@ const STR = {
     sch_h: 'Planning', sch_drafts: 'Concepten om in te plannen', sch_scheduled: 'Ingeplande posts',
     sch_none_drafts: 'Nog geen concepten. Maak content in de Content-tab.', sch_none_sched: 'Nog niets ingepland.',
     sch_schedule: 'Inplannen', sch_date: 'Datum', sch_time: 'Tijd', sch_confirm: 'Bevestig planning', sch_unschedule: 'Terug naar concepten',
-    login_h: 'Log in of maak een profiel', login_btn: 'Ga verder', login_ph_email: 'jij@bedrijf.nl',
     err_generic: 'Er ging iets mis. Probeer opnieuw.',
     untitled: 'Naamloos concept',
     ch_strategy: 'Strategie', ch_placements: 'Plaatsingen', ch_examples: 'Voorbeeldcopy per funnelfase', ch_tone: 'Tone of voice op dit kanaal',
@@ -158,19 +160,20 @@ const STR = {
     foot_tag: 'Founders are their brand.', foot_app: 'App', foot_learn: 'Channels', foot_contact: 'Contact', foot_the_funnel: 'The funnel',
     foot_base: 'FAAB. Built for founders who post with intent.',
     lang_word: 'Language',
-    ob_title: 'Start your brand', ob_step_account: 'Account', ob_step_channels: 'Channels', ob_step_website: 'Brand scan', ob_step_done: 'Examples',
-    ob_acc_h: 'Create your profile', ob_acc_p: 'This keeps your brand saved beyond this session.',
-    ob_name: 'Name', ob_email: 'Email address', ob_login_note: 'If your email already exists, we load your brand.',
+    ob_title: 'Start your brand', ob_ind_account: 'Account', ob_ind_channels: 'Channels', ob_ind_brand: 'Brand',
+    ob_choice_h: 'How do you want to start?',
+    ob_login: 'Log in', ob_register: 'Register', ob_guest: 'Continue without account',
+    ob_guest_note: 'Without an account your brand is only saved on this device.',
+    ob_username: 'Username', ob_password: 'Password', ob_name: 'Name',
+    ob_auth_exists: 'This username already exists. Log in.', ob_auth_wrong: 'Wrong username or password.',
     ob_ch_h: 'Connect your channels', ob_ch_p: 'Enter your profile URL or handle per channel. FAAB uses your public posts and comments as input for your tone of voice.',
     ob_ch_ph: 'Profile URL or @handle',
     ob_web_h: 'Scan your website', ob_web_p: 'FAAB pulls your brand: description, audience and colors.',
     ob_web_ph: 'https://yourcompany.com', ob_scan: 'Scan website', ob_scanning: 'Scanning...',
     ob_scan_err: 'Scan failed. Check the URL or fill it in below yourself.',
     ob_desc: 'Description of your service', ob_aud: 'Target audience', ob_colors: 'Brand colors', ob_logo: 'Logo',
-    ob_done_h: 'Your brand is set', ob_done_p: 'FAAB now generates one example post per connected channel, in your voice.',
-    ob_gen_examples: 'Generate example posts', ob_generating: 'Generating...', ob_open_cms: 'Open the CMS',
-    ob_next: 'Next', ob_back: 'Back', ob_skip: 'Skip',
-    ob_tone_note: 'Tone of voice is derived from your connected channels and brand scan.',
+    ob_save: 'Save', ob_saving: 'Saving...', ob_back: 'Back',
+    ob_tone_note: 'On save FAAB derives your tone of voice from your channels and brand scan. The CMS then opens.',
     cms_brand: 'Brand personality', cms_strategy: 'Strategy', cms_topics: 'Topics', cms_content: 'Content', cms_schedule: 'Schedule',
     cms_exit: 'Back to site', cms_logout: 'Log out',
     b_h: 'Brand personality', b_company: 'Company', b_role: 'Role', b_name: 'Name', b_website: 'Website',
@@ -196,7 +199,6 @@ const STR = {
     sch_h: 'Schedule', sch_drafts: 'Drafts to schedule', sch_scheduled: 'Scheduled posts',
     sch_none_drafts: 'No drafts yet. Create content in the Content tab.', sch_none_sched: 'Nothing scheduled yet.',
     sch_schedule: 'Schedule', sch_date: 'Date', sch_time: 'Time', sch_confirm: 'Confirm schedule', sch_unschedule: 'Back to drafts',
-    login_h: 'Log in or create a profile', login_btn: 'Continue', login_ph_email: 'you@company.com',
     err_generic: 'Something went wrong. Try again.',
     untitled: 'Untitled draft',
     ch_strategy: 'Strategy', ch_placements: 'Placements', ch_examples: 'Example copy per funnel stage', ch_tone: 'Tone of voice on this channel',
@@ -463,15 +465,26 @@ export default function App() {
 
   const go = (v) => { setView(v); setMenu(false); window.scrollTo(0, 0); };
 
-  async function loginOrCreate(email, name) {
-    const e = email.trim().toLowerCase();
-    if (!e) return;
+  async function auth(mode, username, password, name) {
+    const u = String(username || '').trim().toLowerCase();
+    if (mode === 'guest') { setUser({ email: 'guest', name: '' }); return { ok: true }; }
+    if (!u || !password) return { ok: false, err: 'wrong' };
+    let rec = null;
+    try { const r = await store.get('faab:auth:' + u); rec = r && r.value ? JSON.parse(r.value) : null; } catch (e) { rec = null; }
+    if (mode === 'register') {
+      if (rec) return { ok: false, err: 'exists' };
+      await store.set('faab:auth:' + u, JSON.stringify({ password, name: String(name || '').trim() }));
+      setUser({ email: u, name: String(name || '').trim() });
+      setBrand((b) => ({ ...b, name: String(name || '').trim() }));
+      return { ok: true };
+    }
+    if (!rec || rec.password !== password) return { ok: false, err: 'wrong' };
     try {
-      const r = await store.get('faab:user:' + e);
-      if (r && r.value) { applyData(JSON.parse(r.value)); return; }
-    } catch (err) { /* new */ }
-    setUser({ email: e, name: name.trim() });
-    setBrand((b) => ({ ...b, name: name.trim() }));
+      const r = await store.get('faab:user:' + u);
+      if (r && r.value) { applyData(JSON.parse(r.value)); return { ok: true }; }
+    } catch (e) { /* no saved profile yet */ }
+    setUser({ email: u, name: rec.name || '' });
+    return { ok: true };
   }
   function logout() { setUser(null); setBrand(emptyBrand()); setStrategy(emptyStrategy()); setTopics([]); setDrafts([]); setScheduled([]); store.set('faab:last', ''); go('home'); }
 
@@ -528,21 +541,6 @@ Write a tone of voice base text in ${langName(lang)}: 4 to 6 short lines coverin
   }
 
   // ----- AI: example post per connected channel -----
-  const [exState, setExState] = useState('idle');
-  async function generateExamples() {
-    setExState('loading');
-    try {
-      const connected = CHANNELS.filter((c) => (brand.socials[c.id] || '').trim());
-      const targets = connected.length ? connected : [CHANNELS[0]];
-      const results = {};
-      for (const ch of targets) {
-        const text = await genPost({ channel: ch.id, phase: 'reach', angle: '', subject: '' });
-        results[ch.id] = text;
-      }
-      setBrand((p) => ({ ...p, channelExamples: { ...p.channelExamples, ...results } }));
-      setExState('done');
-    } catch (e) { setExState('error'); }
-  }
   async function generateExampleFor(chId) {
     const text = await genPost({ channel: chId, phase: 'reach', angle: '', subject: '' });
     setBrand((p) => ({ ...p, channelExamples: { ...p.channelExamples, [chId]: text } }));
@@ -689,9 +687,8 @@ Write in ${langName(lang)}. Rules:
       {view.startsWith('channel:') && <ChannelPage t={t} lang={lang} id={view.split(':')[1]} go={go} />}
       {view === 'onboarding' && (
         <Onboarding t={t} lang={lang} user={user} brand={brand} setB={setB} setSocial={setSocial}
-          loginOrCreate={loginOrCreate} scanWebsite={scanWebsite} scanState={scanState}
-          generateTone={generateTone} toneState={toneState}
-          generateExamples={generateExamples} exState={exState} go={go} />
+          auth={auth} scanWebsite={scanWebsite} scanState={scanState}
+          generateTone={generateTone} toneState={toneState} go={go} />
       )}
       {view === 'cms' && (
         <CMS t={t} lang={lang} user={user} brand={brand} setB={setB} setBrand={setBrand} setSocial={setSocial}
@@ -746,11 +743,12 @@ function Home({ t, lang, go }) {
   return (
     <main>
       <section className="hero wrap">
-        {Logo.lockup({ animate: true, className: 'hero-lockup' })}
+        <div className="hero-ripple" aria-hidden="true"><span /><span /><span /><span /></div>
+        {Logo.mark({ className: 'hero-mark' })}
         <p className="tagline">{t('hero_slogan')}</p>
         <div className="hero-cta">
-          <button className="btn btn-blue lg" onClick={() => go('onboarding')}>{t('start_brand')} <I.arrow width="18" height="18" /></button>
-          <a className="btn btn-ghost lg" href="#flow">{t('cta_how')}</a>
+          <button className="btn btn-blue" onClick={() => go('onboarding')}>{t('start_brand')} <I.arrow width="18" height="18" /></button>
+          <a className="btn btn-ghost" href="#flow">{t('cta_how')}</a>
         </div>
       </section>
 
@@ -897,140 +895,134 @@ function ChannelPage({ t, lang, id, go }) {
 }
 
 // ---------- Onboarding ----------
-function Onboarding({ t, lang, user, brand, setB, setSocial, loginOrCreate, scanWebsite, scanState, generateTone, toneState, generateExamples, exState, go }) {
-  const [step, setStep] = useState(user ? 1 : 0);
-  const [email, setEmail] = useState(user ? user.email : '');
-  const [name, setName] = useState(user ? user.name : '');
+function Onboarding({ t, lang, user, brand, setB, setSocial, auth, scanWebsite, scanState, generateTone, toneState, go }) {
+  const [mode, setMode] = useState(null); // null | 'login' | 'register'
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [authErr, setAuthErr] = useState('');
+  const [saving, setSaving] = useState(false);
   const logoRef = useRef(null);
-  const steps = [t('ob_step_account'), t('ob_step_channels'), t('ob_step_website'), t('ob_step_done')];
+
+  const accountDone = !!user;
+  const channelsDone = CHANNELS.some((c) => (brand.socials[c.id] || '').trim());
+  const brandDone = !!(brand.description || '').trim() || !!(brand.website || '').trim();
+  const inds = [
+    { k: 'account', label: t('ob_ind_account'), done: accountDone },
+    { k: 'channels', label: t('ob_ind_channels'), done: channelsDone },
+    { k: 'brand', label: t('ob_ind_brand'), done: brandDone },
+  ];
 
   function onLogo(e) {
     const f = e.target.files && e.target.files[0]; if (!f) return;
     const r = new FileReader(); r.onload = () => setB('logo', String(r.result)); r.readAsDataURL(f);
   }
-  async function nextFromAccount() {
-    if (!email.trim()) return;
-    await loginOrCreate(email, name);
-    setStep(1);
+  async function doAuth(m) {
+    setAuthErr('');
+    const res = await auth(m, username, password, name);
+    if (!res.ok) { setAuthErr(t(res.err === 'exists' ? 'ob_auth_exists' : 'ob_auth_wrong')); return; }
   }
-  async function nextFromChannels() {
-    setStep(2);
-  }
-  async function finishSetup() {
-    if (!brand.tone && toneState !== 'loading') await generateTone();
-    setStep(3);
+  async function saveAll() {
+    setSaving(true);
+    try { if (!brand.tone) await generateTone(); } catch (e) { /* tone optional */ }
+    setSaving(false);
+    go('cms');
   }
 
   return (
     <main className="wrap wizard">
       <h1 className="wiz-title">{t('ob_title')}</h1>
       <div className="steps">
-        {steps.map((s, i) => (
-          <div key={s} className={'step' + (i === step ? ' step-on' : '') + (i < step ? ' step-done' : '')}>
-            <span className="step-dot">{i < step ? <I.check width="14" height="14" /> : i + 1}</span>
-            <span className="step-name">{s}</span>
+        {inds.map((s) => (
+          <div key={s.k} className={'step' + (s.done ? ' step-done-c' : '')}>
+            <span className="step-dot">{s.done ? <I.check width="14" height="14" /> : ''}</span>
+            <span className="step-name">{s.label}</span>
           </div>
         ))}
       </div>
 
-      {step === 0 && (
+      {!user && (
         <section className="panel">
-          <div className="panel-head"><h2>{t('ob_acc_h')}</h2><p>{t('ob_acc_p')}</p></div>
-          <div className="row2">
-            <Field label={t('ob_name')}><input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Sten Bossong" /></Field>
-            <Field label={t('ob_email')}><input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('login_ph_email')} /></Field>
-          </div>
-          <div className="li-source-note">{t('ob_login_note')}</div>
-          <div className="wiz-nav"><span />
-            <button className="btn btn-blue" disabled={!email.trim()} onClick={nextFromAccount}>{t('ob_next')} <I.arrow width="18" height="18" /></button>
-          </div>
-        </section>
-      )}
-
-      {step === 1 && (
-        <section className="panel">
-          <div className="panel-head"><h2>{t('ob_ch_h')}</h2><p>{t('ob_ch_p')}</p></div>
-          <div className="soc-list">
-            {CHANNELS.map((c) => (
-              <div className="soc-row" key={c.id}>
-                <span className="soc-ic" style={{ background: c.c }}>{c.ic({ width: 18, height: 18 })}</span>
-                <span className="soc-name">{c.name}</span>
-                <input className="input" value={brand.socials[c.id]} onChange={(e) => setSocial(c.id, e.target.value)} placeholder={t('ob_ch_ph')} />
-              </div>
-            ))}
-          </div>
-          <div className="li-source-note">{t('ob_tone_note')}</div>
-          <div className="wiz-nav">
-            <button className="btn btn-ghost" onClick={() => setStep(0)}>{t('ob_back')}</button>
-            <button className="btn btn-blue" onClick={nextFromChannels}>{t('ob_next')} <I.arrow width="18" height="18" /></button>
-          </div>
-        </section>
-      )}
-
-      {step === 2 && (
-        <section className="panel">
-          <div className="panel-head"><h2>{t('ob_web_h')}</h2><p>{t('ob_web_p')}</p></div>
-          <div className="kw-add">
-            <input className="input" value={brand.website} onChange={(e) => setB('website', e.target.value)} placeholder={t('ob_web_ph')} />
-            <button className="btn btn-blue sm" onClick={scanWebsite} disabled={scanState === 'loading'}><I.globe width="16" height="16" /> {scanState === 'loading' ? t('ob_scanning') : t('ob_scan')}</button>
-          </div>
-          {scanState === 'error' && <div className="mini-err">{t('ob_scan_err')}</div>}
-          <div className="scan-grid">
-            <div className="ava-block">
-              <div className="ava" style={brand.logo ? { backgroundImage: `url(${brand.logo})` } : {}} onClick={() => logoRef.current && logoRef.current.click()}>
-                {!brand.logo && <span className="ava-hint">{t('ob_logo')}</span>}
-              </div>
-              <button className="btn btn-ghost sm" onClick={() => logoRef.current && logoRef.current.click()}><I.upload width="15" height="15" /> {t('ob_logo')}</button>
-              <input ref={logoRef} type="file" accept="image/*" hidden onChange={onLogo} />
-            </div>
-            <div>
-              <Field label={t('b_company')}><input className="input" value={brand.company} onChange={(e) => setB('company', e.target.value)} /></Field>
-              <Field label={t('ob_desc')}><textarea className="input textarea" rows={2} value={brand.description} onChange={(e) => setB('description', e.target.value)} /></Field>
-              <Field label={t('ob_aud')}><textarea className="input textarea" rows={2} value={brand.audience} onChange={(e) => setB('audience', e.target.value)} /></Field>
-              <Field label={t('ob_colors')}>
-                <div className="colors">
-                  {brand.colors.map((c, i) => (
-                    <span className="color-chip" key={i}>
-                      <input type="color" value={/^#([0-9a-f]{6})$/i.test(c) ? c : '#0A66C2'} onChange={(e) => setB('colors', brand.colors.map((x, j) => j === i ? e.target.value : x))} />
-                      <button className="color-x" onClick={() => setB('colors', brand.colors.filter((_, j) => j !== i))}><I.x width="11" height="11" /></button>
-                    </span>
-                  ))}
-                  <button className="btn btn-ghost sm" onClick={() => setB('colors', [...brand.colors, '#0A66C2'])}><I.plus width="14" height="14" /></button>
-                </div>
-              </Field>
-            </div>
-          </div>
-          <div className="wiz-nav">
-            <button className="btn btn-ghost" onClick={() => setStep(1)}>{t('ob_back')}</button>
-            <button className="btn btn-blue" onClick={finishSetup} disabled={toneState === 'loading'}>{toneState === 'loading' ? t('ob_generating') : t('ob_next')} <I.arrow width="18" height="18" /></button>
-          </div>
-        </section>
-      )}
-
-      {step === 3 && (
-        <section className="panel">
-          <div className="panel-head"><h2>{t('ob_done_h')}</h2><p>{t('ob_done_p')}</p></div>
-          {brand.tone && (
-            <div className="tone-box">
-              <div className="field-label">{t('b_tone_h')}</div>
-              <p className="tone-text">{brand.tone}</p>
+          <div className="panel-head"><h2>{t('ob_choice_h')}</h2></div>
+          {!mode && (
+            <div className="auth-choice">
+              <button className="btn btn-blue" onClick={() => setMode('login')}><I.user width="17" height="17" /> {t('ob_login')}</button>
+              <button className="btn btn-blue" onClick={() => setMode('register')}><I.plus width="17" height="17" /> {t('ob_register')}</button>
+              <button className="btn btn-ghost" onClick={() => doAuth('guest')}>{t('ob_guest')} <I.arrow width="17" height="17" /></button>
             </div>
           )}
-          <div className="gen-row">
-            <button className="btn btn-blue" onClick={generateExamples} disabled={exState === 'loading'}><I.spark width="17" height="17" /> {exState === 'loading' ? t('ob_generating') : t('ob_gen_examples')}</button>
-            {exState === 'error' && <span className="mini-err">{t('err_generic')}</span>}
-          </div>
-          <div className="ex-cards">
-            {CHANNELS.filter((c) => brand.channelExamples[c.id]).map((c) => (
-              <div className="ex-card" key={c.id}>
-                <div className="ex-card-head" style={{ color: c.c }}>{c.ic({ width: 18, height: 18 })} {c.name}</div>
-                <p className="ex-copy">{brand.channelExamples[c.id]}</p>
+          {mode && (
+            <div>
+              {mode === 'register' && (
+                <Field label={t('ob_name')}><input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Sten Bossong" /></Field>
+              )}
+              <div className="row2">
+                <Field label={t('ob_username')}><input className="input" value={username} onChange={(e) => setUsername(e.target.value)} autoCapitalize="none" /></Field>
+                <Field label={t('ob_password')}><input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} /></Field>
               </div>
-            ))}
+              {authErr && <div className="mini-err">{authErr}</div>}
+              <div className="wiz-nav">
+                <button className="btn btn-ghost" onClick={() => { setMode(null); setAuthErr(''); }}>{t('ob_back')}</button>
+                <button className="btn btn-blue" disabled={!username.trim() || !password} onClick={() => doAuth(mode)}>{t(mode === 'login' ? 'ob_login' : 'ob_register')} <I.arrow width="18" height="18" /></button>
+              </div>
+            </div>
+          )}
+          <div className="li-source-note">{t('ob_guest_note')}</div>
+        </section>
+      )}
+
+      {user && (
+        <section className="panel">
+          <div className="ob-sec">
+            <div className="panel-head"><h2>{t('ob_ch_h')}</h2><p>{t('ob_ch_p')}</p></div>
+            <div className="soc-list">
+              {CHANNELS.map((c) => (
+                <div className="soc-row" key={c.id}>
+                  <span className="soc-ic" style={{ background: c.c }}>{c.ic({ width: 18, height: 18 })}</span>
+                  <span className="soc-name">{c.name}</span>
+                  <input className="input" value={brand.socials[c.id]} onChange={(e) => setSocial(c.id, e.target.value)} placeholder={t('ob_ch_ph')} />
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="wiz-nav">
-            <button className="btn btn-ghost" onClick={() => setStep(2)}>{t('ob_back')}</button>
-            <button className="btn btn-blue" onClick={() => go('cms')}>{t('ob_open_cms')} <I.arrow width="18" height="18" /></button>
+
+          <div className="ob-sec">
+            <div className="panel-head"><h2>{t('ob_web_h')}</h2><p>{t('ob_web_p')}</p></div>
+            <div className="kw-add">
+              <input className="input" value={brand.website} onChange={(e) => setB('website', e.target.value)} placeholder={t('ob_web_ph')} />
+              <button className="btn btn-blue" onClick={scanWebsite} disabled={scanState === 'loading'}><I.globe width="16" height="16" /> {scanState === 'loading' ? t('ob_scanning') : t('ob_scan')}</button>
+            </div>
+            {scanState === 'error' && <div className="mini-err">{t('ob_scan_err')}</div>}
+            <div className="scan-grid">
+              <div className="ava-block">
+                <div className="ava" style={brand.logo ? { backgroundImage: `url(${brand.logo})` } : {}} onClick={() => logoRef.current && logoRef.current.click()}>
+                  {!brand.logo && <span className="ava-hint">{t('ob_logo')}</span>}
+                </div>
+                <button className="btn btn-ghost" onClick={() => logoRef.current && logoRef.current.click()}><I.upload width="15" height="15" /> {t('ob_logo')}</button>
+                <input ref={logoRef} type="file" accept="image/*" hidden onChange={onLogo} />
+              </div>
+              <div>
+                <Field label={t('b_company')}><input className="input" value={brand.company} onChange={(e) => setB('company', e.target.value)} /></Field>
+                <Field label={t('ob_desc')}><textarea className="input textarea" rows={2} value={brand.description} onChange={(e) => setB('description', e.target.value)} /></Field>
+                <Field label={t('ob_aud')}><textarea className="input textarea" rows={2} value={brand.audience} onChange={(e) => setB('audience', e.target.value)} /></Field>
+                <Field label={t('ob_colors')}>
+                  <div className="colors">
+                    {brand.colors.map((c, i) => (
+                      <span className="color-chip" key={i}>
+                        <input type="color" value={/^#([0-9a-f]{6})$/i.test(c) ? c : '#0A66C2'} onChange={(e) => setB('colors', brand.colors.map((x, j) => j === i ? e.target.value : x))} />
+                        <button className="color-x" onClick={() => setB('colors', brand.colors.filter((_, j) => j !== i))}><I.x width="11" height="11" /></button>
+                      </span>
+                    ))}
+                    <button className="btn btn-ghost" onClick={() => setB('colors', [...brand.colors, '#0A66C2'])}><I.plus width="14" height="14" /></button>
+                  </div>
+                </Field>
+              </div>
+            </div>
+          </div>
+
+          <div className="li-source-note">{t('ob_tone_note')}</div>
+          <div className="wiz-nav"><span />
+            <button className="btn btn-blue" disabled={saving || toneState === 'loading'} onClick={saveAll}>{saving || toneState === 'loading' ? t('ob_saving') : t('ob_save')} <I.arrow width="18" height="18" /></button>
           </div>
         </section>
       )}
@@ -1526,23 +1518,20 @@ const CSS = `
 @keyframes introFade { to { opacity:0; visibility:hidden; } }
 
 /* lockup */
-.lockup { display:flex; flex-direction:column; align-items:center; gap:14px; color:var(--ink); }
+.lockup { display:flex; flex-direction:column; align-items:center; gap:16px; color:var(--ink); }
 .lockup-word { width:min(340px,64vw); height:auto; display:block; }
-.lockup-sub { font-family:'IBM Plex Mono',monospace; font-size:clamp(10px,2.4vw,14px); letter-spacing:0.42em; color:var(--mut); text-indent:0.42em; }
-.lockup-anim .lp { stroke-dasharray:240; stroke-dashoffset:240; animation:draw 1.1s ease forwards; }
-.lockup-anim .lp2 { animation-delay:.25s; }
-.lockup-anim .lp3 { animation-delay:.5s; }
-.lockup-anim .lockup-sub, .lockup-anim + .tagline { animation:none; }
-.lockup-anim .lockup-sub { opacity:0; animation:fadeUp .7s ease 1.2s forwards; }
-@keyframes draw { to { stroke-dashoffset:0; } }
+.lockup-sub { width:89%; height:auto; display:block; color:var(--mut); }
+.lockup-anim .lockup-word { clip-path:inset(-2% 102% -2% -2%); animation:wipe 1.15s cubic-bezier(.7,0,.25,1) .1s forwards; }
+.lockup-anim .lockup-sub { opacity:0; animation:fadeUp .7s ease 1.15s forwards; }
+@keyframes wipe { to { clip-path:inset(-2% -2% -2% -2%); } }
 @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
 /* topbar */
 .topbar { display:flex; align-items:center; justify-content:space-between; padding:14px 26px; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:60; background:rgba(255,255,255,0.9); backdrop-filter:blur(14px); }
 .brand { display:flex; align-items:center; gap:12px; background:none; border:none; padding:0; color:var(--ink); }
-.brand-mark { height:26px; width:auto; display:block; }
-.brand-logo { height:22px; width:auto; display:block; }
-.brand-logo.sm { height:20px; }
+.brand-mark { height:22px; width:auto; aspect-ratio:1719.8/784; display:block; }
+.brand-logo { height:20px; width:auto; aspect-ratio:3636/748; display:block; }
+.brand-logo.sm { height:18px; }
 
 /* burger */
 .burger { position:relative; width:40px; height:40px; border:1px solid var(--line); border-radius:12px; background:var(--white); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; }
@@ -1569,9 +1558,8 @@ const CSS = `
 .menu-foot .btn-blue { background:#fff; color:var(--blue); box-shadow:none; }
 
 /* buttons */
-.btn { display:inline-flex; align-items:center; gap:9px; border:none; border-radius:999px; padding:13px 22px; font-size:15px; font-weight:600; transition:transform .15s ease, box-shadow .2s ease, background .2s; }
-.btn.sm { padding:9px 15px; font-size:13.5px; }
-.btn.lg { padding:15px 26px; font-size:16px; }
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:9px; border:none; border-radius:999px; height:48px; padding:0 24px; font-size:15px; font-weight:600; transition:transform .15s ease, box-shadow .2s ease, background .2s; }
+.btn.sm, .btn.lg { height:48px; padding:0 24px; font-size:15px; }
 .btn-blue { background:var(--blue); color:#fff; box-shadow:0 6px 18px rgba(10,102,194,0.22); }
 .btn-blue:hover { background:var(--blue-d); transform:translateY(-1px); }
 .btn-blue:disabled { opacity:0.45; transform:none; box-shadow:none; cursor:not-allowed; }
@@ -1585,10 +1573,16 @@ const CSS = `
 .wrap-wide { max-width:1320px; margin:0 auto; }
 
 /* hero */
-.hero { padding-top:80px; padding-bottom:80px; text-align:center; display:flex; flex-direction:column; align-items:center; }
-.hero-lockup .lockup-word { width:min(520px,82vw); }
-.tagline { font-family:'Fraunces',serif; font-style:italic; font-size:clamp(19px,3.4vw,30px); color:var(--ink); margin:30px auto 34px; max-width:26ch; line-height:1.3; text-wrap:balance; }
-.hero-cta { display:flex; gap:13px; justify-content:center; flex-wrap:wrap; }
+.hero { position:relative; overflow:hidden; padding-top:90px; padding-bottom:90px; text-align:center; display:flex; flex-direction:column; align-items:center; }
+.hero-mark { position:relative; z-index:1; width:min(230px,52vw); height:auto; color:var(--ink); animation:fadeUp .8s ease both; }
+.hero-ripple { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; }
+.hero-ripple span { position:absolute; width:340px; height:340px; border-radius:50%; border:1.5px solid var(--paper); box-shadow:0 0 0 1px rgba(23,23,23,0.015) inset; animation:ripple 7s ease-out infinite; }
+.hero-ripple span:nth-child(2) { animation-delay:1.75s; }
+.hero-ripple span:nth-child(3) { animation-delay:3.5s; }
+.hero-ripple span:nth-child(4) { animation-delay:5.25s; }
+@keyframes ripple { 0% { transform:scale(.45); opacity:0; } 18% { opacity:1; } 100% { transform:scale(2.5); opacity:0; } }
+.tagline { font-family:'Fraunces',serif; font-style:italic; font-size:clamp(19px,3.4vw,30px); color:var(--ink); margin:30px auto 34px; max-width:26ch; line-height:1.3; text-wrap:balance; position:relative; z-index:1; }
+.hero-cta { display:flex; gap:13px; justify-content:center; flex-wrap:wrap; position:relative; z-index:1; }
 
 /* sections */
 .sect { padding-top:88px; }
@@ -1666,13 +1660,14 @@ const CSS = `
 .wizard { max-width:780px; padding-top:38px; padding-bottom:60px; }
 .wiz-title { font-family:'Fraunces',serif; font-weight:400; font-size:clamp(30px,5vw,42px); margin:0 0 20px; letter-spacing:-0.02em; }
 .steps { display:flex; gap:10px; margin-bottom:22px; }
-.step { display:flex; align-items:center; gap:9px; flex:1; padding:11px 13px; border-radius:12px; background:var(--paper); border:1px solid var(--line); color:var(--dim); }
-.step-on { border-color:var(--blue); color:var(--ink); background:var(--white); }
-.step-done { color:var(--mut); }
-.step-dot { width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; background:var(--white); border:1px solid var(--line); flex:none; }
-.step-on .step-dot { background:var(--blue); border:none; color:#fff; }
-.step-done .step-dot { background:var(--navy); border:none; color:#fff; }
+.step { display:flex; align-items:center; gap:9px; flex:1; padding:11px 13px; border-radius:12px; background:var(--paper); border:1px solid var(--line); color:var(--dim); transition:background .3s, border-color .3s, color .3s; }
+.step-done-c { background:var(--blue); border-color:var(--blue); color:#fff; }
+.step-dot { width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; background:var(--white); border:1px solid var(--line); flex:none; transition:background .3s, color .3s; }
+.step-done-c .step-dot { background:rgba(255,255,255,0.2); border:none; color:#fff; }
 .step-name { font-size:13px; font-weight:500; }
+.auth-choice { display:flex; flex-direction:column; gap:12px; align-items:stretch; max-width:360px; margin-bottom:14px; }
+.auth-choice .btn { width:100%; }
+.ob-sec { margin-bottom:26px; padding-bottom:22px; border-bottom:1px solid var(--line); }
 .wiz-nav { display:flex; justify-content:space-between; align-items:center; margin-top:20px; }
 
 .panel { background:var(--white); border:1px solid var(--line); border-radius:20px; padding:26px; box-shadow:0 8px 24px rgba(23,23,23,0.04); }
@@ -1870,8 +1865,9 @@ const CSS = `
 @media (prefers-reduced-motion:reduce) {
   .btn-blue:hover, .ch-icon:hover, .cms-fab:hover { transform:none; }
   .menu, .menu-item, .burger-bar, .fold-chev { transition:none; }
-  .lockup-anim .lp { animation:none; stroke-dashoffset:0; }
+  .lockup-anim .lockup-word { animation:none; clip-path:none; }
   .lockup-anim .lockup-sub { animation:none; opacity:1; }
+  .hero-ripple span { animation:none; opacity:0.5; }
   .intro { animation-duration:0.01s; animation-delay:0.6s; }
 }
 `;
