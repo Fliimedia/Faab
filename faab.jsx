@@ -223,11 +223,11 @@ const phaseById = (id) => FUNNEL.find((f) => f.id === id) || FUNNEL[0];
 
 // ---------- Userflow ----------
 const USERFLOW = [
-  { k: 'founder', ic: I.user, t: { nl: 'Founderprofiel', en: 'Founder profile' } },
-  { k: 'strategy', ic: I.target, t: { nl: 'Strategie', en: 'Strategy' } },
-  { k: 'topics', ic: I.radar, t: { nl: 'Actuele onderwerpen', en: 'Current topics' } },
-  { k: 'posting', ic: I.calendar, t: { nl: 'Posting', en: 'Posting' } },
-  { k: 'webcare', ic: I.message, t: { nl: 'Webcare', en: 'Webcare' } },
+  { k: 'founder', ic: I.user, t: { nl: 'Founderprofiel', en: 'Founder profile' }, d: { nl: 'Je stem, stijl en merk als basis voor alles.', en: 'Your voice, style and brand as the base for everything.' } },
+  { k: 'strategy', ic: I.target, t: { nl: 'Strategie', en: 'Strategy' }, d: { nl: 'Doel en aanpak per funnelfase, door jou bijgestuurd.', en: 'Goal and approach per funnel stage, steered by you.' } },
+  { k: 'topics', ic: I.radar, t: { nl: 'Actuele onderwerpen', en: 'Current topics' }, d: { nl: 'Trending discussies en zoekvolumes op jouw thema\u0027s.', en: 'Trending discussions and search volumes on your themes.' } },
+  { k: 'posting', ic: I.calendar, t: { nl: 'Posting', en: 'Posting' }, d: { nl: 'Posts in jouw stem. Jij keurt goed en plant in.', en: 'Posts in your voice. You approve and schedule.' } },
+  { k: 'webcare', ic: I.message, t: { nl: 'Webcare', en: 'Webcare' }, d: { nl: 'Reacties en gesprekken onder je posts, bijgehouden.', en: 'Comments and conversations under your posts, kept up.' } },
 ];
 
 // ---------- Channels ----------
@@ -239,8 +239,8 @@ const CHANNELS = [
       en: 'LinkedIn is the home channel of the founder as a brand. Build authority with takes on news, lessons learned and visible expertise. The first two lines decide everything: write hook-first, keep one idea per post and explicitly invite comments. Rhythm wins: two to three posts a week, plus daily commenting on others in your niche.',
     },
     placements: {
-      nl: ['Tekstposts met witruimte (kernformaat)', 'Documentcarrousels voor diepere lessen', 'Peilingen voor interactie', 'Reacties op posts van anderen als zichtbaarheidsmotor'],
-      en: ['Text posts with whitespace (core format)', 'Document carousels for deeper lessons', 'Polls for engagement', 'Comments on others as a visibility engine'],
+      nl: ['Timeline tekstpost', 'Documentcarrousel (PDF)', 'Video', 'Peiling', 'Pulse-artikel / nieuwsbrief'],
+      en: ['Timeline text post', 'Document carousel (PDF)', 'Video', 'Poll', 'Pulse article / newsletter'],
     },
     tone: {
       nl: 'Professioneel maar persoonlijk, in de ik-vorm. Kort van zin, concreet, met een duidelijke mening. Geen jargon, geen corporate wij-vorm.',
@@ -262,8 +262,8 @@ const CHANNELS = [
       en: 'Instagram humanizes your brand. Show the founder behind the company: behind-the-scenes, the team, milestones and visual storytelling. Reels carry reach, carousels carry depth, Stories carry the bond. The feed is your storefront: a consistent style in color and tone is recognized in half a second.',
     },
     placements: {
-      nl: ['Reels voor bereik (korte inzichten, bts)', 'Carrousels voor lessen en stappen', 'Stories voor dagelijks contact en polls', 'Feedposts als visitekaartje in merkstijl'],
-      en: ['Reels for reach (short insights, bts)', 'Carousels for lessons and steps', 'Stories for daily contact and polls', 'Feed posts as a brand-style business card'],
+      nl: ['Reel', 'Carrouselpost', 'Story', 'Feedpost (foto of video)'],
+      en: ['Reel', 'Carousel post', 'Story', 'Feed post (photo or video)'],
     },
     tone: {
       nl: 'Warm, visueel en dichtbij. Kortere zinnen dan op LinkedIn, meer emotie, af en toe een emoji. Caption opent sterk, want de rest klapt in.',
@@ -285,8 +285,8 @@ const CHANNELS = [
       en: 'X is the fastest channel: react to news while it is still news and build a reputation with sharp, short thoughts. A strong one-liner beats a long argument; use threads for the build-out. Be early, be opinionated and join the conversation in the replies, that is where follows are earned.',
     },
     placements: {
-      nl: ['Losse posts met een scherpe gedachte', 'Threads voor uitwerking en lessen', 'Quote-posts op nieuws met eigen mening', 'Replies in je niche als groeimotor'],
-      en: ['Single posts with one sharp thought', 'Threads for build-out and lessons', 'Quote posts on news with your own take', 'Replies in your niche as a growth engine'],
+      nl: ['Timeline post', 'Thread', 'Video', 'Quote-post'],
+      en: ['Timeline post', 'Thread', 'Video', 'Quote post'],
     },
     tone: {
       nl: 'Direct, puntig en met durf. Geen opwarmers, geen hashtag-stapels. Elke post kan op zichzelf staan.',
@@ -308,8 +308,8 @@ const CHANNELS = [
       en: 'Facebook is the community channel: local reach, groups and an audience that reads stories instead of scanning. Longer personal stories, milestones and questions to your community work here. Groups around your field are the hidden growth engine: be helpful there without selling.',
     },
     placements: {
-      nl: ['Persoonlijke verhalen en mijlpalen op je pagina', 'Waardevolle bijdragen in vakgroepen', 'Evenementen en livesessies', 'Foto-posts met team en klanten'],
-      en: ['Personal stories and milestones on your page', 'Valuable contributions in industry groups', 'Events and live sessions', 'Photo posts with team and clients'],
+      nl: ['Timeline post (tekst of foto)', 'Video', 'Story', 'Reel', 'Evenement of livesessie'],
+      en: ['Timeline post (text or photo)', 'Video', 'Story', 'Reel', 'Event or live session'],
     },
     tone: {
       nl: 'Verhalend en toegankelijk. Iets langer mag, zolang het persoonlijk blijft. Schrijf zoals je het aan een bekende zou vertellen.',
@@ -776,6 +776,7 @@ function Home({ t, lang, go }) {
                 <span className="flow-ic">{s.ic({ width: 22, height: 22 })}</span>
                 <span className="flow-n">0{i + 1}</span>
                 <h3>{s.t[lang]}</h3>
+                <p className="flow-d">{s.d[lang]}</p>
               </div>
               {i < USERFLOW.length - 1 && <span className="flow-arrow"><I.arrow width="22" height="22" /></span>}
             </React.Fragment>
@@ -1603,6 +1604,7 @@ const CSS = `
 .flow-ic { width:44px; height:44px; border-radius:12px; background:var(--blue); color:#fff; display:inline-flex; align-items:center; justify-content:center; }
 .flow-n { font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.12em; color:var(--blue); }
 .flow-step h3 { font-family:'Fraunces',serif; font-weight:500; font-size:17px; margin:0; line-height:1.25; }
+.flow-d { margin:0; color:var(--mut); font-size:13.5px; line-height:1.5; }
 .flow-arrow { display:flex; align-items:center; justify-content:center; color:var(--dim); flex:none; }
 
 /* channels */
