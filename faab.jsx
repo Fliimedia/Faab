@@ -111,8 +111,15 @@ const STR = {
     ob_web_ph: 'https://jouwbedrijf.nl', ob_scan: 'Scan website', ob_scanning: 'Scannen...',
     ob_scan_err: 'Scan mislukte. Controleer de URL of vul het hieronder zelf in.',
     ob_desc: 'Beschrijving van je dienst', ob_aud: 'Doelgroep', ob_colors: 'Merkkleuren', ob_logo: 'Logo',
-    ob_save: 'Opslaan', ob_saving: 'Opslaan...', ob_back: 'Terug',
+    ob_save: 'Opslaan', ob_saving: 'Opslaan...', ob_back: 'Terug', ob_next: 'Volgende', ob_skip: 'Overslaan',
     ob_tone_note: 'Bij opslaan bepaalt FAAB je tone of voice uit je kanalen en merkscan. Daarna opent het CMS.',
+    ob_step_account: 'Account', ob_step_channels: 'Kanalen', ob_step_brand: 'Merk',
+    ob_ch_tap: 'Tik op een kanaal om je profiel toe te voegen.',
+    ob_gtone_h: 'Algemene tone of voice', ob_gtone_p: 'Beschrijf in een zin hoe je wilt klinken. Gebruikt als basis voor previews.',
+    ob_gtone_ph: 'Bijv. scherp, persoonlijk, met droge humor',
+    ob_preview: 'Genereer preview', ob_previewing: 'Genereren...', ob_preview_pick: 'Kies een kanaal voor de preview',
+    ob_company_h: 'Je bedrijf', ob_company_p: 'Plak je website, dan haalt FAAB je merk op.',
+    ob_scan_out: 'Merkprofiel', ob_services: 'Diensten en producten', ob_keywords_f: 'Keywords', ob_maincolor: 'Hoofdkleur',
     // cms
     cms_brand: 'Merkpersoonlijkheid', cms_strategy: 'Strategie', cms_topics: 'Onderwerpen', cms_content: 'Content', cms_schedule: 'Planning',
     cms_exit: 'Terug naar site', cms_logout: 'Uitloggen',
@@ -180,8 +187,15 @@ const STR = {
     ob_web_ph: 'https://yourcompany.com', ob_scan: 'Scan website', ob_scanning: 'Scanning...',
     ob_scan_err: 'Scan failed. Check the URL or fill it in below yourself.',
     ob_desc: 'Description of your service', ob_aud: 'Target audience', ob_colors: 'Brand colors', ob_logo: 'Logo',
-    ob_save: 'Save', ob_saving: 'Saving...', ob_back: 'Back',
+    ob_save: 'Save', ob_saving: 'Saving...', ob_back: 'Back', ob_next: 'Next', ob_skip: 'Skip',
     ob_tone_note: 'On save FAAB derives your tone of voice from your channels and brand scan. The CMS then opens.',
+    ob_step_account: 'Account', ob_step_channels: 'Channels', ob_step_brand: 'Brand',
+    ob_ch_tap: 'Tap a channel to add your profile.',
+    ob_gtone_h: 'General tone of voice', ob_gtone_p: 'Describe in one line how you want to sound. Used as the base for previews.',
+    ob_gtone_ph: 'e.g. sharp, personal, with dry humor',
+    ob_preview: 'Generate preview', ob_previewing: 'Generating...', ob_preview_pick: 'Pick a channel for the preview',
+    ob_company_h: 'Your company', ob_company_p: 'Paste your website and FAAB pulls your brand.',
+    ob_scan_out: 'Brand profile', ob_services: 'Services and products', ob_keywords_f: 'Keywords', ob_maincolor: 'Main color',
     cms_brand: 'Brand personality', cms_strategy: 'Strategy', cms_topics: 'Topics', cms_content: 'Content', cms_schedule: 'Schedule',
     cms_exit: 'Back to site', cms_logout: 'Log out',
     b_h: 'Brand personality', b_company: 'Company', b_role: 'Role', b_name: 'Name', b_website: 'Website',
@@ -433,7 +447,7 @@ function Field({ label, hint, children }) {
 // ---------- Default state ----------
 const emptyBrand = () => ({
   company: '', role: '', name: '', website: '', logo: '', description: '', audience: '',
-  personality: '', colors: [], docs: [], tone: '', socials: { linkedin: '', instagram: '', x: '', facebook: '' },
+  personality: '', colors: [], services: [], docs: [], tone: '', socials: { linkedin: '', instagram: '', x: '', facebook: '' },
   channelExamples: {},
   voice: emptyVoice(),
 });
@@ -553,23 +567,35 @@ export default function App() {
     if (!url) return;
     setScanState('loading');
     try {
-      const prompt = `Visit and research this company website: ${url}. Extract the brand.
+      const prompt = `Visit and research this company website: ${url}. Extract the brand identity.
 
 Return ONLY a JSON object:
 - company: company name.
-- description: 2 sentences in ${langName(lang)} describing the service.
+- description: 2 sentences in ${langName(lang)} describing the service or product.
 - audience: 1 sentence in ${langName(lang)} describing the target audience.
-- colors: array of 2 to 4 hex color codes that match the site brand (best guess).
+- services: array of 3 to 5 short strings in ${langName(lang)} naming the core services or products.
+- keywords: array of 5 to 8 short brand or topic keywords in ${langName(lang)}.
+- logo: absolute URL to the company logo image if you can find one, else empty string.
+- mainColor: the single primary brand color as a hex code (the dominant logo color).
+- colors: array of 3 to 5 additional hex color codes from the brand palette, excluding the main color.
 
 No markdown. Do not use em-dashes or en-dashes.`;
       const out = extractJson(textOf(await callClaude([{ role: 'user', content: prompt }], WEB_TOOL)), 'object');
+      const main = typeof out.mainColor === 'string' && /^#([0-9a-f]{6})$/i.test(out.mainColor.trim()) ? out.mainColor.trim() : '';
+      const rest = Array.isArray(out.colors) ? out.colors.map(String).filter((c) => /^#([0-9a-f]{6})$/i.test(c.trim())) : [];
+      const palette = (main ? [main, ...rest.filter((c) => c.toLowerCase() !== main.toLowerCase())] : rest).slice(0, 5);
+      const logoUrl = typeof out.logo === 'string' && /^https?:\/\//i.test(out.logo.trim()) ? out.logo.trim() : '';
       setBrand((p) => ({
         ...p,
-        company: p.company || stripDashes(String(out.company || '')),
+        company: stripDashes(String(out.company || p.company)),
         description: stripDashes(String(out.description || p.description)),
         audience: stripDashes(String(out.audience || p.audience)),
-        colors: Array.isArray(out.colors) && out.colors.length ? out.colors.map(String).slice(0, 4) : p.colors,
+        services: Array.isArray(out.services) ? out.services.map((s) => stripDashes(String(s))).slice(0, 5) : p.services,
+        logo: p.logo || logoUrl,
+        colors: palette.length ? palette : p.colors,
       }));
+      const kws = Array.isArray(out.keywords) ? out.keywords.map((k) => stripDashes(String(k))) : [];
+      if (kws.length) setStrategy((p) => ({ ...p, keywords: Array.from(new Set([...(p.keywords || []), ...kws])).slice(0, 12) }));
       setScanState('done');
     } catch (e) { setScanState('error'); }
   }
@@ -644,6 +670,17 @@ Do not use em-dashes or en-dashes.`;
   async function generateExampleFor(chId) {
     const text = await genPost({ channel: chId, phase: 'reach', angle: '', subject: '' });
     setBrand((p) => ({ ...p, channelExamples: { ...p.channelExamples, [chId]: text } }));
+  }
+
+  // ----- AI: quick tone preview from a free text voice description -----
+  async function previewFor(chId, voiceText) {
+    const ch = channelById(chId);
+    const prompt = `You are an expert social ghostwriter. Write one short example ${ch.name} post that demonstrates this desired tone of voice: "${(voiceText || '').trim() || 'personal, clear, first person'}".
+
+Author context: ${brand.name || 'a founder'}${brand.company ? ' at ' + brand.company : ''}${brand.description ? '. ' + brand.description : ''}.
+Channel conventions for ${ch.name}: ${ch.tone.en}
+Write in ${langName(lang)}. One idea, scroll-stopping first line, short paragraphs, end with a question or call to action. Do NOT use em-dashes or en-dashes. Return only the post text.`;
+    return stripDashes(textOf(await callClaude([{ role: 'user', content: prompt }])));
   }
 
   // ----- AI: strategy per funnel phase -----
@@ -793,7 +830,7 @@ Write in ${langName(lang)}. Rules:
       {view.startsWith('channel:') && <ChannelPage t={t} lang={lang} id={view.split(':')[1]} go={go} />}
       {view === 'onboarding' && (
         <Onboarding t={t} lang={lang} user={user} brand={brand} setB={setB} setSocial={setSocial} setBrand={setBrand}
-          auth={auth} scanWebsite={scanWebsite} scanState={scanState}
+          auth={auth} scanWebsite={scanWebsite} scanState={scanState} previewFor={previewFor}
           generateTone={generateTone} toneState={toneState} toneStage={toneStage} go={go} />
       )}
       {view === 'cms' && (
@@ -1134,22 +1171,28 @@ function ChannelPage({ t, lang, id, go }) {
 }
 
 // ---------- Onboarding ----------
-function Onboarding({ t, lang, user, brand, setB, setSocial, setBrand, auth, scanWebsite, scanState, generateTone, toneState, toneStage, go }) {
+function Onboarding({ t, lang, user, brand, setB, setSocial, setBrand, auth, scanWebsite, scanState, previewFor, generateTone, toneState, toneStage, go }) {
+  const [step, setStep] = useState(user ? 'channels' : 'account');
   const [mode, setMode] = useState(null); // null | 'login' | 'register'
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [authErr, setAuthErr] = useState('');
   const [saving, setSaving] = useState(false);
+  const [openCh, setOpenCh] = useState('');
+  const [gtone, setGtone] = useState('');
+  const [prevCh, setPrevCh] = useState('linkedin');
+  const [prevText, setPrevText] = useState('');
+  const [prevLoading, setPrevLoading] = useState(false);
   const logoRef = useRef(null);
 
   const accountDone = !!user;
-  const channelsDone = CHANNELS.some((c) => (brand.socials[c.id] || '').trim());
+  const channelsDone = CHANNELS.some((c) => (brand.socials[c.id] || '').trim() || (brand.voice.samples[c.id] || '').trim()) || !!gtone.trim();
   const brandDone = !!(brand.description || '').trim() || !!(brand.website || '').trim();
-  const inds = [
-    { k: 'account', label: t('ob_ind_account'), done: accountDone },
-    { k: 'channels', label: t('ob_ind_channels'), done: channelsDone },
-    { k: 'brand', label: t('ob_ind_brand'), done: brandDone },
+  const steps = [
+    { k: 'account', label: t('ob_step_account'), ic: I.user, done: accountDone },
+    { k: 'channels', label: t('ob_step_channels'), ic: I.message, done: channelsDone },
+    { k: 'brand', label: t('ob_step_brand'), ic: I.globe, done: brandDone },
   ];
 
   function onLogo(e) {
@@ -1160,8 +1203,14 @@ function Onboarding({ t, lang, user, brand, setB, setSocial, setBrand, auth, sca
     setAuthErr('');
     const res = await auth(m, username, password, name);
     if (!res.ok) { setAuthErr(t(res.err === 'exists' ? 'ob_auth_exists' : 'ob_auth_wrong')); return; }
+    setStep('channels');
   }
   const setSample = (id, v) => setBrand((p) => ({ ...p, voice: { ...p.voice, samples: { ...p.voice.samples, [id]: v } } }));
+  async function runPreview() {
+    setPrevLoading(true); setPrevText('');
+    try { setPrevText(await previewFor(prevCh, gtone)); } catch (e) { setPrevText(''); }
+    setPrevLoading(false);
+  }
   async function saveAll() {
     setSaving(true);
     try { if (!brand.voice.base) await generateTone(); } catch (e) { /* voice optional */ }
@@ -1172,16 +1221,21 @@ function Onboarding({ t, lang, user, brand, setB, setSocial, setBrand, auth, sca
   return (
     <main className="wrap wizard">
       <h1 className="wiz-title">{t('ob_title')}</h1>
-      <div className="steps">
-        {inds.map((s) => (
-          <div key={s.k} className={'step' + (s.done ? ' step-done-c' : '')}>
-            <span className="step-dot">{s.done ? <I.check width="14" height="14" /> : ''}</span>
-            <span className="step-name">{s.label}</span>
-          </div>
-        ))}
+
+      <div className="wsteps">
+        {steps.map((s) => {
+          const active = step === s.k;
+          return (
+            <button key={s.k} className={'wstep' + (active ? ' wstep-on' : '') + (s.done ? ' wstep-done' : '')}
+              onClick={() => { if (s.k === 'account' || user) setStep(s.k); }} disabled={s.k !== 'account' && !user}>
+              <span className="wstep-ic">{s.done && !active ? <I.check width="18" height="18" /> : s.ic({ width: 20, height: 20 })}</span>
+              <span className="wstep-label">{s.label}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {!user && (
+      {step === 'account' && (
         <section className="panel">
           <div className="panel-head"><h2>{t('ob_choice_h')}</h2></div>
           {!mode && (
@@ -1211,67 +1265,108 @@ function Onboarding({ t, lang, user, brand, setB, setSocial, setBrand, auth, sca
         </section>
       )}
 
-      {user && (
+      {step === 'channels' && user && (
         <section className="panel">
-          <div className="ob-sec">
-            <div className="panel-head"><h2>{t('ob_ch_h')}</h2><p>{t('ob_ch_p')}</p></div>
-            <div className="soc-list">
+          <div className="panel-head"><h2>{t('ob_ch_h')}</h2><p>{t('ob_ch_tap')}</p></div>
+          <div className="ch-choice">
+            {CHANNELS.map((c) => {
+              const filled = (brand.socials[c.id] || '').trim() || (brand.voice.samples[c.id] || '').trim();
+              return (
+                <button key={c.id} className={'ch-choice-ic' + (openCh === c.id ? ' ch-choice-on' : '') + (filled ? ' ch-choice-filled' : '')}
+                  style={{ '--cc': c.c }} onClick={() => setOpenCh(openCh === c.id ? '' : c.id)} aria-label={c.name}>
+                  {c.ic({ width: 24, height: 24 })}
+                  {filled && <span className="ch-choice-dot"><I.check width="10" height="10" /></span>}
+                </button>
+              );
+            })}
+          </div>
+          {openCh && (() => {
+            const c = channelById(openCh);
+            return (
+              <div className="ch-expand" style={{ '--cc': c.c }}>
+                <div className="ch-expand-head" style={{ color: c.c }}>{c.ic({ width: 18, height: 18 })} {c.name}</div>
+                <Field label={t('ob_ch_ph')}><input className="input" value={brand.socials[c.id]} onChange={(e) => setSocial(c.id, e.target.value)} placeholder={t('ob_ch_ph')} autoFocus /></Field>
+                <Field label={t('v_samples')}><textarea className="input textarea" rows={3} value={brand.voice.samples[c.id]} onChange={(e) => setSample(c.id, e.target.value)} placeholder={t('v_sample_ph')} /></Field>
+              </div>
+            );
+          })()}
+
+          <div className="ob-sec mt">
+            <div className="panel-head"><h2>{t('ob_gtone_h')}</h2><p>{t('ob_gtone_p')}</p></div>
+            <input className="input" value={gtone} onChange={(e) => setGtone(e.target.value)} placeholder={t('ob_gtone_ph')} />
+            <div className="prev-tabs">
               {CHANNELS.map((c) => (
-                <div className="soc-row" key={c.id}>
-                  <span className="soc-ic" style={{ background: c.c }}>{c.ic({ width: 18, height: 18 })}</span>
-                  <span className="soc-name">{c.name}</span>
-                  <input className="input" value={brand.socials[c.id]} onChange={(e) => setSocial(c.id, e.target.value)} placeholder={t('ob_ch_ph')} />
-                </div>
+                <button key={c.id} className={'fch' + (prevCh === c.id ? ' fch-on' : '')} style={{ '--cc': c.c }} onClick={() => setPrevCh(c.id)} aria-label={c.name}>
+                  {c.ic({ width: 16, height: 16 })}
+                </button>
               ))}
+              <button className="btn btn-blue sm" disabled={prevLoading} onClick={runPreview}><I.spark width="15" height="15" /> {prevLoading ? t('ob_previewing') : t('ob_preview')}</button>
             </div>
-            <div className="field-label mt">{t('v_samples')}</div>
-            <p className="li-source-note">{t('v_samples_p')}</p>
-            <div className="v-sample-grid">
-              {CHANNELS.map((c) => (
-                <div className="v-sample" key={c.id}>
-                  <div className="v-sample-head" style={{ color: c.c }}>{c.ic({ width: 16, height: 16 })} {c.name}</div>
-                  <textarea className="input textarea" rows={2} value={brand.voice.samples[c.id]} onChange={(e) => setSample(c.id, e.target.value)} placeholder={t('v_sample_ph')} />
+            {prevText && (
+              <div className="ch-post ch-post-big prev-post" style={{ '--cc': channelById(prevCh).c }}>
+                <div className="ch-post-top">
+                  <span className="ch-ava" style={{ background: channelById(prevCh).c }}>{channelById(prevCh).ic({ width: 18, height: 18, color: '#fff' })}</span>
+                  <div><div className="ch-post-name">{brand.name || 'Founder'}</div><div className="ch-post-sub">{channelById(prevCh).name}</div></div>
                 </div>
-              ))}
-            </div>
+                <p className="ch-post-text demo-text">{prevText}</p>
+              </div>
+            )}
           </div>
 
-          <div className="ob-sec">
-            <div className="panel-head"><h2>{t('ob_web_h')}</h2><p>{t('ob_web_p')}</p></div>
-            <div className="kw-add">
-              <input className="input" value={brand.website} onChange={(e) => setB('website', e.target.value)} placeholder={t('ob_web_ph')} />
-              <button className="btn btn-blue" onClick={scanWebsite} disabled={scanState === 'loading'}><I.globe width="16" height="16" /> {scanState === 'loading' ? t('ob_scanning') : t('ob_scan')}</button>
-            </div>
-            {scanState === 'error' && <div className="mini-err">{t('ob_scan_err')}</div>}
+          <div className="wiz-nav"><span />
+            <button className="btn btn-blue" onClick={() => setStep('brand')}>{t('ob_next')} <I.arrow width="18" height="18" /></button>
+          </div>
+        </section>
+      )}
+
+      {step === 'brand' && user && (
+        <section className="panel">
+          <div className="panel-head"><h2>{t('ob_company_h')}</h2><p>{t('ob_company_p')}</p></div>
+          <div className="kw-add">
+            <input className="input" value={brand.website} onChange={(e) => setB('website', e.target.value)} placeholder={t('ob_web_ph')} />
+            <button className="btn btn-blue" onClick={scanWebsite} disabled={scanState === 'loading'}><I.globe width="16" height="16" /> {scanState === 'loading' ? t('ob_scanning') : t('ob_scan')}</button>
+          </div>
+          {scanState === 'error' && <div className="mini-err">{t('ob_scan_err')}</div>}
+
+          <div className="scan-out">
             <div className="scan-grid">
               <div className="ava-block">
                 <div className="ava" style={brand.logo ? { backgroundImage: `url(${brand.logo})` } : {}} onClick={() => logoRef.current && logoRef.current.click()}>
                   {!brand.logo && <span className="ava-hint">{t('ob_logo')}</span>}
                 </div>
-                <button className="btn btn-ghost" onClick={() => logoRef.current && logoRef.current.click()}><I.upload width="15" height="15" /> {t('ob_logo')}</button>
+                <button className="btn btn-ghost sm" onClick={() => logoRef.current && logoRef.current.click()}><I.upload width="15" height="15" /> {t('ob_logo')}</button>
                 <input ref={logoRef} type="file" accept="image/*" hidden onChange={onLogo} />
               </div>
               <div>
                 <Field label={t('b_company')}><input className="input" value={brand.company} onChange={(e) => setB('company', e.target.value)} /></Field>
                 <Field label={t('ob_desc')}><textarea className="input textarea" rows={2} value={brand.description} onChange={(e) => setB('description', e.target.value)} /></Field>
                 <Field label={t('ob_aud')}><textarea className="input textarea" rows={2} value={brand.audience} onChange={(e) => setB('audience', e.target.value)} /></Field>
-                <Field label={t('ob_colors')}>
-                  <div className="colors">
-                    {brand.colors.map((c, i) => (
-                      <span className="color-chip" key={i}>
-                        <input type="color" value={/^#([0-9a-f]{6})$/i.test(c) ? c : '#0A66C2'} onChange={(e) => setB('colors', brand.colors.map((x, j) => j === i ? e.target.value : x))} />
-                        <button className="color-x" onClick={() => setB('colors', brand.colors.filter((_, j) => j !== i))}><I.x width="11" height="11" /></button>
-                      </span>
-                    ))}
-                    <button className="btn btn-ghost" onClick={() => setB('colors', [...brand.colors, '#0A66C2'])}><I.plus width="14" height="14" /></button>
-                  </div>
-                </Field>
               </div>
             </div>
+
+            {brand.services && brand.services.length > 0 && (
+              <Field label={t('ob_services')}>
+                <div className="chips">{brand.services.map((s, i) => <span className="chip-static" key={i}>{s}</span>)}</div>
+              </Field>
+            )}
+
+            <Field label={t('ob_colors')}>
+              <div className="colors">
+                {brand.colors.map((c, i) => (
+                  <span className={'color-chip' + (i === 0 ? ' color-main' : '')} key={i}>
+                    <input type="color" value={/^#([0-9a-f]{6})$/i.test(c) ? c : '#0A66C2'} onChange={(e) => setB('colors', brand.colors.map((x, j) => j === i ? e.target.value : x))} />
+                    {i === 0 && <span className="color-tag">{t('ob_maincolor')}</span>}
+                    <button className="color-x" onClick={() => setB('colors', brand.colors.filter((_, j) => j !== i))}><I.x width="11" height="11" /></button>
+                  </span>
+                ))}
+                <button className="btn btn-ghost" onClick={() => setB('colors', [...brand.colors, '#0A66C2'])}><I.plus width="14" height="14" /></button>
+              </div>
+            </Field>
           </div>
 
-          <div className="li-source-note">{t('ob_tone_note')}</div>
-          <div className="wiz-nav"><span />
+          <div className="li-source-note mt">{t('ob_tone_note')}</div>
+          <div className="wiz-nav">
+            <button className="btn btn-ghost" onClick={() => setStep('channels')}><I.chevL width="16" height="16" /> {t('ob_back')}</button>
             <button className="btn btn-blue" disabled={saving || toneState === 'loading'} onClick={saveAll}>{toneState === 'loading' ? (toneStage === 'synth' ? t('v_stage_synth') : t('v_analyzing')) : (saving ? t('ob_saving') : t('ob_save'))} <I.arrow width="18" height="18" /></button>
           </div>
         </section>
@@ -1997,14 +2092,33 @@ const CSS = `
 /* wizard / onboarding */
 .wizard { max-width:780px; padding-top:38px; padding-bottom:60px; }
 .wiz-title { font-family:'Fraunces',serif; font-weight:400; font-size:clamp(30px,5vw,42px); margin:0 0 20px; letter-spacing:-0.02em; }
-.steps { display:flex; gap:10px; margin-bottom:22px; }
-.step { display:flex; align-items:center; gap:9px; flex:1; padding:11px 13px; border-radius:12px; background:var(--paper); border:1px solid var(--line); color:var(--dim); transition:background .3s, border-color .3s, color .3s; }
-.step-done-c { background:var(--blue); border-color:var(--blue); color:#fff; }
-.step-dot { width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; background:var(--white); border:1px solid var(--line); flex:none; transition:background .3s, color .3s; }
-.step-done-c .step-dot { background:rgba(255,255,255,0.2); border:none; color:#fff; }
-.step-name { font-size:13px; font-weight:500; }
+.wsteps { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:22px; }
+.wstep { aspect-ratio:1/1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; border-radius:16px; background:var(--paper); border:1px solid var(--line); color:var(--dim); transition:background .25s, border-color .25s, color .25s, transform .12s; cursor:pointer; }
+.wstep:not(:disabled):hover { transform:translateY(-2px); border-color:var(--blue); }
+.wstep:disabled { cursor:not-allowed; opacity:0.6; }
+.wstep-ic { width:46px; height:46px; border-radius:13px; display:inline-flex; align-items:center; justify-content:center; background:var(--white); border:1px solid var(--line); transition:background .25s, color .25s, border-color .25s; }
+.wstep-label { font-size:14px; font-weight:600; }
+.wstep-done { border-color:var(--blue); color:var(--blue); }
+.wstep-done .wstep-ic { background:var(--blue-soft); color:var(--blue); border-color:transparent; }
+.wstep-on { background:var(--blue); border-color:var(--blue); color:#fff; box-shadow:0 10px 26px rgba(10,102,194,0.22); }
+.wstep-on .wstep-ic { background:rgba(255,255,255,0.18); color:#fff; border-color:transparent; }
 .auth-choice { display:flex; flex-direction:column; gap:12px; align-items:stretch; max-width:360px; margin-bottom:14px; }
 .auth-choice .btn { width:100%; }
+.ch-choice { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:6px; }
+.ch-choice-ic { position:relative; width:64px; height:64px; border-radius:18px; border:1px solid var(--line); background:var(--white); color:var(--dim); display:inline-flex; align-items:center; justify-content:center; transition:color .15s, border-color .15s, background .15s, transform .12s; }
+.ch-choice-ic:hover { transform:translateY(-2px); color:var(--cc); border-color:var(--cc); }
+.ch-choice-filled { color:var(--cc); border-color:var(--cc); }
+.ch-choice-on { color:#fff; background:var(--cc); border-color:var(--cc); box-shadow:0 8px 20px color-mix(in srgb, var(--cc) 32%, transparent); }
+.ch-choice-dot { position:absolute; top:-5px; right:-5px; width:20px; height:20px; border-radius:50%; background:var(--cc); color:#fff; display:inline-flex; align-items:center; justify-content:center; border:2px solid var(--white); }
+.ch-choice-on .ch-choice-dot { background:#fff; color:var(--cc); }
+.ch-expand { border:1px solid var(--cc); border-radius:14px; padding:16px; margin-bottom:8px; background:color-mix(in srgb, var(--cc) 5%, white); }
+.ch-expand-head { display:flex; align-items:center; gap:8px; font-weight:600; font-size:14px; margin-bottom:12px; }
+.prev-tabs { display:flex; gap:9px; align-items:center; flex-wrap:wrap; margin-top:12px; }
+.prev-post { margin-top:14px; }
+.chip-static { display:inline-flex; align-items:center; background:var(--blue-tint); border:1px solid var(--line); color:var(--blue); padding:7px 13px; border-radius:999px; font-size:13px; font-weight:500; }
+.color-main input[type=color] { box-shadow:0 0 0 2px var(--blue); border-radius:12px; }
+.color-tag { font-family:'IBM Plex Mono',monospace; font-size:9px; text-transform:uppercase; letter-spacing:0.06em; color:var(--blue); position:absolute; bottom:-16px; left:50%; transform:translateX(-50%); white-space:nowrap; }
+.scan-out { margin-top:6px; }
 .ob-sec { margin-bottom:26px; padding-bottom:22px; border-bottom:1px solid var(--line); }
 .wiz-nav { display:flex; justify-content:space-between; align-items:center; margin-top:20px; }
 
@@ -2050,8 +2164,9 @@ const CSS = `
 
 /* scan */
 .scan-grid { display:grid; grid-template-columns:130px 1fr; gap:24px; margin-top:18px; }
-.colors { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+
 .color-chip { position:relative; display:inline-flex; }
+.colors { display:flex; flex-wrap:wrap; gap:12px; align-items:center; padding-bottom:18px; }
 .color-chip input[type=color] { width:44px; height:44px; border:1px solid var(--line); border-radius:11px; padding:2px; background:var(--white); cursor:pointer; }
 .color-x { position:absolute; top:-6px; right:-6px; width:18px; height:18px; border-radius:50%; border:none; background:var(--ink); color:#fff; display:inline-flex; align-items:center; justify-content:center; }
 
