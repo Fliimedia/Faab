@@ -92,12 +92,11 @@ const STR = {
     eb_flow: 'Hoe het werkt', flow_h2: 'Personal branding voor founders',
     flow_lede: 'Keur posts simpelweg goed of af. Onze AI signaleert trending onderwerpen in jouw niche en zet kant-en-klare posts voor je klaar, op basis van jouw stijl, stem, persoonlijkheid en doelen.',
     eb_channels: 'Kanalen', channels_h2a: 'Jouw voice,', channels_h2b: 'afgestemd per kanaal.',
-    eb_control: 'De human review', control_h2: 'Drie momenten waarop jij beslist.',
+    eb_control: 'De human review', control_h2: 'Twee momenten waarop jij beslist.',
     rv1_t: 'Onderwerpkeuze', rv1_d: 'AI signaleert trending onderwerpen in jouw niche. Jij bepaalt welke doorgaan.',
-    rv2_t: 'De draft', rv2_d: 'Elke post staat klaar als preview, in jouw stem. Bewerk vrij of laat staan.',
-    rv3_t: 'Akkoord', rv3_d: 'Goedkeuren, aanpassen of afwijzen. Zonder jouw akkoord gaat niets live.',
+    rv2_t: 'Draft en akkoord', rv2_d: 'Elke post staat klaar als preview, in jouw stem. Bewerk vrij, keur goed of wijs af. Zonder jouw akkoord gaat niets live.',
     eb_contact: 'Contact', contact_h2a: 'Praat met ons over', contact_h2b: 'jouw founder-merk.',
-    foot_tag: 'Founders zijn hun merk.', foot_app: 'App', foot_learn: 'Kanalen', foot_contact: 'Contact', foot_the_funnel: 'De funnel',
+    foot_tag: 'Founder as a brand.', foot_app: 'App', foot_learn: 'Kanalen', foot_contact: 'Contact', foot_the_funnel: 'De funnel',
     lang_word: 'Taal',
     // onboarding
     ob_title: 'Start je merk', ob_ind_account: 'Account', ob_ind_channels: 'Kanalen', ob_ind_brand: 'Merk',
@@ -163,12 +162,11 @@ const STR = {
     eb_flow: 'How it works', flow_h2: 'Personal branding for founders',
     flow_lede: 'Simply approve or reject posts. Our AI signals trending niche topics and prepares ready made posts for you, based on your style, voice, personality and goals.',
     eb_channels: 'Channels', channels_h2a: 'Your voice,', channels_h2b: 'tuned per channel.',
-    eb_control: 'The human review', control_h2: 'Three moments where you decide.',
+    eb_control: 'The human review', control_h2: 'Two moments where you decide.',
     rv1_t: 'Topic selection', rv1_d: 'AI signals trending topics in your niche. You decide which ones go ahead.',
-    rv2_t: 'The draft', rv2_d: 'Every post is ready as a preview, in your voice. Edit freely or leave it.',
-    rv3_t: 'Approval', rv3_d: 'Approve, adjust or reject. Nothing goes live without your sign-off.',
+    rv2_t: 'Draft and approval', rv2_d: 'Every post is ready as a preview, in your voice. Edit freely, approve or reject. Nothing goes live without your sign-off.',
     eb_contact: 'Contact', contact_h2a: 'Talk to us about', contact_h2b: 'your founder brand.',
-    foot_tag: 'Founders are their brand.', foot_app: 'App', foot_learn: 'Channels', foot_contact: 'Contact', foot_the_funnel: 'The funnel',
+    foot_tag: 'Founder as a brand.', foot_app: 'App', foot_learn: 'Channels', foot_contact: 'Contact', foot_the_funnel: 'The funnel',
     lang_word: 'Language',
     ob_title: 'Start your brand', ob_ind_account: 'Account', ob_ind_channels: 'Channels', ob_ind_brand: 'Brand',
     ob_choice_h: 'How do you want to start?',
@@ -344,6 +342,29 @@ const CHANNELS = [
   },
 ];
 const channelById = (id) => CHANNELS.find((c) => c.id === id) || CHANNELS[0];
+
+const ENGAGEMENT_DEMO = {
+  author: 'Mike Warren',
+  role: { nl: 'Creative Director @ Sports United', en: 'Creative Director @ Sports United' },
+  copy: {
+    linkedin: {
+      nl: 'We hebben zes maanden stilletjes iets gebouwd.\n\nEen AI-tool die je eigen voetbalschoen laat ontwerpen, van silhouet tot stiksel, in minuten.\n\nGeen designdiploma nodig. Alleen jouw idee.\n\nWoensdag laat ik in een gratis webinar precies zien hoe het werkt en waarom we dit maakten.\n\nWat zou jouw eerste ontwerp worden? Reageer hieronder.',
+      en: 'We quietly built something for six months.\n\nAn AI tool that lets you design your own football cleat, from silhouette to stitching, in minutes.\n\nNo design degree needed. Just your idea.\n\nWednesday I will show exactly how it works in a free webinar, and why we built it.\n\nWhat would your first design be? Drop it below.',
+    },
+    instagram: {
+      nl: 'Jouw schoen. Jouw regels. Nu met AI. \u26bd\ufe0f\n\nWoensdag onthullen we hoe je in minuten je eigen cleat ontwerpt. Gratis webinar, link in bio.\n\nWie ontwerp jij als eerste?',
+      en: 'Your boot. Your rules. Now with AI. \u26bd\ufe0f\n\nWednesday we reveal how you design your own cleat in minutes. Free webinar, link in bio.\n\nWho are you designing first?',
+    },
+    x: {
+      nl: 'We hebben een AI gebouwd die je eigen voetbalschoen ontwerpt in minuten.\n\nWoensdag, gratis webinar, ik laat alles zien.\n\nWat wordt jouw eerste ontwerp?',
+      en: 'We built an AI that designs your own football cleat in minutes.\n\nWednesday, free webinar, I show all of it.\n\nWhat is your first design?',
+    },
+    facebook: {
+      nl: 'Zes maanden werk, nu eindelijk klaar: een AI-tool waarmee iedereen zijn eigen voetbalschoen ontwerpt.\n\nWoensdag leg ik in een gratis webinar uit hoe het werkt. Wat zou jij als eerste maken?',
+      en: 'Six months of work, finally ready: an AI tool that lets anyone design their own football cleat.\n\nWednesday I explain how it works in a free webinar. What would you make first?',
+    },
+  },
+};
 
 // ---------- Environment shim ----------
 const IN_ARTIFACT = typeof window !== 'undefined' && !!window.storage;
@@ -824,11 +845,72 @@ Write in ${langName(lang)}. Rules:
 }
 
 // ---------- Home ----------
+function CleatCreative({ className }) {
+  return (
+    <svg className={'creative' + (className ? ' ' + className : '')} viewBox="0 0 640 360" role="img" aria-label="Create on and off the pitch">
+      <defs>
+        <linearGradient id="cr-bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#0C2F5A" />
+          <stop offset="0.5" stopColor="#12386B" />
+          <stop offset="1" stopColor="#0A1730" />
+        </linearGradient>
+        <linearGradient id="cr-gold" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#E9C46A" />
+          <stop offset="1" stopColor="#B8862F" />
+        </linearGradient>
+        <linearGradient id="cr-flame" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#FF6A3D" />
+          <stop offset="0.6" stopColor="#E7235A" />
+          <stop offset="1" stopColor="#7A1E3C" />
+        </linearGradient>
+        <radialGradient id="cr-glow" cx="0.5" cy="0.42" r="0.5">
+          <stop offset="0" stopColor="#ffffff" stopOpacity="0.5" />
+          <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id="cr-fadeL" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#E9C46A" stopOpacity="0.9" />
+          <stop offset="1" stopColor="#E9C46A" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id="cr-fadeR" x1="1" y1="0" x2="0" y2="0">
+          <stop offset="0" stopColor="#FF6A3D" stopOpacity="0.9" />
+          <stop offset="1" stopColor="#FF6A3D" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+
+      <rect width="640" height="360" fill="url(#cr-bg)" />
+      <rect width="640" height="360" fill="url(#cr-glow)" />
+
+      {/* left face silhouette, gold */}
+      <g fill="url(#cr-gold)" opacity="0.96">
+        <path d="M150 360c0-42 2-70 2-96 0-14-8-20-8-38 0-30 22-54 52-54 12 0 20 4 26 10 8 8 12 20 12 40 0 26-10 40-10 60 0 22 4 44 4 78z" />
+        <circle cx="196" cy="150" r="7" fill="#0A1730" />
+      </g>
+      <rect x="60" y="150" width="150" height="14" rx="7" fill="url(#cr-fadeL)" opacity="0.5" />
+
+      {/* right face silhouette, flame */}
+      <g fill="url(#cr-flame)" opacity="0.96">
+        <path d="M490 360c0-42-2-70-2-96 0-14 8-20 8-38 0-30-22-54-52-54-12 0-20 4-26 10-8 8-12 20-12 40 0 26 10 40 10 60 0 22-4 44-4 78z" />
+        <circle cx="444" cy="150" r="7" fill="#ffffff" />
+      </g>
+      <rect x="430" y="150" width="150" height="14" rx="7" fill="url(#cr-fadeR)" opacity="0.5" />
+
+      {/* original dynamic mark, not a real brand */}
+      <path d="M296 116c34-14 62-16 48 6-10 16-40 24-70 26 26-6 44-16 22-32z" fill="#ffffff" opacity="0.95" />
+
+      {/* slogan */}
+      <text x="320" y="250" textAnchor="middle" className="cr-slogan-a">CREATE ON</text>
+      <text x="320" y="292" textAnchor="middle" className="cr-slogan-b">and off the pitch</text>
+    </svg>
+  );
+}
+
 function FunnelViz({ t, lang }) {
   const [phase, setPhase] = useState('reach');
-  const W = 1000, H = 330, cy = 145, labelY = 318, segW = W / FUNNEL.length;
+  const [demoCh, setDemoCh] = useState('linkedin');
+  const W = 1000, H = 330, cy = 145, segW = W / FUNNEL.length;
   const hs = [...FUNNEL.map((f) => f.w * 2.6), FUNNEL[FUNNEL.length - 1].w * 2.6 * 0.7];
   const f = FUNNEL.find((x) => x.id === phase) || FUNNEL[0];
+  const dch = channelById(demoCh);
   return (
     <div className="hfunnel">
       <svg className="bowtie" viewBox={`0 0 ${W} ${H}`} role="group" aria-label={t('eb_funnel')}>
@@ -843,8 +925,8 @@ function FunnelViz({ t, lang }) {
               role="button" tabIndex={0} aria-pressed={on}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setPhase(fu.id); } }}>
               <polygon points={pts} fill={fu.c} />
-              {fu.ic({ x: cx - 15, y: cy - 15, width: 30, height: 30, color: '#fff', className: 'bic' })}
-              <text x={cx} y={labelY} textAnchor="middle" className="blbl">{fu.t[lang]}</text>
+              {fu.ic({ x: cx - 15, y: cy - 26, width: 30, height: 30, color: '#fff', className: 'bic' })}
+              <text x={cx} y={cy + 30} textAnchor="middle" className="blbl">{fu.t[lang].split(' ').map((w) => w.charAt(0).toUpperCase()).join('')}</text>
             </g>
           );
         })}
@@ -853,6 +935,33 @@ function FunnelViz({ t, lang }) {
         <span className="fnote-ic" style={{ background: f.c }}>{f.ic({ width: 16, height: 16 })}</span>
         <div className="fnote-body">
           <p className="fnote-d"><b>{f.t[lang]}.</b> {f.j[lang]}</p>
+
+          {phase === 'engagement' && (
+            <div className="demo">
+              <div className="demo-tabs">
+                {CHANNELS.map((c) => (
+                  <button key={c.id} className={'fch' + (demoCh === c.id ? ' fch-on' : '')} style={{ '--cc': c.c }}
+                    onClick={() => setDemoCh(c.id)} aria-label={c.name} aria-pressed={demoCh === c.id}>
+                    {c.ic({ width: 16, height: 16 })}
+                  </button>
+                ))}
+              </div>
+              <div className="ch-post ch-post-big demo-post" style={{ '--cc': dch.c }}>
+                <div className="ch-post-top">
+                  <span className="ch-ava" style={{ background: dch.c }}>{dch.ic({ width: 18, height: 18, color: '#fff' })}</span>
+                  <div><div className="ch-post-name">{ENGAGEMENT_DEMO.author}</div><div className="ch-post-sub">{ENGAGEMENT_DEMO.role[lang]} &middot; {dch.name}</div></div>
+                  <span className="ch-post-badge" style={{ color: dch.c }}>{dch.ic({ width: 18, height: 18 })}</span>
+                </div>
+                <p className="ch-post-text demo-text">{ENGAGEMENT_DEMO.copy[demoCh][lang]}</p>
+                <CleatCreative className="demo-creative" />
+                <div className="ch-post-actions">
+                  <span><I.heart width="16" height="16" /> 842</span>
+                  <span><I.message width="16" height="16" /> 214</span>
+                  <span><I.send width="16" height="16" /> 96</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -954,30 +1063,18 @@ function Home({ t, lang, go }) {
             </div>
             <div className="rv-card">
               <svg className="rv-visual" viewBox="0 0 150 92" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <rect x="26" y="10" width="98" height="72" rx="9" opacity="0.55" />
-                <circle cx="42" cy="26" r="6" opacity="0.55" />
-                <line x1="54" y1="23" x2="92" y2="23" opacity="0.55" />
-                <line x1="54" y1="30" x2="80" y2="30" opacity="0.35" />
-                <line x1="38" y1="46" x2="112" y2="46" opacity="0.35" />
-                <line x1="38" y1="55" x2="104" y2="55" opacity="0.35" />
-                <line x1="38" y1="64" x2="96" y2="64" className="rv-blue" />
-                <path d="M116 74l14 -14 6 6 -14 14 -7.5 1.5z" className="rv-blue" fill="var(--white)" />
+                <rect x="26" y="6" width="98" height="52" rx="9" opacity="0.55" />
+                <circle cx="42" cy="20" r="6" opacity="0.55" />
+                <line x1="54" y1="17" x2="92" y2="17" opacity="0.55" />
+                <line x1="38" y1="36" x2="112" y2="36" opacity="0.35" />
+                <line x1="38" y1="45" x2="96" y2="45" className="rv-blue" />
+                <path d="M104 40l10 -10 6 6 -10 10 -5.5 1z" className="rv-blue" fill="var(--white)" />
+                <rect x="34" y="70" width="40" height="16" rx="8" className="rv-fill" stroke="none" />
+                <path d="M46 78l3.5 3.5 8 -8" stroke="#fff" />
+                <rect x="82" y="70" width="34" height="16" rx="8" opacity="0.5" />
+                <path d="M95 74l8 8 M103 74l-8 8" opacity="0.5" />
               </svg>
               <h3>{t('rv2_t')}</h3><p>{t('rv2_d')}</p>
-            </div>
-            <div className="rv-card">
-              <svg className="rv-visual" viewBox="0 0 150 92" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <rect x="26" y="8" width="98" height="52" rx="9" opacity="0.55" />
-                <circle cx="42" cy="22" r="6" opacity="0.55" />
-                <line x1="54" y1="19" x2="92" y2="19" opacity="0.55" />
-                <line x1="38" y1="38" x2="112" y2="38" opacity="0.35" />
-                <line x1="38" y1="47" x2="98" y2="47" opacity="0.35" />
-                <rect x="34" y="68" width="38" height="16" rx="8" className="rv-fill" stroke="none" />
-                <path d="M46 76l3.5 3.5 8 -8" stroke="#fff" />
-                <rect x="80" y="68" width="38" height="16" rx="8" opacity="0.55" />
-                <path d="M94 72l8 8 M102 72l-8 8" opacity="0.55" />
-              </svg>
-              <h3>{t('rv3_t')}</h3><p>{t('rv3_d')}</p>
             </div>
           </div>
         </div>
@@ -1806,7 +1903,7 @@ const CSS = `
 .hero-cta { display:flex; gap:13px; justify-content:center; flex-wrap:wrap; position:relative; z-index:1; }
 
 /* sections */
-.sect { padding-top:88px; }
+.sect { padding-top:88px; scroll-margin-top:82px; }
 .h2 { font-family:'Fraunces',serif; font-weight:400; font-size:clamp(28px,4vw,42px); letter-spacing:-0.02em; line-height:1.12; margin:14px 0 28px; text-wrap:balance; }
 
 /* funnel */
@@ -1820,14 +1917,23 @@ const CSS = `
 .bic { pointer-events:none; }
 .blbl { font-family:'IBM Plex Mono',monospace; font-size:30px; font-weight:600; fill:var(--mut); letter-spacing:0.04em; }
 .bseg-on .blbl { fill:var(--blue); }
+.creative { width:100%; height:auto; display:block; border-radius:12px; }
+.cr-slogan-a { font-family:'Fraunces',serif; font-weight:600; font-size:44px; fill:#ffffff; letter-spacing:0.01em; }
+.cr-slogan-b { font-family:'Fraunces',serif; font-style:italic; font-weight:400; font-size:28px; fill:#EAF1FA; }
 .fnote { display:flex; gap:14px; align-items:flex-start; background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:18px; }
 .fnote-ic { width:32px; height:32px; border-radius:9px; color:#fff; display:inline-flex; align-items:center; justify-content:center; flex:none; }
 .fnote-body { display:flex; flex-direction:column; gap:12px; min-width:0; flex:1; }
 .fnote-d { margin:0; color:var(--mut); font-size:14.5px; line-height:1.6; }
 .fnote-d b { color:var(--ink); font-weight:600; }
-.fch { width:38px; height:38px; border-radius:11px; border:1px solid var(--line); background:var(--white); color:var(--dim); display:inline-flex; align-items:center; justify-content:center; transition:color .15s, border-color .15s, transform .12s; }
+.demo { margin-top:14px; }
+.demo-tabs { display:flex; gap:9px; margin-bottom:12px; }
+.demo-post { width:100%; box-sizing:border-box; }
+.demo-text { white-space:pre-wrap; margin-bottom:14px; }
+.demo-creative { margin:4px 0 6px; border:1px solid var(--line); }
+.fch { width:44px; height:44px; border-radius:12px; border:1px solid var(--line); background:var(--white); color:var(--dim); display:inline-flex; align-items:center; justify-content:center; transition:color .15s, border-color .15s, background .15s, transform .12s; }
 .fch:hover { transform:translateY(-1px); color:var(--cc); }
-.fch-on { color:#fff; background:var(--cc); border-color:var(--cc); }
+.fch-on { color:#fff; background:var(--cc); border-color:var(--cc); box-shadow:0 6px 16px color-mix(in srgb, var(--cc) 35%, transparent); }
+.fch-on svg { color:#fff; }
 
 /* userflow */
 .flow { display:flex; align-items:stretch; gap:10px; margin-top:8px; }
@@ -1860,7 +1966,7 @@ const CSS = `
 .ctrl-head { display:flex; gap:18px; align-items:center; margin-bottom:20px; }
 .ctrl-ic { display:inline-flex; width:56px; height:56px; align-items:center; justify-content:center; border-radius:16px; background:var(--blue); color:#fff; flex:none; }
 .ctrl-head .h2 { margin:8px 0 0; }
-.rv-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.rv-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
 .rv-card { background:var(--white); border:1px solid var(--line); border-radius:16px; padding:20px; display:flex; flex-direction:column; gap:6px; }
 .rv-visual { width:100%; max-width:190px; height:auto; color:var(--ink); margin:0 auto 14px; display:block; }
 .rv-visual .rv-blue { stroke:var(--blue); }
