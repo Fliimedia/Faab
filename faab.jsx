@@ -962,8 +962,8 @@ function FunnelViz({ t, lang }) {
               role="button" tabIndex={0} aria-pressed={on}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setPhase(fu.id); } }}>
               <polygon points={pts} fill={fu.c} />
-              {fu.ic({ x: cx - 14, y: cy - 30, width: 28, height: 28, color: '#fff', className: 'bic' })}
-              <text x={cx} y={cy + 30} textAnchor="middle" className="blbl">{fu.t[lang].split(' ').map((w) => w.charAt(0).toUpperCase()).join('')}</text>
+              {fu.ic({ x: cx - 14, y: cy - 34, width: 28, height: 28, color: '#fff', className: 'bic' })}
+              <text x={cx} y={cy + 32} textAnchor="middle" className="blbl">{fu.t[lang].split(' ').map((w) => w.charAt(0).toUpperCase()).join('')}</text>
             </g>
           );
         })}
@@ -2010,7 +2010,7 @@ const CSS = `
 .bseg:focus-visible polygon { stroke:#fff; stroke-width:2; }
 .bseg-on polygon { opacity:1; filter:brightness(1.1); stroke:#fff; stroke-width:1.4; }
 .bic { pointer-events:none; }
-.blbl { font-family:'Fraunces',serif; font-size:44px; font-weight:600; fill:#ffffff; letter-spacing:0.02em; }
+.blbl { font-family:'Fraunces',serif; font-size:34px; font-weight:600; fill:#ffffff; letter-spacing:0.02em; }
 .bseg-on .blbl { fill:#ffffff; }
 .creative { width:100%; height:auto; display:block; border-radius:12px; }
 .cr-slogan-a { font-family:'Fraunces',serif; font-weight:600; font-size:44px; fill:#ffffff; letter-spacing:0.01em; }
