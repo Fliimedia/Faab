@@ -90,7 +90,7 @@ const STR = {
     eb_funnel: 'De funnel', funnel_h2a: 'Van bereik tot ambassadeurschap,', funnel_h2b: 'in vijf fasen.',
     funnel_lede: 'Elke post krijgt een plek in de klantreis: zo werkt je content gericht van eerste kennismaking naar ambassadeur.',
     eb_flow: 'Hoe het werkt', flow_h2: 'Personal branding voor founders',
-    flow_lede: 'Keur posts simpelweg goed of af. Onze AI signaleert trending onderwerpen in jouw niche en zet kant-en-klare posts voor je klaar, op basis van jouw stijl, stem, persoonlijkheid en doelen.',
+    flow_lede: 'Keur posts simpelweg goed of af. Onze AI signaleert trending onderwerpen in jouw niche en zet ze om naar kant-en-klare posts in de stijl van jouw merkpersoonlijkheid.',
     eb_channels: 'Kanalen', channels_h2a: 'Jouw voice,', channels_h2b: 'afgestemd per kanaal.',
     eb_control: 'De human review', control_h2: 'Twee momenten waarop jij beslist.',
     rv1_t: 'Onderwerpkeuze', rv1_d: 'AI signaleert trending onderwerpen in jouw niche. Jij bepaalt welke doorgaan.',
@@ -962,7 +962,7 @@ function FunnelViz({ t, lang }) {
               role="button" tabIndex={0} aria-pressed={on}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setPhase(fu.id); } }}>
               <polygon points={pts} fill={fu.c} />
-              {fu.ic({ x: cx - 15, y: cy - 26, width: 30, height: 30, color: '#fff', className: 'bic' })}
+              {fu.ic({ x: cx - 14, y: cy - 30, width: 28, height: 28, color: '#fff', className: 'bic' })}
               <text x={cx} y={cy + 30} textAnchor="middle" className="blbl">{fu.t[lang].split(' ').map((w) => w.charAt(0).toUpperCase()).join('')}</text>
             </g>
           );
@@ -1020,13 +1020,6 @@ function Home({ t, lang, go }) {
         </div>
       </section>
 
-      <section id="funnel" className="sect wrap">
-        <div className="eyebrow">{t('eb_funnel')}</div>
-        <h2 className="h2">{t('funnel_h2a')}<br className="bk" /> {t('funnel_h2b')}</h2>
-        <p className="sect-lede">{t('funnel_lede')}</p>
-        <FunnelViz t={t} lang={lang} />
-      </section>
-
       <section id="flow" className="sect wrap">
         <div className="eyebrow">{t('eb_flow')}</div>
         <h2 className="h2">{t('flow_h2')}</h2>
@@ -1044,6 +1037,13 @@ function Home({ t, lang, go }) {
             </React.Fragment>
           ))}
         </div>
+      </section>
+
+      <section id="funnel" className="sect wrap">
+        <div className="eyebrow">{t('eb_funnel')}</div>
+        <h2 className="h2">{t('funnel_h2a')}<br className="bk" /> {t('funnel_h2b')}</h2>
+        <p className="sect-lede">{t('funnel_lede')}</p>
+        <FunnelViz t={t} lang={lang} />
       </section>
 
       <section id="channels" className="sect wrap">
@@ -2010,8 +2010,8 @@ const CSS = `
 .bseg:focus-visible polygon { stroke:#fff; stroke-width:2; }
 .bseg-on polygon { opacity:1; filter:brightness(1.1); stroke:#fff; stroke-width:1.4; }
 .bic { pointer-events:none; }
-.blbl { font-family:'IBM Plex Mono',monospace; font-size:30px; font-weight:600; fill:var(--mut); letter-spacing:0.04em; }
-.bseg-on .blbl { fill:var(--blue); }
+.blbl { font-family:'Fraunces',serif; font-size:44px; font-weight:600; fill:#ffffff; letter-spacing:0.02em; }
+.bseg-on .blbl { fill:#ffffff; }
 .creative { width:100%; height:auto; display:block; border-radius:12px; }
 .cr-slogan-a { font-family:'Fraunces',serif; font-weight:600; font-size:44px; fill:#ffffff; letter-spacing:0.01em; }
 .cr-slogan-b { font-family:'Fraunces',serif; font-style:italic; font-weight:400; font-size:28px; fill:#EAF1FA; }
