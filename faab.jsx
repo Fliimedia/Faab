@@ -285,75 +285,6 @@ const CHANNELS = [
     },
     sample: { nl: 'Onpopulaire mening: je founderprofiel verslaat je bedrijfspagina. Elke week weer.', en: 'Unpopular opinion: your founder profile beats your company page. Every single week.' },
   },
-  {
-    id: 'instagram', name: 'Instagram', ic: I.instagram, c: '#C13584',
-    strat: {
-      nl: 'Instagram maakt je merk menselijk. Hier laat je de founder achter het bedrijf zien: behind-the-scenes, het team, mijlpalen en visuele storytelling. Reels dragen het bereik, carrousels dragen de diepgang, Stories dragen de band. De feed is je etalage: consistente stijl in kleur en toon herkent men in een halve seconde.',
-      en: 'Instagram humanizes your brand. Show the founder behind the company: behind-the-scenes, the team, milestones and visual storytelling. Reels carry reach, carousels carry depth, Stories carry the bond. The feed is your storefront: a consistent style in color and tone is recognized in half a second.',
-    },
-    placements: {
-      nl: ['Reel', 'Carrouselpost', 'Story', 'Feedpost (foto of video)'],
-      en: ['Reel', 'Carousel post', 'Story', 'Feed post (photo or video)'],
-    },
-    tone: {
-      nl: 'Warm, visueel en dichtbij. Kortere zinnen dan op LinkedIn, meer emotie, af en toe een emoji. Caption opent sterk, want de rest klapt in.',
-      en: 'Warm, visual and close. Shorter sentences than LinkedIn, more emotion, an occasional emoji. The caption opens strong, the rest folds away.',
-    },
-    ex: {
-      reach: { nl: 'Dag 1 vs dag 400 van ons bedrijf. Zelfde missie, ander kantoor.', en: 'Day 1 vs day 400 of our company. Same mission, different office.' },
-      engagement: { nl: 'Welke kies jij: sneller groeien of rustiger bouwen? Stem in de comments.', en: 'Which one do you pick: grow faster or build calmer? Vote in the comments.' },
-      followers: { nl: 'Elke vrijdag: een blik achter de schermen bij het bouwen van ons merk. Volg mee.', en: 'Every Friday: a look behind the scenes of building our brand. Follow along.' },
-      revenue: { nl: 'Van aanvraag tot resultaat in vier stappen. Swipe voor hoe we dat aanpakken.', en: 'From request to result in four steps. Swipe to see how we do it.' },
-      ambassadorship: { nl: 'Onze klanten zeggen het mooier dan wij. Deel dit met iemand die dit nodig heeft.', en: 'Our clients say it better than we do. Share this with someone who needs it.' },
-    },
-    sample: { nl: 'Dag 1 vs dag 400. Zelfde missie, ander verhaal. Swipe.', en: 'Day 1 vs day 400. Same mission, different story. Swipe.' },
-  },
-  {
-    id: 'x', name: 'X', ic: I.xsocial, c: '#171717',
-    strat: {
-      nl: 'X is het snelste kanaal: hier reageer je op nieuws terwijl het nog nieuws is en bouw je een reputatie met scherpe, korte gedachten. Een sterke one-liner doet meer dan een lang betoog; threads gebruik je voor de uitwerking. Wees vroeg, wees stellig en ga het gesprek aan in de replies, daar wordt het volgen verdiend.',
-      en: 'X is the fastest channel: react to news while it is still news and build a reputation with sharp, short thoughts. A strong one-liner beats a long argument; use threads for the build-out. Be early, be opinionated and join the conversation in the replies, that is where follows are earned.',
-    },
-    placements: {
-      nl: ['Timeline post', 'Thread', 'Video', 'Quote-post'],
-      en: ['Timeline post', 'Thread', 'Video', 'Quote post'],
-    },
-    tone: {
-      nl: 'Direct, puntig en met durf. Geen opwarmers, geen hashtag-stapels. Elke post kan op zichzelf staan.',
-      en: 'Direct, punchy and daring. No warm-ups, no hashtag piles. Every post can stand on its own.',
-    },
-    ex: {
-      reach: { nl: 'Je hebt geen contentkalender nodig. Je hebt een mening nodig.', en: 'You do not need a content calendar. You need an opinion.' },
-      engagement: { nl: 'Founders: wat was je duurste fout onder de 1000 euro? Ik begin.', en: 'Founders: what was your most expensive mistake under 1000 dollars? I will start.' },
-      followers: { nl: 'Ik bouw in het openbaar aan ons bedrijf. Alles wat werkt en niet werkt deel ik hier.', en: 'Building our company in public. Everything that works and does not work gets shared here.' },
-      revenue: { nl: 'We hebben dit kwartaal 3 diensten geschrapt en groeien sneller dan ooit. Thread over focus:', en: 'We cut 3 services this quarter and grow faster than ever. A thread on focus:' },
-      ambassadorship: { nl: 'De beste marketing is een klant die het doorvertelt. RT als je dit ook zo bouwt.', en: 'The best marketing is a client who passes it on. RT if you build like this too.' },
-    },
-    sample: { nl: 'Je hebt geen contentkalender nodig. Je hebt een mening nodig.', en: 'You do not need a content calendar. You need an opinion.' },
-  },
-  {
-    id: 'facebook', name: 'Facebook', ic: I.facebook, c: '#1877F2',
-    strat: {
-      nl: 'Facebook is het gemeenschapskanaal: lokaal bereik, groepen en een publiek dat verhalen leest in plaats van scant. Hier werken langere, persoonlijke verhalen, mijlpalen en vragen aan je community. Groepen rond je vakgebied zijn de verborgen groeimotor: wees daar behulpzaam zonder te verkopen.',
-      en: 'Facebook is the community channel: local reach, groups and an audience that reads stories instead of scanning. Longer personal stories, milestones and questions to your community work here. Groups around your field are the hidden growth engine: be helpful there without selling.',
-    },
-    placements: {
-      nl: ['Timeline post (tekst of foto)', 'Video', 'Story', 'Reel', 'Evenement of livesessie'],
-      en: ['Timeline post (text or photo)', 'Video', 'Story', 'Reel', 'Event or live session'],
-    },
-    tone: {
-      nl: 'Verhalend en toegankelijk. Iets langer mag, zolang het persoonlijk blijft. Schrijf zoals je het aan een bekende zou vertellen.',
-      en: 'Narrative and approachable. A bit longer is fine, as long as it stays personal. Write like you would tell it to someone you know.',
-    },
-    ex: {
-      reach: { nl: 'Vijf jaar geleden begon dit bedrijf aan een keukentafel. Vandaag een nieuwe mijlpaal. Het hele verhaal:', en: 'Five years ago this company started at a kitchen table. Today a new milestone. The full story:' },
-      engagement: { nl: 'Ondernemers hier: wat is het beste advies dat je ooit kreeg? De reacties worden goud.', en: 'Business owners here: what is the best advice you ever got? The comments will be gold.' },
-      followers: { nl: 'Elke maand delen we hier wat we leerden van onze klanten. Volg de pagina om niets te missen.', en: 'Every month we share what we learned from our clients here. Follow the page so you miss nothing.' },
-      revenue: { nl: 'We hebben plek voor twee nieuwe projecten deze maand. Stuur een bericht en we denken vrijblijvend mee.', en: 'We have room for two new projects this month. Send a message and we will think along, no strings attached.' },
-      ambassadorship: { nl: 'Zonder jullie was deze mijlpaal er niet. Ken je iemand die we kunnen helpen? Deel dit bericht.', en: 'This milestone would not exist without you. Know someone we can help? Share this post.' },
-    },
-    sample: { nl: 'Vijf jaar geleden: een keukentafel. Vandaag: een team van tien. Het hele verhaal in de comments.', en: 'Five years ago: a kitchen table. Today: a team of ten. Full story in the comments.' },
-  },
 ];
 const channelById = (id) => CHANNELS.find((c) => c.id === id) || CHANNELS[0];
 
@@ -364,18 +295,6 @@ const ENGAGEMENT_DEMO = {
     linkedin: {
       nl: 'We hebben zes maanden stilletjes iets gebouwd.\n\nEen AI-tool die je eigen voetbalschoen laat ontwerpen, van silhouet tot stiksel, in minuten.\n\nGeen designdiploma nodig. Alleen jouw idee.\n\nWoensdag laat ik in een gratis webinar precies zien hoe het werkt en waarom we dit maakten.\n\nWat zou jouw eerste ontwerp worden? Reageer hieronder.',
       en: 'We quietly built something for six months.\n\nAn AI tool that lets you design your own football cleat, from silhouette to stitching, in minutes.\n\nNo design degree needed. Just your idea.\n\nWednesday I will show exactly how it works in a free webinar, and why we built it.\n\nWhat would your first design be? Drop it below.',
-    },
-    instagram: {
-      nl: 'Jouw schoen. Jouw regels. Nu met AI. \u26bd\ufe0f\n\nWoensdag onthullen we hoe je in minuten je eigen cleat ontwerpt. Gratis webinar, link in bio.\n\nWie ontwerp jij als eerste?',
-      en: 'Your boot. Your rules. Now with AI. \u26bd\ufe0f\n\nWednesday we reveal how you design your own cleat in minutes. Free webinar, link in bio.\n\nWho are you designing first?',
-    },
-    x: {
-      nl: 'We hebben een AI gebouwd die je eigen voetbalschoen ontwerpt in minuten.\n\nWoensdag, gratis webinar, ik laat alles zien.\n\nWat wordt jouw eerste ontwerp?',
-      en: 'We built an AI that designs your own football cleat in minutes.\n\nWednesday, free webinar, I show all of it.\n\nWhat is your first design?',
-    },
-    facebook: {
-      nl: 'Zes maanden werk, nu eindelijk klaar: een AI-tool waarmee iedereen zijn eigen voetbalschoen ontwerpt.\n\nWoensdag leg ik in een gratis webinar uit hoe het werkt. Wat zou jij als eerste maken?',
-      en: 'Six months of work, finally ready: an AI tool that lets anyone design their own football cleat.\n\nWednesday I explain how it works in a free webinar. What would you make first?',
     },
   },
 };
@@ -447,15 +366,15 @@ function Field({ label, hint, children }) {
 // ---------- Default state ----------
 const emptyBrand = () => ({
   company: '', role: '', name: '', website: '', logo: '', description: '', audience: '',
-  personality: '', colors: [], services: [], docs: [], tone: '', socials: { linkedin: '', instagram: '', x: '', facebook: '' },
+  personality: '', colors: [], services: [], docs: [], tone: '', socials: { linkedin: '' },
   channelExamples: {},
   voice: emptyVoice(),
 });
 const emptyVoice = () => ({
   base: '',
   traits: [],
-  perChannel: { linkedin: '', instagram: '', x: '', facebook: '' },
-  samples: { linkedin: '', instagram: '', x: '', facebook: '' },
+  perChannel: { linkedin: '' },
+  samples: { linkedin: '' },
   sources: [],
   updated: 0,
 });
@@ -781,7 +700,6 @@ Write in ${langName(lang)}. Rules:
   const MENU = [
     { k: 'home', label: t('nav_home'), act: () => go('home') },
     { k: 'how', label: t('nav_how'), act: () => { go('home'); setTimeout(() => { const el = document.getElementById('flow'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 60); } },
-    { k: 'channels', label: t('nav_channels'), act: () => { go('home'); setTimeout(() => { const el = document.getElementById('channels'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 60); } },
     ...(setupDone ? [{ k: 'cms', label: t('nav_cms'), act: () => go('cms') }] : []),
     { k: 'start', label: t('nav_start'), act: () => go('onboarding') },
   ];
@@ -865,7 +783,7 @@ Write in ${langName(lang)}. Rules:
             </div>
             <div className="foot-col">
               <span className="foot-h">{t('foot_learn')}</span>
-              {CHANNELS.map((c) => <button className="foot-link" key={c.id} onClick={() => go('channel:' + c.id)}>{c.name}</button>)}
+              <button className="foot-link" onClick={() => go('channel:linkedin')}>LinkedIn</button>
             </div>
           </div>
           <div className="foot-base">
@@ -943,11 +861,10 @@ function CleatCreative({ className }) {
 
 function FunnelViz({ t, lang }) {
   const [phase, setPhase] = useState('reach');
-  const [demoCh, setDemoCh] = useState('linkedin');
   const W = 1000, H = 330, cy = 145, segW = W / FUNNEL.length;
   const hs = [...FUNNEL.map((f) => f.w * 2.6), FUNNEL[FUNNEL.length - 1].w * 2.6 * 0.7];
   const f = FUNNEL.find((x) => x.id === phase) || FUNNEL[0];
-  const dch = channelById(demoCh);
+  const dch = channelById('linkedin');
   return (
     <div className="hfunnel">
       <svg className="bowtie" viewBox={`0 0 ${W} ${H}`} role="group" aria-label={t('eb_funnel')}>
@@ -975,21 +892,13 @@ function FunnelViz({ t, lang }) {
 
           {phase === 'engagement' && (
             <div className="demo">
-              <div className="demo-tabs">
-                {CHANNELS.map((c) => (
-                  <button key={c.id} className={'fch' + (demoCh === c.id ? ' fch-on' : '')} style={{ '--cc': c.c }}
-                    onClick={() => setDemoCh(c.id)} aria-label={c.name} aria-pressed={demoCh === c.id}>
-                    {c.ic({ width: 16, height: 16 })}
-                  </button>
-                ))}
-              </div>
               <div className="ch-post ch-post-big demo-post" style={{ '--cc': dch.c }}>
                 <div className="ch-post-top">
                   <span className="ch-ava" style={{ background: dch.c }}>{dch.ic({ width: 18, height: 18, color: '#fff' })}</span>
                   <div><div className="ch-post-name">{ENGAGEMENT_DEMO.author}</div><div className="ch-post-sub">{ENGAGEMENT_DEMO.role[lang]} &middot; {dch.name}</div></div>
                   <span className="ch-post-badge" style={{ color: dch.c }}>{dch.ic({ width: 18, height: 18 })}</span>
                 </div>
-                <p className="ch-post-text demo-text">{ENGAGEMENT_DEMO.copy[demoCh][lang]}</p>
+                <p className="ch-post-text demo-text">{ENGAGEMENT_DEMO.copy.linkedin[lang]}</p>
                 <CleatCreative className="demo-creative" />
                 <div className="ch-post-actions">
                   <span><I.heart width="16" height="16" /> 842</span>
@@ -1006,8 +915,6 @@ function FunnelViz({ t, lang }) {
 }
 
 function Home({ t, lang, go }) {
-  const [prevCh, setPrevCh] = useState('linkedin');
-  const pc = channelById(prevCh);
   return (
     <main>
       <section className="hero wrap">
@@ -1044,38 +951,6 @@ function Home({ t, lang, go }) {
         <h2 className="h2">{t('funnel_h2a')}<br className="bk" /> {t('funnel_h2b')}</h2>
         <p className="sect-lede">{t('funnel_lede')}</p>
         <FunnelViz t={t} lang={lang} />
-      </section>
-
-      <section id="channels" className="sect wrap">
-        <div className="eyebrow">{t('eb_channels')}</div>
-        <h2 className="h2">{t('channels_h2a')}<br className="bk" /> {t('channels_h2b')}</h2>
-        <div className="ch-tabs" role="tablist">
-          {CHANNELS.map((c) => (
-            <button key={c.id} role="tab" aria-selected={prevCh === c.id}
-              className={'fch' + (prevCh === c.id ? ' fch-on' : '')} style={{ '--cc': c.c }}
-              onClick={() => setPrevCh(c.id)} aria-label={c.name}>
-              {c.ic({ width: 18, height: 18 })}
-            </button>
-          ))}
-        </div>
-        <div className="ch-stage">
-          <div className="ch-post ch-post-big" style={{ '--cc': pc.c }}>
-            <div className="ch-post-top">
-              <span className="ch-ava" style={{ background: pc.c }}>{Logo.mark({ width: 20, height: 20 })}</span>
-              <div><div className="ch-post-name">Founder</div><div className="ch-post-sub">@founder &middot; {pc.name}</div></div>
-              <span className="ch-post-badge" style={{ color: pc.c }}>{pc.ic({ width: 18, height: 18 })}</span>
-            </div>
-            <p className="ch-post-text">{pc.sample[lang]}</p>
-            <div className="ch-post-actions">
-              <span><I.heart width="16" height="16" /> 128</span>
-              <span><I.message width="16" height="16" /> 32</span>
-              <span><I.send width="16" height="16" /> 11</span>
-            </div>
-          </div>
-          <button className="ch-open" style={{ color: pc.c }} onClick={() => go('channel:' + pc.id)}>
-            {pc.name} <I.arrow width="15" height="15" />
-          </button>
-        </div>
       </section>
 
       <section id="control" className="sect wrap">
